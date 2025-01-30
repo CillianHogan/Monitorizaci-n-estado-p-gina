@@ -39,8 +39,8 @@ class ApiEndpointsController < ApplicationController
   def destroy
     @api_endpoint.destroy
     redirect_to api_endpoints_url, notice: "API endpoint was successfully deleted."
-
   end
+
 
   private
 

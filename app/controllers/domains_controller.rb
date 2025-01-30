@@ -39,8 +39,8 @@ class DomainsController < ApplicationController
   def destroy
     @domain.destroy
     redirect_to domains_url, notice: "Domain was successfully deleted."
-
   end
+
 
   private
 
