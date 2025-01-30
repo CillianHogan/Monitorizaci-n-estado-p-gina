@@ -1,6 +1,6 @@
 class ApiEndpointsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_api_endpoint, only: [:show, :edit, :update, :destroy]
+  before_action :set_api_endpoint, only: [ :show, :edit, :update, :destroy ]
 
   def index
     @api_endpoints = current_user.api_endpoints
@@ -18,7 +18,7 @@ class ApiEndpointsController < ApplicationController
 
     if @api_endpoint.save
       @api_endpoint.check_status!
-      redirect_to @api_endpoint, notice: 'API endpoint was successfully created.'
+      redirect_to @api_endpoint, notice: "API endpoint was successfully created."
     else
       render :new, status: :unprocessable_entity
     end
@@ -30,7 +30,7 @@ class ApiEndpointsController < ApplicationController
   def update
     if @api_endpoint.update(api_endpoint_params)
       @api_endpoint.check_status!
-      redirect_to @api_endpoint, notice: 'API endpoint was successfully updated.'
+      redirect_to @api_endpoint, notice: "API endpoint was successfully updated."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -38,7 +38,8 @@ class ApiEndpointsController < ApplicationController
 
   def destroy
     @api_endpoint.destroy
-    redirect_to api_endpoints_url, notice: 'API endpoint was successfully deleted.'
+    redirect_to api_endpoints_url, notice: "API endpoint was successfully deleted."
+
   end
 
   private
