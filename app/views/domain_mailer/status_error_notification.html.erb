@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+</head>
+<body>
+  <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h1 style="color: #dc2626;">Domain Status Alert</h1>
+    
+    <p>Hello <%= @user.email %>,</p>
+
+    <p>We detected that your domain <strong><%= @domain.name %></strong> is currently experiencing issues.</p>
+
+    <p>Details:</p>
+    <ul>
+      <li>Domain URL: <%= @domain.url %></li>
+      <li>Current Status: <%= @domain.status %></li>
+      <li>Last Checked: <%= @domain.updated_at.strftime('%B %d, %Y at %H:%M UTC') %></li>
+    </ul>
+
+    <p>We will continue monitoring your domain and notify you when it's back online.</p>
+
+    <p>Best regards,<br>Domain Checker Team</p>
+  </div>
+</body>
+</html>

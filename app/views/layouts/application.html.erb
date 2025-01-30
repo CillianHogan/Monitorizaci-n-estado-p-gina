@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Domain Checker" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
+    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="bg-gradient-to-br from-indigo-50 to-blue-50 min-h-screen">
+    <header class="bg-gradient-to-r from-blue-600 to-indigo-600 shadow-lg">
+      <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+          <div class="flex-shrink-0">
+            <%= link_to root_path, class: "text-2xl font-bold text-white hover:text-blue-100 transition duration-150 ease-in-out" do %>
+              <h1>Domain Checker</h1>
+            <% end %>
+          </div>
+          <div class="flex items-center space-x-4">
+            <% if user_signed_in? %>
+              <div class="relative" data-controller="dropdown">
+                <button type="button" class="flex items-center space-x-2 text-white hover:text-blue-100" data-action="click->dropdown#toggle">
+                  <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  </svg>
+                  <span><%= current_user.email %></span>
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </button>
+                <div class="hidden absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5" role="menu" data-dropdown-target="menu">
+                  <%= link_to 'Mi perfil', edit_user_registration_path, class: 'block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50', role: 'menuitem' %>
+                  <%= link_to 'Mis Dominios', domains_path, class: 'block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50', role: 'menuitem' %>
+                  <%= button_to 'Cerrar sesión', destroy_user_session_path, method: :delete, class: 'w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50', role: 'menuitem' %>
+                </div>
+              </div>
+            <% else %>
+              <%= link_to 'Sign In', new_user_session_path, class: 'text-white hover:text-blue-100' %>
+              <%= link_to 'Register', new_user_registration_path, class: 'bg-white text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-md font-medium' %>
+            <% end %>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container mx-auto px-5 py-8">
+      <%= yield %>
+    </main>
+  </body>
+</html>
