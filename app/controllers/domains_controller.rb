@@ -1,6 +1,6 @@
 class DomainsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_domain, only: [:show, :edit, :update, :destroy]
+  before_action :set_domain, only: [ :show, :edit, :update, :destroy ]
 
   def index
     @domains = current_user.domains
@@ -45,7 +45,7 @@ class DomainsController < ApplicationController
   private
 
   def set_domain
-    @domain = current_user.domains.find(params[:id])
+    @domain = current_user.domains.find(params[ :id ])
   end
 
   def domain_params
