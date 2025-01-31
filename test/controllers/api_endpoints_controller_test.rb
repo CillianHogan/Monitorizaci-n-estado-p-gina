@@ -7,15 +7,25 @@ class ApiEndpointsControllerTest < ActionDispatch::IntegrationTest
     @user = users(:one)
     @api_endpoint = api_endpoints(:one)
     sign_in @user
+
+    # Stub HTTP request for API endpoint status checking
+    stub_request(:get, "https://api.example.com/")
+      .with(
+        headers: {
+          'Accept'=>'*/*',
+          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'User-Agent'=>'Ruby'
+        })
+      .to_return(status: 200, body: "{\"status\":\"ok\"}", headers: { 'Content-Type' => 'application/json' })
   end
 
   test "should get index" do
-    get api_endpoints_url
+    get api_endpoints_url, as: :html
     assert_response :success
   end
 
   test "should get new" do
-    get new_api_endpoint_url
+    get new_api_endpoint_url, as: :html
     assert_response :success
   end
 
@@ -37,16 +47,25 @@ class ApiEndpointsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should show api_endpoint" do
-    get api_endpoint_url(@api_endpoint)
+    get api_endpoint_url(@api_endpoint), as: :html
     assert_response :success
   end
 
   test "should get edit" do
-    get edit_api_endpoint_url(@api_endpoint)
+    get edit_api_endpoint_url(@api_endpoint), as: :html
     assert_response :success
   end
 
   test "should update api_endpoint" do
+    stub_request(:get, 'https://updated-api.example.com')
+      .with(
+        headers: {
+          'Accept'=>'*/*',
+          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'User-Agent'=>'Ruby'
+        })
+      .to_return(status: 200, body: '{"status":"ok"}', headers: { 'Content-Type' => 'application/json' })
+
     patch api_endpoint_url(@api_endpoint), params: {
       api_endpoint: {
         name: 'Updated API',
@@ -58,6 +77,7 @@ class ApiEndpointsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 'API endpoint was successfully updated.', flash[:notice]
     @api_endpoint.reload
     assert_equal 'Updated API', @api_endpoint.name
+    assert_equal 'up', @api_endpoint.status
   end
 
   test "should destroy api_endpoint" do
@@ -76,8 +96,7 @@ class ApiEndpointsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should check status after create" do
-    stub_request(:get, 'https://api.example.com')
-      .to_return(status: 200, body: '{"status":"ok"}', headers: { 'Content-Type' => 'application/json' })
+    # Stub is already set up in setup method
 
     post api_endpoints_url, params: {
       api_endpoint: {
@@ -93,6 +112,12 @@ class ApiEndpointsControllerTest < ActionDispatch::IntegrationTest
 
   test "should check status after update" do
     stub_request(:get, 'https://updated-api.example.com')
+      .with(
+        headers: {
+          'Accept'=>'*/*',
+          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'User-Agent'=>'Ruby'
+        })
       .to_return(status: 200, body: '{"status":"ok"}', headers: { 'Content-Type' => 'application/json' })
 
     patch api_endpoint_url(@api_endpoint), params: {

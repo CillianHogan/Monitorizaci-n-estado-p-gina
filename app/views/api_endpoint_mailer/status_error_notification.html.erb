@@ -1,0 +1,16 @@
+<h1>API Endpoint Status Alert</h1>
+
+<p>Dear <%= @user.email %>,</p>
+
+<p>Your API endpoint "<%= @api_endpoint.name %>" is currently experiencing issues.</p>
+
+<p>Details:</p>
+<ul>
+  <li>API Endpoint: <%= @api_endpoint.name %></li>
+  <li>URL: <%= @api_endpoint.url %></li>
+  <li>Current Status: Error</li>
+</ul>
+
+<p>Please check your API endpoint configuration and ensure it is accessible.</p>
+
+<p>Best regards,<br>Domain Checker</p>

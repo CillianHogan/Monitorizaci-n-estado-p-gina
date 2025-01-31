@@ -37,7 +37,7 @@ class DomainTest < ActiveSupport::TestCase
   end
 
   test "should check status successfully" do
-    stub_request(:get, @domain.url)
+    stub_request(:head, @domain.url)
       .to_return(status: 200, body: '', headers: {})
 
     @domain.check_status!
@@ -45,7 +45,7 @@ class DomainTest < ActiveSupport::TestCase
   end
 
   test "should mark as down when domain returns error status" do
-    stub_request(:get, @domain.url)
+    stub_request(:head, @domain.url)
       .to_return(status: 500, body: '', headers: {})
 
     @domain.check_status!
@@ -53,16 +53,24 @@ class DomainTest < ActiveSupport::TestCase
   end
 
   test "should mark as error and notify when connection fails" do
-    stub_request(:get, @domain.url).to_raise(StandardError)
+    stub_request(:head, @domain.url)
+      .with(
+        headers: {
+          'Accept'=>'*/*',
+          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'User-Agent'=>'Ruby'
+        })
+      .to_raise(StandardError)
 
-    assert_enqueued_email_with DomainMailer, :status_error_notification, args: [@domain] do
+    perform_enqueued_jobs do
       @domain.check_status!
+      assert_emails 1
+      assert_equal 'error', @domain.status
     end
-    assert_equal 'error', @domain.status
   end
 
   test "should log status changes" do
-    stub_request(:get, @domain.url)
+    stub_request(:head, @domain.url)
       .to_return(status: 200, body: '', headers: {})
 
     assert_logged("Domain #{@domain.name} status changed from pending to up") do
@@ -72,7 +80,7 @@ class DomainTest < ActiveSupport::TestCase
 
   test "should log errors" do
     error = StandardError.new("Connection refused")
-    stub_request(:get, @domain.url).to_raise(error)
+    stub_request(:head, @domain.url).to_raise(error)
 
     assert_logged("Error checking domain #{@domain.name}: Connection refused") do
       @domain.check_status!

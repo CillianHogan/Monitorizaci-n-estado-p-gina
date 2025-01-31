@@ -1,17 +1,17 @@
 one:
-  name: Example API
-  url: https://api.example.com
+  name: "Example API"
+  url: "https://api.example.com"
   status: pending
-  http_method: get
+  http_method: "get"
   headers: {}
   expected_response: {}
   user: one
 
 two:
-  name: Another API
-  url: https://another-api.example.com
+  name: "Another API"
+  url: "https://another-api.example.com"
   status: up
-  http_method: post
-  headers: { 'Authorization': 'Bearer token' }
-  expected_response: { 'status': 'ok' }
+  http_method: "post"
+  headers: { "Authorization": "Bearer token" }
+  expected_response: { "status": "ok" }
   user: two

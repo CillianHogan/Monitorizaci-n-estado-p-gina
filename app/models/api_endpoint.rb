@@ -4,8 +4,8 @@ class ApiEndpoint < ApplicationRecord
   validates :url, presence: true, format: URI::regexp(%w[http https])
   validates :name, presence: true
 
-  enum "status", { pending: 0, up: 1, down: 2, error: 3 }
-  enum "http_method", { get: 0, post: 1, put: 2, patch: 3, delete: 4 }, default: :get
+  enum :status, { pending: 0, up: 1, down: 2, error: 3 }, prefix: true
+  enum :http_method, { get: 0, post: 1, put: 2, patch: 3, remove: 4 }, default: :get
   
   after_initialize :set_default_status, if: :new_record?
 
@@ -39,7 +39,7 @@ class ApiEndpoint < ApplicationRecord
   end
 
   def notify_error
-    ApiEndpointMailer.status_error_notification(self).deliver_later
+    ApiEndpointMailer.status_error_notification(self).deliver_now
   end
 
   def set_default_status

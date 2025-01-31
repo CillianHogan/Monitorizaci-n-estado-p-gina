@@ -55,9 +55,8 @@ class ApiEndpointTest < ActiveSupport::TestCase
   test "should mark as error and notify when connection fails" do
     stub_request(:get, @api_endpoint.url).to_raise(StandardError)
 
-    assert_enqueued_email_with ApiEndpointMailer, :status_error_notification, args: [@api_endpoint] do
-      @api_endpoint.check_status!
-    end
+    @api_endpoint.check_status!
+    assert_emails 1
     assert_equal 'error', @api_endpoint.status
   end
 

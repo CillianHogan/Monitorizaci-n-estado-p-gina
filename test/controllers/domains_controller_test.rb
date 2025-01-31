@@ -7,6 +7,16 @@ class DomainsControllerTest < ActionDispatch::IntegrationTest
     @user = users(:one)
     @domain = domains(:one)
     sign_in @user
+
+    # Stub HTTP request for domain status checking
+    stub_request(:head, "https://example.com/")
+      .with(
+        headers: {
+          'Accept'=>'*/*',
+          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'User-Agent'=>'Ruby'
+        })
+      .to_return(status: 200, body: "", headers: {})
   end
 
   test "should get index" do
@@ -44,6 +54,15 @@ class DomainsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update domain" do
+    stub_request(:head, "https://updated-example.com/")
+      .with(
+        headers: {
+          'Accept'=>'*/*',
+          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'User-Agent'=>'Ruby'
+        })
+      .to_return(status: 200, body: "", headers: {})
+
     patch domain_url(@domain), params: {
       domain: {
         name: 'Updated Domain',
@@ -55,6 +74,7 @@ class DomainsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 'Domain was successfully updated.', flash[:notice]
     @domain.reload
     assert_equal 'Updated Domain', @domain.name
+    assert_equal 'up', @domain.status
   end
 
   test "should destroy domain" do
@@ -73,7 +93,7 @@ class DomainsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should check status after create" do
-    stub_request(:get, 'https://example.com')
+    stub_request(:head, 'https://example.com')
       .to_return(status: 200, body: '', headers: {})
 
     post domains_url, params: {
@@ -88,7 +108,7 @@ class DomainsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should check status after update" do
-    stub_request(:get, 'https://updated-example.com')
+    stub_request(:head, 'https://updated-example.com')
       .to_return(status: 200, body: '', headers: {})
 
     patch domain_url(@domain), params: {

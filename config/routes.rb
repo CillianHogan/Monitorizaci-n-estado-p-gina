@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   root "home#index"
 
-  # Add RESTful routes for domains
+  # Add RESTful routes for domains and API endpoints
   resources :domains
+  resources :api_endpoints
 end

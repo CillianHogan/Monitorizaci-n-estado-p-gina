@@ -4,13 +4,21 @@ class ApiEndpointsController < ApplicationController
 
   def index
     @api_endpoints = current_user.api_endpoints
+    respond_to do |format|
+      format.html
+    end
   end
 
   def show
+    respond_to do |format|
+      format.html
+      format.json { render json: @api_endpoint }
+    end
   end
 
   def new
     @api_endpoint = current_user.api_endpoints.build
+    render :new
   end
 
   def create
@@ -25,6 +33,9 @@ class ApiEndpointsController < ApplicationController
   end
 
   def edit
+    respond_to do |format|
+      format.html { render :edit }
+    end
   end
 
   def update
@@ -40,7 +51,6 @@ class ApiEndpointsController < ApplicationController
     @api_endpoint.destroy
     redirect_to api_endpoints_url, notice: "API endpoint was successfully deleted."
   end
-
 
   private
 

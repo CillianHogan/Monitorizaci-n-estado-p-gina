@@ -1,11 +1,11 @@
 one:
-  name: Example Domain
-  url: https://example.com
+  name: "Example Domain"
+  url: "https://example.com"
   status: pending
   user: one
 
 two:
-  name: Another Domain
-  url: https://another-example.com
+  name: "Another Domain"
+  url: "https://another-example.com"
   status: up
   user: two
