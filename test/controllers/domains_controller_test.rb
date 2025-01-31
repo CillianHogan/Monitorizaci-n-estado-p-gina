@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 class DomainsControllerTest < ActionDispatch::IntegrationTest
   include Devise::Test::IntegrationHelpers
@@ -12,9 +12,9 @@ class DomainsControllerTest < ActionDispatch::IntegrationTest
     stub_request(:head, "https://example.com/")
       .with(
         headers: {
-          'Accept'=>'*/*',
-          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-          'User-Agent'=>'Ruby'
+          "Accept"=>"*/*",
+          "Accept-Encoding"=>"gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+          "User-Agent"=>"Ruby"
         })
       .to_return(status: 200, body: "", headers: {})
   end
@@ -30,17 +30,17 @@ class DomainsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should create domain" do
-    assert_difference('Domain.count') do
+    assert_difference("Domain.count") do
       post domains_url, params: {
         domain: {
-          name: 'New Domain',
-          url: 'https://example.com'
+          name: "New Domain",
+          url: "https://example.com"
         }
       }
     end
 
     assert_redirected_to domain_url(Domain.last)
-    assert_equal 'Domain was successfully created.', flash[:notice]
+    assert_equal "Domain was successfully created.", flash[:notice]
   end
 
   test "should show domain" do
@@ -57,33 +57,33 @@ class DomainsControllerTest < ActionDispatch::IntegrationTest
     stub_request(:head, "https://updated-example.com/")
       .with(
         headers: {
-          'Accept'=>'*/*',
-          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-          'User-Agent'=>'Ruby'
+          "Accept"=>"*/*",
+          "Accept-Encoding"=>"gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+          "User-Agent"=>"Ruby"
         })
       .to_return(status: 200, body: "", headers: {})
 
     patch domain_url(@domain), params: {
       domain: {
-        name: 'Updated Domain',
-        url: 'https://updated-example.com'
+        name: "Updated Domain",
+        url: "https://updated-example.com"
       }
     }
 
     assert_redirected_to domain_url(@domain)
-    assert_equal 'Domain was successfully updated.', flash[:notice]
+    assert_equal "Domain was successfully updated.", flash[:notice]
     @domain.reload
-    assert_equal 'Updated Domain', @domain.name
-    assert_equal 'up', @domain.status
+    assert_equal "Updated Domain", @domain.name
+    assert_equal "up", @domain.status
   end
 
   test "should destroy domain" do
-    assert_difference('Domain.count', -1) do
+    assert_difference("Domain.count", -1) do
       delete domain_url(@domain)
     end
 
     assert_redirected_to domains_url
-    assert_equal 'Domain was successfully deleted.', flash[:notice]
+    assert_equal "Domain was successfully deleted.", flash[:notice]
   end
 
   test "should require authentication" do
@@ -93,31 +93,31 @@ class DomainsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should check status after create" do
-    stub_request(:head, 'https://example.com')
-      .to_return(status: 200, body: '', headers: {})
+    stub_request(:head, "https://example.com")
+      .to_return(status: 200, body: "", headers: {})
 
     post domains_url, params: {
       domain: {
-        name: 'New Domain',
-        url: 'https://example.com'
+        name: "New Domain",
+        url: "https://example.com"
       }
     }
 
     new_domain = Domain.last
-    assert_equal 'up', new_domain.status
+    assert_equal "up", new_domain.status
   end
 
   test "should check status after update" do
-    stub_request(:head, 'https://updated-example.com')
-      .to_return(status: 200, body: '', headers: {})
+    stub_request(:head, "https://updated-example.com")
+      .to_return(status: 200, body: "", headers: {})
 
     patch domain_url(@domain), params: {
       domain: {
-        url: 'https://updated-example.com'
+        url: "https://updated-example.com"
       }
     }
 
     @domain.reload
-    assert_equal 'up', @domain.status
+    assert_equal "up", @domain.status
   end
 end
