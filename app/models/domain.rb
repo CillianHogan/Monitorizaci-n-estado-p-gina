@@ -5,6 +5,8 @@ class Domain < ApplicationRecord
 
   enum :status, { pending: 0, up: 1, down: 2, error: 3 }, prefix: true
 
+  after_update_commit :notify_error, if: -> { saved_change_to_status? && status_error? }
+
   def check_status!
     begin
       response = HTTParty.head(url)
@@ -12,7 +14,12 @@ class Domain < ApplicationRecord
     rescue StandardError => e
       update(status: :error)
       Rails.logger.error("Domain check failed for #{url}: #{e.message}")
-      DomainMailer.status_error_notification(self).deliver_now
     end
+  end
+
+  private
+
+  def notify_error
+    DomainMailer.status_error_notification(self).deliver_now
   end
 end
