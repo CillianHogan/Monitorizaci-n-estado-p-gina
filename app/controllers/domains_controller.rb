@@ -2,16 +2,6 @@ class DomainsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_domain, only: [ :show, :edit, :update, :destroy ]
 
-  private
-
-  def set_domain
-    @domain = current_user.domains.find(params[:id])
-  end
-
-  def domain_params
-    params.require(:domain).permit(:name, :url)
-  end
-
   def index
     @domains = current_user.domains
   end
@@ -50,7 +40,6 @@ class DomainsController < ApplicationController
     @domain.destroy
     redirect_to domains_url, notice: "Domain was successfully deleted."
   end
-
 
   private
 
