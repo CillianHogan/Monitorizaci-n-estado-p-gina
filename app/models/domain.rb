@@ -5,7 +5,7 @@ class Domain < ApplicationRecord
 
   enum :status, { pending: 0, up: 1, down: 2, error: 3 }, prefix: true
 
-  after_update_commit :notify_error, if: -> { saved_change_to_status? && status_error? }
+  after_update_commit :notify_error, if: -> { saved_change_to_status?(from: :pending, to: :error) || saved_change_to_status?(from: :up, to: :error) || saved_change_to_status?(from: :down, to: :error) }
 
   def check_status!
     begin
