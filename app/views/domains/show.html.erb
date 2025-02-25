@@ -33,13 +33,23 @@
     </div>
   </div>
 
-  <div class="mt-8 bg-white shadow-lg rounded-lg overflow-hidden border border-gray-100">
+  <div class="mt-8 bg-white shadow-lg rounded-lg overflow-hidden border border-gray-100" data-controller="domain-chart" data-domain-chart-data-value="<%= @domain.status_histories.to_json %>">
     <div class="px-4 py-5 sm:px-6 bg-gradient-to-r from-indigo-50 to-blue-50">
       <h2 class="text-xl font-semibold text-indigo-800">Domain Status History</h2>
       <p class="mt-1 text-sm text-gray-600">Uptime monitoring over time</p>
+      <div class="mt-3">
+        <select data-action="change->domain-chart#changeTimeRange" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+          <option value="all">All Time</option>
+          <option value="week">Last Week</option>
+          <option value="month">Last Month</option>
+          <option value="3months">Last 3 Months</option>
+          <option value="6months">Last 6 Months</option>
+          <option value="year">Last Year</option>
+        </select>
+      </div>
     </div>
     <div class="p-6">
-      <div class="w-full h-64" data-controller="domain-chart" data-domain-chart-data-value="<%= @domain.status_histories.to_json %>">
+      <div class="w-full h-64">
         <canvas id="domainStatusChart" class="w-full h-full"></canvas>
       </div>
     </div>
