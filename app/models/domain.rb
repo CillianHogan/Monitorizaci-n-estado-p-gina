@@ -1,11 +1,14 @@
 class Domain < ApplicationRecord
   belongs_to :user
+  has_many :status_histories, class_name: 'DomainStatusHistory'
+
   validates :url, presence: true, format: { with: URI::DEFAULT_PARSER.make_regexp, message: "must be a valid URL" }
   validates :name, presence: true
 
   enum :status, { pending: 0, up: 1, down: 2, error: 3 }, prefix: true
 
-  after_update_commit :notify_error, if: -> { saved_change_to_status?(from: :pending, to: :error) || saved_change_to_status?(from: :up, to: :error) || saved_change_to_status?(from: :down, to: :error) }
+  after_update_commit :notify_error, if: -> { saved_change_to_status?(to: :error) }
+  after_save :create_status_history, if: :saved_change_to_status?
 
   def check_status!
     begin
@@ -21,5 +24,9 @@ class Domain < ApplicationRecord
 
   def notify_error
     DomainMailer.status_error_notification(self).deliver_now
+  end
+
+  def create_status_history
+    status_histories.create!(status: status, recorded_at: Time.current)
   end
 end

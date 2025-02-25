@@ -3,12 +3,16 @@ class CheckDomainStatusJob < ApplicationJob
 
   def perform
     Domain.find_each do |domain|
-      domain.check_status!
+      begin
+        domain.check_status!
+      rescue StandardError => e
+        Rails.logger.error("Error checking domain #{domain.id}: #{e.message}")
+      end
     end
 
     # Reschedule the job to run again in 5 minutes
     self.class.set(wait: 5.minutes).perform_later
   rescue StandardError => e
-    Rails.logger.error("Error checking domain #{domain_id}: #{e.message}")
+    Rails.logger.error("Error in CheckDomainStatusJob: #{e.message}")
   end
 end

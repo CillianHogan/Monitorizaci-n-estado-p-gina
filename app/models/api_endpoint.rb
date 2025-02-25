@@ -7,7 +7,7 @@ class ApiEndpoint < ApplicationRecord
   enum :status, { pending: 0, up: 1, down: 2, error: 3 }, prefix: true
   enum :http_method, { get: 0, post: 1, put: 2, patch: 3, remove: 4 }, default: :get
 
-  after_update_commit :notify_error, if: -> { saved_change_to_status? && status_error? }
+  after_update_commit :notify_error, if: -> { saved_change_to_status?(to: :error) }
 
   def check_status!
     begin

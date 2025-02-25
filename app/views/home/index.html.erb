@@ -8,7 +8,52 @@
         Keep track of your domain status in real-time. Get instant notifications when your domains go down.
       </p>
       <div class="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
-        <%= link_to 'Get Started', new_user_registration_path, class: 'w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-10' %>
+        <%= link_to 'Get Started', user_signed_in? ? domains_path : new_user_registration_path, class: 'w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-10' %>
+      </div>
+    </div>
+
+    <div class="mt-24">
+      <h3 class="text-3xl font-bold text-center text-gray-800 mb-12">Upcoming Features</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
+          <div class="text-blue-600 mb-4">
+            <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+          </div>
+          <h4 class="text-xl font-semibold text-gray-800 mb-2">Advanced Analytics</h4>
+          <p class="text-gray-600">Detailed dashboard with monitoring statistics and visual graphs for better insights.</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
+          <div class="text-blue-600 mb-4">
+            <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+            </svg>
+          </div>
+          <h4 class="text-xl font-semibold text-gray-800 mb-2">Custom Notifications</h4>
+          <p class="text-gray-600">Choose your preferred notification channels: Email, SMS, or Slack integration.</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
+          <div class="text-blue-600 mb-4">
+            <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            </svg>
+          </div>
+          <h4 class="text-xl font-semibold text-gray-800 mb-2">Domain Groups</h4>
+          <p class="text-gray-600">Organize your domains into categories and projects for better management.</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
+          <div class="text-blue-600 mb-4">
+            <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+          </div>
+          <h4 class="text-xl font-semibold text-gray-800 mb-2">Detailed Reports</h4>
+          <p class="text-gray-600">Export comprehensive uptime reports for analysis and documentation.</p>
+        </div>
       </div>
     </div>
   </main>

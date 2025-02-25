@@ -33,6 +33,18 @@
     </div>
   </div>
 
+  <div class="mt-8 bg-white shadow-lg rounded-lg overflow-hidden border border-gray-100">
+    <div class="px-4 py-5 sm:px-6 bg-gradient-to-r from-indigo-50 to-blue-50">
+      <h2 class="text-xl font-semibold text-indigo-800">Domain Status History</h2>
+      <p class="mt-1 text-sm text-gray-600">Uptime monitoring over time</p>
+    </div>
+    <div class="p-6">
+      <div class="w-full h-64" data-controller="domain-chart" data-domain-chart-data-value="<%= @domain.status_histories.to_json %>">
+        <canvas id="domainStatusChart"></canvas>
+      </div>
+    </div>
+  </div>
+
   <div class="mt-6 flex justify-end space-x-3">
     <%= link_to 'Edit', edit_domain_path(@domain), class: 'inline-flex items-center px-4 py-2 border border-indigo-300 shadow-sm text-sm font-medium rounded-md text-indigo-700 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' %>
     <%= button_to 'Delete', domain_path(@domain), method: :delete, class: 'inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500', form: { data: { turbo_confirm: 'Are you sure?' } } %>
