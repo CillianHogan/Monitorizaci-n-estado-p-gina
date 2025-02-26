@@ -33,15 +33,17 @@ export default class extends Controller {
     this.ctx.clearRect(0, 0, width, height)
     
     const padding = 40
-    const chartWidth = width - padding * 2
-    const chartHeight = height - padding * 2
+    const bottomPadding = 100
+    const rightPadding = 30
+    const chartWidth = width - padding * 2 - rightPadding
+    const chartHeight = height - padding - bottomPadding
     
     // Draw axes
     this.ctx.beginPath()
     this.ctx.strokeStyle = '#666'
     this.ctx.moveTo(padding, padding)
-    this.ctx.lineTo(padding, height - padding)
-    this.ctx.lineTo(width - padding, height - padding)
+    this.ctx.lineTo(padding, height - bottomPadding)
+    this.ctx.lineTo(width - padding, height - bottomPadding)
     this.ctx.stroke()
     
     // Plot data points
@@ -55,7 +57,7 @@ export default class extends Controller {
       
       this._filteredData.forEach((point, i) => {
         const x = padding + i * step
-        const y = height - padding - (point.status === 'up' ? chartHeight : 0)
+        const y = height - bottomPadding - (point.status === 'up' ? chartHeight : 0)
         
         if (i === 0) {
           this.ctx.moveTo(x, y)
@@ -72,58 +74,78 @@ export default class extends Controller {
     this.ctx.font = '12px Arial'
     this.ctx.textAlign = 'right'
     this.ctx.fillText('Up', padding - 5, padding + 4)
-    this.ctx.fillText('Down', padding - 5, height - padding + 4)
+    this.ctx.fillText('Down', padding - 5, height - bottomPadding + 4)
     
     // Draw X axis labels
     this.ctx.textAlign = 'center'
     if (this._filteredData && this._filteredData.length > 1) {
       const step = chartWidth / (this._filteredData.length - 1)
-      const labelInterval = Math.max(1, Math.ceil(this._filteredData.length / 5))
       
+      // Group consecutive error/down points
+      let currentGroup = []
       this._filteredData.forEach((point, i) => {
-        if (i % labelInterval === 0) {
-          const x = padding + i * step
-          const date = new Date(point.recorded_at).toLocaleDateString('es-ES', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          })
-          this.ctx.fillText(date, x, height - padding + 20)
+        if (point.status === 'error' || point.status === 'down') {
+          currentGroup.push({ point, index: i })
+        } else if (currentGroup.length > 0) {
+          // Display only first and last points of the group
+          this.drawTimestamp(currentGroup[0], step, padding, height, bottomPadding)
+          if (currentGroup.length > 1) {
+            this.drawTimestamp(currentGroup[currentGroup.length - 1], step, padding, height, bottomPadding)
+          }
+          currentGroup = []
         }
       })
+      
+      // Handle the last group if it exists
+      if (currentGroup.length > 0) {
+        this.drawTimestamp(currentGroup[0], step, padding, height, bottomPadding)
+        if (currentGroup.length > 1) {
+          this.drawTimestamp(currentGroup[currentGroup.length - 1], step, padding, height, bottomPadding)
+        }
+      }
     }
   }
 
-  changeTimeRange(event) {
-    const timeRange = event.target.value
-    this._filteredData = this.filterDataByTimeRange(timeRange)
-    this.drawChart()
-}
+  drawTimestamp({ point, index }, step, padding, height, bottomPadding) {
+    const x = Math.max(padding, padding + index * step)
+    const date = new Date(point.recorded_at).toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+    this.ctx.fillStyle = point.status === 'error' ? '#dc2626' : '#d97706'
+    this.ctx.save()
+    this.ctx.translate(x + 30, height - bottomPadding + 50)
+    this.ctx.rotate(45 * Math.PI / 180)
+    this.ctx.fillText(date, 0, 0)
+    this.ctx.restore()
+    this.ctx.fillStyle = '#666'
+  }
 
-  filterDataByTimeRange(timeRange) {
+  changeTimeRange(event) {
+    this._filteredData = this.filterDataByTimeRange(event.target.value)
+    this.drawChart()
+  }
+
+  filterDataByTimeRange(range) {
     const now = new Date()
     const data = this.dataValue
-    
-    if (!data || !Array.isArray(data)) return []
-    
-    if (timeRange === 'all') return data
-    
-    const msPerDay = 24 * 60 * 60 * 1000
-    const ranges = {
-      'week': 7 * msPerDay,
-      'month': 30 * msPerDay,
-      '3months': 90 * msPerDay,
-      '6months': 180 * msPerDay,
-      'year': 365 * msPerDay
+
+    switch (range) {
+      case 'week':
+        return data.filter(d => new Date(d.recorded_at) > new Date(now - 7 * 24 * 60 * 60 * 1000))
+      case 'month':
+        return data.filter(d => new Date(d.recorded_at) > new Date(now - 30 * 24 * 60 * 60 * 1000))
+      case '3months':
+        return data.filter(d => new Date(d.recorded_at) > new Date(now - 90 * 24 * 60 * 60 * 1000))
+      case '6months':
+        return data.filter(d => new Date(d.recorded_at) > new Date(now - 180 * 24 * 60 * 60 * 1000))
+      case 'year':
+        return data.filter(d => new Date(d.recorded_at) > new Date(now - 365 * 24 * 60 * 60 * 1000))
+      default:
+        return data
     }
-    
-    const cutoffTime = ranges[timeRange] ? now.getTime() - ranges[timeRange] : 0
-    
-    return data.filter(d => {
-      const pointDate = new Date(d.created_at)
-      return pointDate.getTime() >= cutoffTime
-    })
   }
 }

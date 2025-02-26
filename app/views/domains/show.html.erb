@@ -1,35 +1,68 @@
 <div class="container">
   <div class="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-100">
-    <div class="px-4 py-5 sm:px-6 flex justify-between items-center bg-gradient-to-r from-indigo-50 to-blue-50">
-      <div>
-        <h1 class="text-2xl font-bold text-indigo-800"><%= @domain.name %></h1>
-        <p class="mt-1 max-w-2xl text-sm text-gray-600">Domain monitoring details</p>
+    <div class="px-4 py-5 sm:px-6 bg-gradient-to-r from-indigo-50 to-blue-50">
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <h1 class="text-2xl font-bold text-indigo-800"><%= @domain.name %></h1>
+        </div>
+        <div class="flex items-center gap-2 sm:hidden">
+          <span class="inline-flex items-center px-4 py-2 rounded-lg text-base font-semibold shadow-sm <%= @domain.status_up? ? 'bg-green-100 text-green-800 ring-1 ring-green-500/20' : (@domain.status_error? ? 'bg-red-100 text-red-800 ring-1 ring-red-500/20' : 'bg-amber-100 text-amber-800 ring-1 ring-amber-500/20') %>">
+            <% case @domain.status %>
+            <% when 'up' %>
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            <% when 'error' %>
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            <% else %>
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <% end %>
+            <%= @domain.status.titleize %>
+          </span>
+        </div>
       </div>
-      <span class="<%= status_badge_class(@domain.status) %>">
-        <%= @domain.status.titleize %>
-      </span>
+      <p class="mt-1 max-w-2xl text-sm text-gray-600">Domain monitoring details</p>
     </div>
     <div class="border-t border-gray-200">
-      <dl>
-        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-600">URL</dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:col-span-2">
-            <%= link_to @domain.url, @domain.url, target: '_blank', class: 'text-blue-600 hover:text-blue-800 underline' %>
-          </dd>
+      <div class="flex">
+        <dl class="flex-grow">
+          <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-600">URL</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2">
+              <%= link_to @domain.url, @domain.url, target: '_blank', class: 'text-blue-600 hover:text-blue-800 underline' %>
+            </dd>
+          </div>
+          <div class="bg-gradient-to-r from-indigo-50 to-blue-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-600">Created</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2">
+              <%= @domain.created_at.strftime("%B %d, %Y") %>
+            </dd>
+          </div>
+          <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-600">Last Updated</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2">
+              <%= @domain.updated_at.strftime("%B %d, %Y at %I:%M %p") %>
+            </dd>
+          </div>
+        </dl>
+        <div class="sm:flex items-center justify-center py-6 w-64 border-l border-gray-200 hidden">
+          <div class="text-center">
+            <div class="mb-4">
+              <div class="inline-flex items-center justify-center w-24 h-24 rounded-full <%= @domain.status_up? ? 'bg-green-100' : (@domain.status_error? ? 'bg-red-100' : 'bg-amber-100') %>">
+                <% case @domain.status %>
+                <% when 'up' %>
+                  <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <% when 'error' %>
+                  <svg class="w-12 h-12 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                <% else %>
+                  <svg class="w-12 h-12 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <% end %>
+              </div>
+            </div>
+            <h2 class="text-xl font-bold <%= @domain.status_up? ? 'text-green-600' : (@domain.status_error? ? 'text-red-600' : 'text-amber-600') %>">
+              <%= @domain.status.titleize %>
+            </h2>
+          </div>
         </div>
-        <div class="bg-gradient-to-r from-indigo-50 to-blue-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-600">Created</dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:col-span-2">
-            <%= @domain.created_at.strftime("%B %d, %Y") %>
-          </dd>
-        </div>
-        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-600">Last Updated</dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:col-span-2">
-            <%= @domain.updated_at.strftime("%B %d, %Y at %I:%M %p") %>
-          </dd>
-        </div>
-      </dl>
+      </div>
     </div>
   </div>
 
@@ -38,7 +71,7 @@
       <h2 class="text-xl font-semibold text-indigo-800">Domain Status History</h2>
       <p class="mt-1 text-sm text-gray-600">Uptime monitoring over time</p>
       <div class="mt-3">
-        <select data-action="change->domain-chart#changeTimeRange" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+        <select data-action="change->domain-chart#changeTimeRange" class="mt-1 block w-full pl-3 pr-8 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-no-repeat bg-[right_0.8rem_center] appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Ctitle%3Edown-arrow%3C%2Ftitle%3E%3Cg%20fill%3D%22%23000000%22%3E%3Cpath%20d%3D%22M10.293%2C3.293%2C6%2C7.586%2C1.707%2C3.293A1%2C1%2C0%2C0%2C0%2C.293%2C4.707l5%2C5a1%2C1%2C0%2C0%2C0%2C1.414%2C0l5-5a1%2C1%2C0%2C1%2C0-1.414-1.414Z%22%20fill%3D%22%23404040%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E')]">
           <option value="all">All Time</option>
           <option value="week">Last Week</option>
           <option value="month">Last Month</option>
@@ -48,9 +81,9 @@
         </select>
       </div>
     </div>
-    <div class="p-6">
-      <div class="w-full h-64">
-        <canvas id="domainStatusChart" class="w-full h-full"></canvas>
+    <div class="p-6 overflow-x-auto">
+      <div class="w-full h-[250px] sm:h-[300px] md:h-80">
+        <canvas id="domainStatusChart" class="w-full h-full" data-domain-chart-options-value='{"responsive":true,"maintainAspectRatio":false,"interaction":{"mode":"nearest","intersect":false},"plugins":{"legend":{"position":"top","labels":{"boxWidth":10,"padding":10,"font":{"size":10,"family":"system-ui"}}},"tooltip":{"enabled":true,"mode":"index","intersect":false,"bodyFont":{"size":11},"titleFont":{"size":11}}},"scales":{"x":{"grid":{"display":false},"ticks":{"maxRotation":45,"minRotation":45,"font":{"size":9,"family":"system-ui"}}},"y":{"beginAtZero":true,"ticks":{"font":{"size":9,"family":"system-ui"}}}}}' />
       </div>
     </div>
   </div>
