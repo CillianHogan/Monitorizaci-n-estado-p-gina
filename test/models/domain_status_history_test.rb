@@ -34,7 +34,7 @@ class DomainStatusHistoryTest < ActiveSupport::TestCase
   end
 
   test "should have valid status values" do
-    valid_statuses = [:pending, :up, :down, :error]
+    valid_statuses = [ :pending, :up, :down, :error ]
     valid_statuses.each do |status|
       @status_history.status = status
       assert @status_history.valid?, "#{status} should be a valid status"

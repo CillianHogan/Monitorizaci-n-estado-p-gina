@@ -14,8 +14,8 @@ class ApiEndpoint < ApplicationRecord
       response = HTTParty.get(url)
       update(status: validate_response?(response) ? :up : :down)
     rescue StandardError => e
-      update(status: :error)
       Rails.logger.error("API Endpoint check failed for #{url}: #{e.message}")
+      update(status: :error)
     end
   end
 

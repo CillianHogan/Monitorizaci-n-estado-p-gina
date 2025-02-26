@@ -18,14 +18,14 @@ domain = Domain.where(url: 'https://www.21ninjas.com').first_or_create!(
   # Create 4-6 status changes per day
   rand(4..6).times do
     recorded_at = date.to_time + rand(0..23).hours + rand(0..59).minutes
-    
+
     # Generate more realistic status patterns
     # 70% chance of being up, 20% down, 10% error
     status = case rand(1..100)
-             when 1..70 then :up
-             when 71..90 then :down
-             else :error
-             end
+    when 1..70 then :up
+    when 71..90 then :down
+    else :error
+    end
 
     DomainStatusHistory.create!(
       domain: domain,
