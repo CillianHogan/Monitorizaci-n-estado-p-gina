@@ -81,18 +81,19 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    database: domain_checker_production
-    username: domain_checker
-    password: <%= ENV["DOMAIN_CHECKER_DATABASE_PASSWORD"] %>
+    database: d5deoufkgf8fhm
+    username: u9trjkl9695n97
+    password: pe94dd4c3477fa8b7c899a5b03c3341a8b1c71beb76b2804b9989d9cb821eebd0
+    host: clhtb6lu92mj2.cluster-czz5s0kz4scl.eu-west-1.rds.amazonaws.com
   cache:
     <<: *primary_production
-    database: domain_checker_production_cache
+    database: d5deoufkgf8fhm_cache
     migrations_paths: db/cache_migrate
   queue:
     <<: *primary_production
-    database: domain_checker_production_queue
+    database: d5deoufkgf8fhm_queue
     migrations_paths: db/queue_migrate
   cable:
     <<: *primary_production
-    database: domain_checker_production_cable
+    database: d5deoufkgf8fhm_cable
     migrations_paths: db/cable_migrate
