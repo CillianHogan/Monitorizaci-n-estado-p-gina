@@ -123,7 +123,7 @@ export default class extends Controller {
       hour: '2-digit',
       minute: '2-digit'
     })
-    this.ctx.fillStyle = point.status === 'error' ? '#dc2626' : '#d97706'
+    this.ctx.fillStyle = point.status === 'up' ? '#16a34a' : point.status === 'error' ? '#dc2626' : '#d97706'
     this.ctx.save()
     this.ctx.translate(x + 30, height - bottomPadding + 50)
     this.ctx.rotate(45 * Math.PI / 180)
