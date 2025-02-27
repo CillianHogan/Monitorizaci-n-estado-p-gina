@@ -81,11 +81,19 @@ export default class extends Controller {
     if (this._filteredData && this._filteredData.length > 1) {
       const step = chartWidth / (this._filteredData.length - 1)
       
-      // Group consecutive error/down points
+      // Always draw first and last timestamps
+      this.drawTimestamp({ point: this._filteredData[0], index: 0 }, step, padding, height, bottomPadding)
+      this.drawTimestamp(
+        { point: this._filteredData[this._filteredData.length - 1], index: this._filteredData.length - 1 },
+        step, padding, height, bottomPadding
+      )
+      
+      // Group consecutive error/down points for intermediate timestamps
       let currentGroup = []
-      this._filteredData.forEach((point, i) => {
+      this._filteredData.slice(1, -1).forEach((point, i) => {
+        const actualIndex = i + 1 // Adjust index for the sliced array
         if (point.status === 'error' || point.status === 'down') {
-          currentGroup.push({ point, index: i })
+          currentGroup.push({ point, index: actualIndex })
         } else if (currentGroup.length > 0) {
           // Display only first and last points of the group
           this.drawTimestamp(currentGroup[0], step, padding, height, bottomPadding)
@@ -96,7 +104,7 @@ export default class extends Controller {
         }
       })
       
-      // Handle the last group if it exists
+      // Handle the last intermediate group if it exists
       if (currentGroup.length > 0) {
         this.drawTimestamp(currentGroup[0], step, padding, height, bottomPadding)
         if (currentGroup.length > 1) {
