@@ -1,13 +1,13 @@
+# frozen_string_literal: true
+
 class CheckDomainStatusJob < ApplicationJob
   queue_as :default
 
   def perform
     Domain.find_each do |domain|
-      begin
-        domain.check_status!
-      rescue StandardError => e
-        Rails.logger.error("Error checking domain #{domain.id}: #{e.message}")
-      end
+      domain.check_status!
+    rescue StandardError => e
+      Rails.logger.error("Error checking domain #{domain.id}: #{e.message}")
     end
 
     # Reschedule the job to run again in 5 minutes

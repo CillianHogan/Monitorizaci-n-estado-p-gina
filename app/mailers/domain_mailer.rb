@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DomainMailer < ApplicationMailer
   def status_error_notification(domain)
     @domain = domain

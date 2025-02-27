@@ -1,36 +1,36 @@
+# frozen_string_literal: true
+
 class DomainsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_domain, only: [ :show, :edit, :update, :destroy ]
+  before_action :set_domain, only: %i[show edit update destroy]
 
   def index
     @domains = current_user.domains
   end
 
-  def show
-  end
+  def show; end
 
   def new
     @domain = current_user.domains.build
   end
+
+  def edit; end
 
   def create
     @domain = current_user.domains.build(domain_params)
 
     if @domain.save
       @domain.check_status!
-      redirect_to @domain, notice: "Domain was successfully created."
+      redirect_to @domain, notice: 'Domain was successfully created.'
     else
       render :new, status: :unprocessable_entity
     end
   end
 
-  def edit
-  end
-
   def update
     if @domain.update(domain_params)
       @domain.check_status!
-      redirect_to @domain, notice: "Domain was successfully updated."
+      redirect_to @domain, notice: 'Domain was successfully updated.'
     else
       render :edit, status: :unprocessable_entity
     end
@@ -38,7 +38,7 @@ class DomainsController < ApplicationController
 
   def destroy
     @domain.destroy
-    redirect_to domains_url, notice: "Domain was successfully deleted."
+    redirect_to domains_url, notice: 'Domain was successfully deleted.'
   end
 
   private
@@ -48,6 +48,6 @@ class DomainsController < ApplicationController
   end
 
   def domain_params
-    params.require(:domain).permit(:name, :url)
+    params.expect(domain: %i[name url])
   end
 end

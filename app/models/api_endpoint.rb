@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 class ApiEndpoint < ApplicationRecord
   belongs_to :user
-  validates :url, presence: true, format: { with: URI::DEFAULT_PARSER.make_regexp, message: "must be a valid URL" }
+  validates :url, presence: true, format: { with: URI::DEFAULT_PARSER.make_regexp, message: 'must be a valid URL' }
   validates :name, presence: true
   validates :expected_response, presence: false
 
@@ -10,13 +12,11 @@ class ApiEndpoint < ApplicationRecord
   after_update_commit :notify_error, if: -> { saved_change_to_status?(to: :error) }
 
   def check_status!
-    begin
-      response = HTTParty.get(url)
-      update(status: validate_response?(response) ? :up : :down)
-    rescue StandardError => e
-      Rails.logger.error("API Endpoint check failed for #{url}: #{e.message}")
-      update(status: :error)
-    end
+    response = HTTParty.get(url)
+    update(status: validate_response?(response) ? :up : :down)
+  rescue StandardError => e
+    Rails.logger.error("API Endpoint check failed for #{url}: #{e.message}")
+    update(status: :error)
   end
 
   private

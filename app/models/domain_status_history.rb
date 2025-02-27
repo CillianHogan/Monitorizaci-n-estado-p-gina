@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DomainStatusHistory < ApplicationRecord
   belongs_to :domain
 

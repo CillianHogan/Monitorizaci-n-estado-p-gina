@@ -1,12 +1,14 @@
-ENV["RAILS_ENV"] ||= "test"
-require_relative "../config/environment"
-require "rails/test_help"
-require "webmock/minitest"
+# frozen_string_literal: true
+
+ENV['RAILS_ENV'] ||= 'test'
+require_relative '../config/environment'
+require 'rails/test_help'
+require 'webmock/minitest'
 
 module ActiveSupport
   class TestCase
     include ActiveJob::TestHelper
-  include ActionMailer::TestHelper
+    include ActionMailer::TestHelper
 
     # Run tests in parallel with specified workers
     parallelize(workers: :number_of_processors)
@@ -30,8 +32,6 @@ module ActiveSupport
         Rails.logger = original_logger
       end
     end
-
-
 
     def assert_valid_api_endpoint_status(endpoint, status)
       assert_includes ApiEndpoint.statuses.keys, status.to_s, "Invalid status: #{status}"
