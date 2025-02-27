@@ -9,6 +9,7 @@ class Domain < ApplicationRecord
 
   enum :status, { pending: 0, up: 1, down: 2, error: 3 }, prefix: true
 
+  after_create :check_initial_status
   after_save :create_status_history, if: :saved_change_to_status?
 
   def check_status!
@@ -28,5 +29,9 @@ class Domain < ApplicationRecord
 
   def create_status_history
     status_histories.create!(status: status, recorded_at: Time.current)
+  end
+
+  def check_initial_status
+    check_status!
   end
 end
