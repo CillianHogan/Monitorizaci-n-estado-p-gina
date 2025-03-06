@@ -11,7 +11,7 @@ class CheckDomainStatusJob < ApplicationJob
     end
 
     # Reschedule the job to run again in 5 minutes
-    self.class.set(wait: 5.minutes).perform_later
+    self.class.set(wait: 1.minutes).perform_later
   rescue StandardError => e
     Rails.logger.error("Error in CheckDomainStatusJob: #{e.message}")
   end
