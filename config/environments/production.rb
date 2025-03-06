@@ -67,7 +67,7 @@ Rails.application.configure do
     address: ENV.fetch('SMTP_ADDRESS', 'smtp.sendgrid.net'),
     port: ENV.fetch('SMTP_PORT', 587),
     domain: ENV.fetch('SMTP_DOMAIN', 'domain-monitor-ea281e1f44d9.herokuapp.com'),
-    user_name: ENV.fetch('SMTP_USERNAME', apikey),
+    user_name: ENV.fetch('SMTP_USERNAME', 'apikey'),
     password: ENV.fetch('SMTP_PASSWORD', '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'),
     authentication: :plain,
     enable_starttls_auto: true
