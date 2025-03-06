@@ -64,11 +64,11 @@ Rails.application.configure do
   # Configure SMTP settings for production
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-    address: ENV['SMTP_ADDRESS'],
+    address: ENV.fetch('SMTP_ADDRESS', nil),
     port: ENV.fetch('SMTP_PORT', 587),
-    domain: ENV['SMTP_DOMAIN'],
-    user_name: ENV['SMTP_USERNAME'],
-    password: ENV['SMTP_PASSWORD'],
+    domain: ENV.fetch('SMTP_DOMAIN', nil),
+    user_name: ENV.fetch('SMTP_USERNAME', nil),
+    password: ENV.fetch('SMTP_PASSWORD', nil),
     authentication: :plain,
     enable_starttls_auto: true
   }
