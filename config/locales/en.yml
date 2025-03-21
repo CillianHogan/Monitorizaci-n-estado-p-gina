@@ -29,3 +29,10 @@
 
 en:
   hello: "Hello world"
+  activerecord:
+    errors:
+      models:
+        user:
+          attributes:
+            email:
+              taken: "The email or password you entered is invalid. Please check your credentials and try again."

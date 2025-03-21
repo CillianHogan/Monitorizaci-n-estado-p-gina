@@ -9,4 +9,13 @@ class DomainMailer < ApplicationMailer
       subject: "Domain Status Alert: #{@domain.name} is experiencing issues"
     )
   end
+
+  def status_down_notification(domain)
+    @domain = domain
+    @user = domain.user
+    mail(
+      to: @user.email,
+      subject: "Domain Status Alert: #{@domain.name} is down"
+    )
+  end
 end

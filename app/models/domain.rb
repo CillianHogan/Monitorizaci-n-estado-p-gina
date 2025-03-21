@@ -12,19 +12,24 @@ class Domain < ApplicationRecord
   after_create :check_initial_status
   after_save :create_status_history, if: :saved_change_to_status?
 
+  after_update_commit :notify_status_change, if: -> { saved_change_to_status? && (status_previously_was == "up" || status == "up") }
+
   def check_status!
     response = HTTParty.head(url)
     update(status: response.success? ? :up : :down)
   rescue StandardError => e
     Rails.logger.error("Domain check failed for #{url}: #{e.message}")
     update(status: :error)
-    notify_error
   end
 
   private
 
-  def notify_error
-    DomainMailer.status_error_notification(self).deliver_now
+  def notify_status_change
+    if status == "up"
+      DomainMailer.status_up_notification(self).deliver_now
+    else
+      DomainMailer.status_down_notification(self).deliver_now
+    end
   end
 
   def create_status_history
