@@ -1,14 +1,18 @@
 # frozen_string_literal: true
 
+require 'securerandom'
+
 class Domain < ApplicationRecord
   belongs_to :user
   has_many :status_histories, dependent: :destroy, class_name: 'DomainStatusHistory'
 
   validates :url, presence: true, format: { with: URI::DEFAULT_PARSER.make_regexp, message: 'must be a valid URL' }
   validates :name, presence: true
+  validates :public_token, presence: true, uniqueness: true
 
   enum :status, { pending: 0, up: 1, down: 2, error: 3 }, prefix: true
 
+  before_validation :generate_public_token, on: :create
   after_create :check_initial_status
   after_save :create_status_history, if: :saved_change_to_status?
 
@@ -23,6 +27,13 @@ class Domain < ApplicationRecord
   end
 
   private
+
+  def generate_public_token
+    self.public_token = loop do
+      token = SecureRandom.urlsafe_base64(16)
+      break token unless Domain.exists?(public_token: token)
+    end
+  end
 
   def notify_status_change
     if status == "up"

@@ -1,0 +1,165 @@
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50 text-gray-800 py-8 px-4">
+  <div class="container mx-auto max-w-6xl">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <div class="flex items-center">
+        <h1 class="text-xl font-bold text-indigo-800"><%= @domain.name %></h1>
+      </div>
+      <div class="text-sm text-gray-600">
+        Service status
+        <div>Last updated: <%= Time.current.strftime("%H:%M:%S") %> | Next update in 30 sec</div>
+      </div>
+    </div>
+
+    <!-- Status Card -->
+    <div class="bg-white rounded-lg p-6 mb-8">
+      <div class="flex items-center">
+        <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center mr-4">
+          <% if @domain.status_up? %>
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+          <% elsif @domain.status_error? || @domain.status_down? %>
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          <% else %>
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <% end %>
+        </div>
+        <div>
+          <div class="flex items-center">
+            <h2 class="text-xl font-bold text-gray-900">All systems 
+              <% if @domain.status_up? %>
+                <span class="text-green-500">operational</span>
+              <% elsif @domain.status_error? || @domain.status_down? %>
+                <span class="text-red-500">down</span>
+              <% else %>
+                <span class="text-yellow-500">pending</span>
+              <% end %>
+            </h2>
+          </div>
+          <% if @status_histories.any? && @status_histories.first.status != 'up' %>
+            <div class="text-sm text-gray-500 mt-1">Latest downtime detected <%= time_ago_in_words(@status_histories.first.recorded_at) %> ago.</div>
+          <% else %>
+            <div class="text-sm text-gray-500 mt-1">No downtime detected in the last 30 days.</div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Uptime Section -->
+    <div class="mb-8">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-bold">Uptime <span class="text-sm font-normal">Last 90 days</span></h2>
+      </div>
+
+      <!-- Uptime Bars for Website -->
+      <div class="bg-white rounded-lg p-6 mb-4">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center">
+            <span class="text-gray-700 mr-2">Website</span>
+            <span class="text-xs text-gray-500">↑ <%= calculate_uptime_percentage(@last_90_days_histories).round(2) %>%</span>
+          </div>
+          <div class="<%= @domain.status_up? ? 'text-green-500' : 'text-red-500' %> text-sm font-medium">
+            <%= @domain.status_up? ? 'Operational' : 'Down' %>
+          </div>
+        </div>
+        <div class="flex w-full">
+          <% if @last_90_days_histories.any? %>
+            <% # Group by day to show one bar per day %>
+            <% histories_by_day = @last_90_days_histories.group_by { |h| h.recorded_at.to_date } %>
+            <% # Fill in missing days with the last known status %>
+            <% (0..89).each do |days_ago| %>
+              <% date = days_ago.days.ago.to_date %>
+              <% 
+                # Determine status for this day
+                day_status = if histories_by_day[date].present?
+                  # If we have records for this day, use the most common status
+                  statuses = histories_by_day[date].map(&:status)
+                  statuses.max_by { |s| statuses.count(s) }
+                elsif days_ago == 0 && @domain.status.present?
+                  # For today, use current status if no history
+                  @domain.status
+                else
+                  # For past days with no records, use 'up' as default
+                  'up'
+                end
+              %>
+              <div class="h-6 flex-grow <%= day_status == 'up' ? 'bg-green-500' : 'bg-red-500' %> mx-px" title="<%= date.strftime('%d %b, %Y') %>"></div>
+            <% end %>
+          <% else %>
+            <% # If no history, show all as up %>
+            <% 90.times do %>
+              <div class="h-6 flex-grow bg-green-500 mx-px"></div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Overall Uptime Stats -->
+    <div class="mb-8">
+      <h2 class="text-lg font-bold mb-4">Overall Uptime</h2>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-white rounded-lg p-6 text-center">
+          <div class="text-xl font-bold text-gray-900"><%= calculate_uptime_percentage(@last_24_hours_histories).round(3) %>%</div>
+          <div class="text-sm text-gray-500">Last 24 hours</div>
+        </div>
+        <div class="bg-white rounded-lg p-6 text-center">
+          <div class="text-xl font-bold text-gray-900"><%= calculate_uptime_percentage(@last_7_days_histories).round(3) %>%</div>
+          <div class="text-sm text-gray-500">Last 7 days</div>
+        </div>
+        <div class="bg-white rounded-lg p-6 text-center">
+          <div class="text-xl font-bold text-gray-900"><%= calculate_uptime_percentage(@last_30_days_histories).round(3) %>%</div>
+          <div class="text-sm text-gray-500">Last 30 days</div>
+        </div>
+        <div class="bg-white rounded-lg p-6 text-center">
+          <div class="text-xl font-bold text-gray-900"><%= calculate_uptime_percentage(@last_90_days_histories).round(3) %>%</div>
+          <div class="text-sm text-gray-500">Last 90 days</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Updates -->
+    <div class="mb-8">
+      <h2 class="text-lg font-bold mb-4">Status updates</h2>
+      <% if @incidents.any? %>
+        <% @incidents.first(5).each do |incident| %>
+        <div class="bg-white rounded-lg p-6 mb-4">
+          <div class="flex items-start">
+            <div class="text-red-500 mr-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <div>
+              <h3 class="text-gray-900 font-medium"><%= @domain.name %> was down for <%= incident[:duration] %> minutes</h3>
+              <div class="text-sm text-gray-500 mt-1"><%= incident[:start].strftime("%B %d, %Y, %H:%M") %></div>
+              <div class="mt-2">
+                <div class="text-gray-700">The reason was <span class="font-medium"><%= incident[:status].titleize %></span></div>
+                <div class="text-sm text-gray-500 mt-1">Details: <%= incident[:status] == 'error' ? 'The server returned an error response.' : 'The server did not respond.' %></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <% end %>
+        <% if @incidents.size > 5 %>
+          <div class="text-center text-sm text-gray-500 mt-2">
+            <%= @incidents.size - 5 %> more incidents not shown
+          </div>
+        <% end %>
+      <% else %>
+        <div class="bg-white rounded-lg p-6 text-center text-gray-500">
+          No incidents reported in the last 30 days.
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Footer -->
+    <div class="text-center text-sm text-gray-600 mt-12 mb-4">
+      That's all folks!
+    </div>
+
+    <div class="flex justify-between items-center text-xs text-gray-600">
+      <div>
+        Powered by <span class="text-indigo-800 font-medium">Domain Checker</span>
+      </div>
+    </div>
+  </div>
+</div>

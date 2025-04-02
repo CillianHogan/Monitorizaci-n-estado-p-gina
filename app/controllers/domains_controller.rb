@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class DomainsController < ApplicationController
-  before_action :authenticate_user!
   before_action :set_domain, only: %i[show edit update destroy]
 
   def index
@@ -48,6 +47,6 @@ class DomainsController < ApplicationController
   end
 
   def domain_params
-    params.expect(domain: %i[name url])
+    params.require(:domain).permit(:name, :url)
   end
 end

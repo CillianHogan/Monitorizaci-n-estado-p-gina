@@ -10,7 +10,7 @@
     <%= form_for(resource, as: resource_name, url: confirmation_path(resource_name), html: { method: :post, class: "mt-8 space-y-6" }) do |f| %>
       <%= render "devise/shared/error_messages", resource: resource %>
 
-      <div class="rounded-md -space-y-px">
+      <div class="rounded-md">
         <div class="mb-4">
           <%= f.label :email, class: "block text-sm font-medium text-gray-700 mb-1" %>
           <%= f.email_field :email, autofocus: true, autocomplete: "email", value: (resource.pending_reconfirmation? ? resource.unconfirmed_email : resource.email), class: "appearance-none relative block w-full px-4 py-3 border border-gray-200 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm transition-all duration-200 hover:border-gray-300 shadow-sm", placeholder: "name@example.com" %>

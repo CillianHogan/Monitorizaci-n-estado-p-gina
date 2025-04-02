@@ -37,11 +37,9 @@ Rails.application.configure do
   config.action_mailer.raise_delivery_errors = true
 
   # Configure mail delivery method for development
-  config.action_mailer.delivery_method = :smtp
-  config.action_mailer.smtp_settings = {
-    address: 'localhost',
-    port: 1025
-  }
+  # Using letter_opener to preview emails in the browser instead of sending them
+  config.action_mailer.delivery_method = :letter_opener
+  config.action_mailer.perform_deliveries = true
 
   # Make template changes take effect immediately.
   config.action_mailer.perform_caching = false
