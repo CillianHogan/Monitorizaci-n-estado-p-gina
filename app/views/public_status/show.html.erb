@@ -55,7 +55,7 @@
         <div class="flex items-center justify-between mb-2">
           <div class="flex items-center">
             <span class="text-gray-700 mr-2">Website</span>
-            <span class="text-xs text-gray-500">↑ <%= calculate_uptime_percentage(@last_90_days_histories).round(2) %>%</span>
+            <span class="text-xs text-gray-500">↑ <%= calculate_weighted_uptime_percentage(@last_90_days_histories).round(2) %>%</span>
           </div>
           <div class="<%= @domain.status_up? ? 'text-green-500' : 'text-red-500' %> text-sm font-medium">
             <%= @domain.status_up? ? 'Operational' : 'Down' %>
@@ -100,19 +100,19 @@
       <h2 class="text-lg font-bold mb-4">Overall Uptime</h2>
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div class="bg-white rounded-lg p-6 text-center">
-          <div class="text-xl font-bold text-gray-900"><%= calculate_uptime_percentage(@last_24_hours_histories).round(3) %>%</div>
+          <div class="text-xl font-bold text-gray-900"><%= calculate_weighted_uptime_percentage(@last_24_hours_histories).round(3) %>%</div>
           <div class="text-sm text-gray-500">Last 24 hours</div>
         </div>
         <div class="bg-white rounded-lg p-6 text-center">
-          <div class="text-xl font-bold text-gray-900"><%= calculate_uptime_percentage(@last_7_days_histories).round(3) %>%</div>
+          <div class="text-xl font-bold text-gray-900"><%= calculate_weighted_uptime_percentage(@last_7_days_histories).round(3) %>%</div>
           <div class="text-sm text-gray-500">Last 7 days</div>
         </div>
         <div class="bg-white rounded-lg p-6 text-center">
-          <div class="text-xl font-bold text-gray-900"><%= calculate_uptime_percentage(@last_30_days_histories).round(3) %>%</div>
+          <div class="text-xl font-bold text-gray-900"><%= calculate_weighted_uptime_percentage(@last_30_days_histories).round(3) %>%</div>
           <div class="text-sm text-gray-500">Last 30 days</div>
         </div>
         <div class="bg-white rounded-lg p-6 text-center">
-          <div class="text-xl font-bold text-gray-900"><%= calculate_uptime_percentage(@last_90_days_histories).round(3) %>%</div>
+          <div class="text-xl font-bold text-gray-900"><%= calculate_weighted_uptime_percentage(@last_90_days_histories).round(3) %>%</div>
           <div class="text-sm text-gray-500">Last 90 days</div>
         </div>
       </div>

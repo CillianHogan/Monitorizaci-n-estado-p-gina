@@ -26,33 +26,53 @@ class PublicStatusController < ApplicationController
   def calculate_uptime_percentage(histories)
     return 100.0 if histories.empty?
     
-    # Para períodos cortos (menos de 48 horas), calculamos por hora en lugar de por día
-    if histories.last.recorded_at - histories.first.recorded_at < 48.hours && histories.size > 1
-      # Agrupar por hora para períodos cortos
-      time_unit = :hour
-      histories_by_unit = histories.group_by { |h| h.recorded_at.beginning_of_hour }
-    else
-      # Agrupar registros por día para períodos más largos
-      time_unit = :day
-      histories_by_unit = histories.group_by { |h| h.recorded_at.to_date }
-    end
+    # Simplemente contar la proporción de registros 'up' respecto al total
+    up_count = histories.count { |h| h.status == 'up' }
+    total_count = histories.size
     
-    # Calcular el tiempo total de actividad
-    total_up_time = 0.0
+    # Calcular el porcentaje de tiempo de actividad
+    (up_count.to_f / total_count) * 100
+  end
+  
+  # Método alternativo que calcula el uptime ponderado por tiempo entre registros
+  def calculate_weighted_uptime_percentage(histories)
+    return 100.0 if histories.empty?
+    return 100.0 if histories.size == 1 && histories.first.status == 'up'
+    return 0.0 if histories.size == 1 && histories.first.status != 'up'
+    
+    # Ordenar historiales por tiempo de registro
+    sorted_histories = histories.sort_by(&:recorded_at)
+    
     total_time = 0.0
+    uptime = 0.0
     
-    histories_by_unit.each do |time, unit_histories|
-      # Calcular el porcentaje de tiempo 'up' para esta unidad de tiempo
-      up_count = unit_histories.count { |h| h.status == 'up' }
-      unit_up_percentage = (up_count.to_f / unit_histories.size) * 100
+    # Calcular el tiempo ponderado entre cada par de registros consecutivos
+    (0...(sorted_histories.size - 1)).each do |i|
+      current = sorted_histories[i]
+      next_record = sorted_histories[i + 1]
       
-      # Acumular el tiempo ponderado
-      total_up_time += unit_up_percentage
-      total_time += 100.0 # Cada unidad representa 100%
+      # Calcular el tiempo entre este registro y el siguiente
+      time_diff = (next_record.recorded_at - current.recorded_at).to_f
+      
+      # Si el estado actual es 'up', añadir este tiempo al uptime
+      uptime += time_diff if current.status == 'up'
+      
+      # Añadir este tiempo al tiempo total
+      total_time += time_diff
     end
     
-    # Calcular el porcentaje global de tiempo de actividad
-    (total_up_time / total_time) * 100
+    # Para el último registro, asumimos que su estado se mantiene hasta ahora
+    # Solo si el período de tiempo es reciente (últimas 24 horas)
+    if (Time.current - sorted_histories.last.recorded_at) < 24.hours
+      last_time_diff = (Time.current - sorted_histories.last.recorded_at).to_f
+      uptime += last_time_diff if sorted_histories.last.status == 'up'
+      total_time += last_time_diff
+    end
+    
+    return 0.0 if total_time.zero?
+    
+    # Calcular el porcentaje de tiempo de actividad
+    (uptime / total_time) * 100
   end
   
   def calculate_incidents
@@ -114,5 +134,5 @@ class PublicStatusController < ApplicationController
     incidents.sort_by { |i| i[:start] }.reverse
   end
   
-  helper_method :calculate_uptime_percentage
+  helper_method :calculate_uptime_percentage, :calculate_weighted_uptime_percentage
 end
