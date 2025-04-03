@@ -37,8 +37,18 @@ class PublicStatusController < ApplicationController
   # Método alternativo que calcula el uptime ponderado por tiempo entre registros
   def calculate_weighted_uptime_percentage(histories)
     return 100.0 if histories.empty?
-    return 100.0 if histories.size == 1 && histories.first.status == 'up'
-    return 0.0 if histories.size == 1 && histories.first.status != 'up'
+    
+    # Si solo hay un registro, usamos su estado para determinar el uptime
+    if histories.size == 1
+      # Si el registro es reciente (últimas 24 horas), consideramos su estado actual
+      if (Time.current - histories.first.recorded_at) < 24.hours
+        return histories.first.status == 'up' ? 100.0 : 0.0
+      else
+        # Si el registro es antiguo, asumimos un uptime del 50% para evitar valores extremos
+        # basados en datos insuficientes
+        return 50.0
+      end
+    end
     
     # Ordenar historiales por tiempo de registro
     sorted_histories = histories.sort_by(&:recorded_at)
@@ -62,14 +72,12 @@ class PublicStatusController < ApplicationController
     end
     
     # Para el último registro, asumimos que su estado se mantiene hasta ahora
-    # Solo si el período de tiempo es reciente (últimas 24 horas)
-    if (Time.current - sorted_histories.last.recorded_at) < 24.hours
-      last_time_diff = (Time.current - sorted_histories.last.recorded_at).to_f
-      uptime += last_time_diff if sorted_histories.last.status == 'up'
-      total_time += last_time_diff
-    end
+    # Consideramos el último registro independientemente de su antigüedad
+    last_time_diff = (Time.current - sorted_histories.last.recorded_at).to_f
+    uptime += last_time_diff if sorted_histories.last.status == 'up'
+    total_time += last_time_diff
     
-    return 0.0 if total_time.zero?
+    return 50.0 if total_time.zero? # Valor predeterminado si no hay tiempo total calculable
     
     # Calcular el porcentaje de tiempo de actividad
     (uptime / total_time) * 100
