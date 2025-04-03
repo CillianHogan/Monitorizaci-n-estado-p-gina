@@ -37,37 +37,53 @@ class PublicStatusController < ApplicationController
       histories_by_unit = histories.group_by { |h| h.recorded_at.to_date }
     end
     
-    # Calcular el estado predominante para cada unidad de tiempo
-    units_up = 0
-    total_units = histories_by_unit.size
+    # Calcular el tiempo total de actividad
+    total_up_time = 0.0
+    total_time = 0.0
     
     histories_by_unit.each do |time, unit_histories|
-      # Una unidad de tiempo se considera 'up' si la mayoría de los registros están 'up'
+      # Calcular el porcentaje de tiempo 'up' para esta unidad de tiempo
       up_count = unit_histories.count { |h| h.status == 'up' }
-      units_up += 1 if up_count > unit_histories.size / 2.0
+      unit_up_percentage = (up_count.to_f / unit_histories.size) * 100
+      
+      # Acumular el tiempo ponderado
+      total_up_time += unit_up_percentage
+      total_time += 100.0 # Cada unidad representa 100%
     end
     
-    # Calcular el porcentaje de unidades de tiempo con estado predominante 'up'
-    (units_up.to_f / total_units) * 100
+    # Calcular el porcentaje global de tiempo de actividad
+    (total_up_time / total_time) * 100
   end
   
   def calculate_incidents
     incidents = []
     current_incident = nil
     last_status = nil
+    last_recorded_at = nil
     min_incident_duration = 2.minutes # Ignorar fluctuaciones muy breves
+    stability_threshold = 5.minutes # Tiempo mínimo para considerar un estado como estable
     
     @domain.status_histories.order(recorded_at: :asc).each do |history|
+      # Si es el primer registro, solo guardamos el estado
+      if last_status.nil?
+        last_status = history.status
+        last_recorded_at = history.recorded_at
+        next
+      end
+      
+      # Calcular el tiempo transcurrido desde el último registro
+      time_since_last = history.recorded_at - last_recorded_at
+      
       # Iniciar un nuevo incidente cuando el estado cambia de 'up' a cualquier otro
-      if history.status != 'up' && (last_status == 'up' || last_status.nil?) && current_incident.nil?
+      if history.status != 'up' && last_status == 'up' && current_incident.nil?
         # Start of a new incident
         current_incident = { 
           start: history.recorded_at, 
           status: history.status,
           details: "El servicio cambió de estado a #{history.status}"
         }
-      # Finalizar un incidente cuando el estado cambia a 'up'
-      elsif history.status == 'up' && current_incident.present?
+      # Finalizar un incidente cuando el estado cambia a 'up' y ha pasado suficiente tiempo para considerarlo estable
+      elsif history.status == 'up' && current_incident.present? && time_since_last >= stability_threshold
         # End of an incident
         current_incident[:end] = history.recorded_at
         current_incident[:duration] = ((current_incident[:end] - current_incident[:start]) / 60.0).round # in minutes
@@ -84,6 +100,7 @@ class PublicStatusController < ApplicationController
       end
       
       last_status = history.status
+      last_recorded_at = history.recorded_at
     end
     
     # Handle ongoing incident

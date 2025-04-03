@@ -16,7 +16,7 @@ class Domain < ApplicationRecord
   after_create :check_initial_status
   after_save :create_status_history, if: :saved_change_to_status?
 
-  after_update_commit :notify_status_change, if: -> { saved_change_to_status? && (status_previously_was == "up" || status == "up") }
+  after_update_commit :notify_status_change, if: -> { saved_change_to_status? }
 
   def check_status!
     response = HTTParty.head(url)
@@ -36,10 +36,19 @@ class Domain < ApplicationRecord
   end
 
   def notify_status_change
-    if status == "up"
-      DomainMailer.status_up_notification(self).deliver_now
-    else
-      DomainMailer.status_down_notification(self).deliver_now
+    # Solo notificar cuando el estado cambia realmente
+    # El callback ya verifica saved_change_to_status?, así que sabemos que hubo un cambio
+    previous_status = saved_change_to_status.first
+    current_status = status
+    
+    # Solo enviar notificación si el estado anterior es diferente al actual
+    # y si el estado anterior o actual es "up" (para notificar caídas y recuperaciones)
+    if previous_status != current_status && (previous_status == "up" || current_status == "up")
+      if current_status == "up"
+        DomainMailer.status_up_notification(self).deliver_now
+      else
+        DomainMailer.status_down_notification(self).deliver_now
+      end
     end
   end
 
