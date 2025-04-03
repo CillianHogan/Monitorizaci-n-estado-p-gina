@@ -14,7 +14,7 @@ class Domain < ApplicationRecord
 
   before_validation :generate_public_token, on: :create
   after_create :check_initial_status
-  after_save :create_status_history, if: :saved_change_to_status?
+  after_save :create_status_history
 
   after_update_commit :notify_status_change, if: -> { saved_change_to_status? }
 
