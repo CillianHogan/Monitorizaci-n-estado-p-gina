@@ -19,22 +19,22 @@ module RoleAuthorization
 
   # Verifica si el usuario actual tiene un rol específico
   def current_user_has_role?(role)
-    current_user&.has_role?(role)
+    current_user&.role?(role)
   end
 
   # Requiere que el usuario tenga rol de administrador
   def require_admin
-    unless current_user_admin?
-      flash[:alert] = 'Acceso denegado. Se requiere rol de administrador.'
-      redirect_to root_path
-    end
+    return if current_user_admin?
+
+    flash[:alert] = 'Acceso denegado. Se requiere rol de administrador.'
+    redirect_to root_path
   end
 
   # Requiere que el usuario tenga rol de manager o superior
   def require_manager
-    unless current_user_admin? || current_user_manager?
-      flash[:alert] = 'Acceso denegado. Se requiere rol de manager o administrador.'
-      redirect_to root_path
-    end
+    return if current_user_admin? || current_user_manager?
+
+    flash[:alert] = 'Acceso denegado. Se requiere rol de manager o administrador.'
+    redirect_to root_path
   end
 end

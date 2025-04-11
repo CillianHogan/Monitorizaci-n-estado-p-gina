@@ -47,6 +47,6 @@ class DomainsController < ApplicationController
   end
 
   def domain_params
-    params.require(:domain).permit(:name, :url)
+    params.expect(domain: %i[name url])
   end
 end
