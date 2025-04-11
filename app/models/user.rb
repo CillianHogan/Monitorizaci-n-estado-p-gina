@@ -8,4 +8,26 @@ class User < ApplicationRecord
 
   has_many :domains, dependent: :destroy
   has_many :api_endpoints, dependent: :destroy
+  
+  # Definición de roles de usuario
+  ROLES = %w[admin manager user].freeze
+  
+  validates :role, presence: true, inclusion: { in: ROLES }
+  
+  # Métodos auxiliares para verificar roles
+  def admin?
+    role == 'admin'
+  end
+  
+  def manager?
+    role == 'manager'
+  end
+  
+  def regular_user?
+    role == 'user'
+  end
+  
+  def has_role?(requested_role)
+    role == requested_role.to_s
+  end
 end
