@@ -27,4 +27,13 @@ class DomainMailer < ApplicationMailer
       subject: "Domain Status Alert: #{@domain.name} is back online"
     )
   end
+
+  def ssl_expiration_warning_notification(domain)
+    @domain = domain
+    @user = domain.user
+    mail(
+      to: @user.email,
+      subject: "SSL Warning: El certificado de #{@domain.name} caduca en #{@domain.ssl_days_remaining} días"
+    )
+  end
 end
