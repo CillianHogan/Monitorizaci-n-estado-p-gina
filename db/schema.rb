@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_11_090958) do
+ActiveRecord::Schema[8.0].define(version: 2026_09_22_104852) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -44,6 +44,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_11_090958) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "public_token"
+    t.boolean "ssl_valid"
+    t.string "ssl_issuer"
+    t.datetime "ssl_expires_at"
+    t.integer "ssl_days_remaining"
     t.index ["public_token"], name: "index_domains_on_public_token", unique: true
     t.index ["user_id"], name: "index_domains_on_user_id"
   end
