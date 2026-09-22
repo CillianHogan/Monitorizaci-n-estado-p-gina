@@ -60,7 +60,7 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
 
   # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: 'example.com' }
+  config.action_mailer.default_url_options = { host: 'domain-monitor-ea281e1f44d9.herokuapp.com', protocol: 'https' }
 
   # Configure SMTP settings for production
   config.action_mailer.delivery_method = :smtp
@@ -96,4 +96,5 @@ Rails.application.configure do
   #
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+  config.action_mailer.default_url_options = { host: 'domain-monitor-ea281e1f44d9.herokuapp.com', protocol: 'https' }
 end
