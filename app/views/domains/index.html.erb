@@ -11,6 +11,7 @@
           <th class="py-3 px-6 text-left font-semibold">Name</th>
           <th class="py-3 px-6 text-left font-semibold">URL</th>
           <th class="py-3 px-6 text-center font-semibold">Status</th>
+          <th class="py-3 px-6 text-center font-semibold">SSL</th>
           <th class="py-3 px-6 text-center font-semibold">Actions</th>
         </tr>
       </thead>
@@ -27,6 +28,23 @@
               <span class="<%= status_badge_class(domain.status) %>">
                 <%= domain.status.titleize %>
               </span>
+            </td>
+            <td class="py-3 px-6 text-center">
+              <% if domain.respond_to?(:ssl_valid) && domain.ssl_valid? %>
+                <% if domain.ssl_days_remaining.to_i <= 30 %>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 ring-1 ring-amber-500/20" title="Caduca en <%= domain.ssl_days_remaining %> días (<%= domain.ssl_issuer %>)">
+                    <%= domain.ssl_days_remaining %>d restantes
+                  </span>
+                <% else %>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 ring-1 ring-green-500/20" title="Válido: <%= domain.ssl_days_remaining %> días (<%= domain.ssl_issuer %>)">
+                    Válido (<%= domain.ssl_days_remaining %>d)
+                  </span>
+                <% end %>
+              <% else %>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 ring-1 ring-gray-400/20">
+                  Sin HTTPS
+                </span>
+              <% end %>
             </td>
             <td class="py-3 px-6 text-center">
               <div class="flex item-center justify-center space-x-3">
