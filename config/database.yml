@@ -18,3 +18,10 @@ test:
 production:
   <<: *default
   database: monitorizacion_production
+
+production:
+  primary: &primary_production
+    <<: *default
+    url: <%= ENV["DATABASE_URL"] %>
+  queue:
+    <<: *primary_production
