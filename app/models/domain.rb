@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'securerandom'
+require 'socket'
+require 'openssl'
 
 class Domain < ApplicationRecord
   belongs_to :user
@@ -19,11 +21,41 @@ class Domain < ApplicationRecord
   after_update_commit :notify_status_change, if: -> { saved_change_to_status? }
 
   def check_status!
-    response = HTTParty.head(url)
+    response = HTTParty.head(url, timeout: 10)
     update(status: response.success? ? :up : :down)
   rescue StandardError => e
     Rails.logger.error("Domain check failed for #{url}: #{e.message}")
     update(status: :error)
+  end
+
+  # Comprobación SSL usando la librería nativa OpenSSL de Ruby
+  def check_ssl
+    uri = URI.parse(url)
+    return { valid: false, error: 'No es HTTPS' } unless uri.scheme == 'https'
+
+    tcp_client = Socket.tcp(uri.host, 443, connect_timeout: 5)
+    ssl_context = OpenSSL::SSL::SSLContext.new
+    ssl_client = OpenSSL::SSL::SSLSocket.new(tcp_client, ssl_context)
+    ssl_client.hostname = uri.host
+    ssl_client.connect
+
+    cert = ssl_client.peer_cert
+    ssl_client.close
+
+    return { valid: false, error: 'Certificado no encontrado' } unless cert
+
+    days_remaining = ((cert.not_after - Time.current) / 1.day).to_i
+    issuer = cert.issuer.to_a.find { |field| field[0] == 'O' }&.at(1) || 'Desconocido'
+
+    {
+      valid: days_remaining.positive?,
+      expires_at: cert.not_after,
+      days_remaining: days_remaining,
+      issuer: issuer
+    }
+  rescue StandardError => e
+    Rails.logger.warn("SSL check failed for #{url}: #{e.message}")
+    { valid: false, error: e.message }
   end
 
   private
@@ -36,13 +68,9 @@ class Domain < ApplicationRecord
   end
 
   def notify_status_change
-    # Solo notificar cuando el estado cambia realmente
-    # El callback ya verifica saved_change_to_status?, así que sabemos que hubo un cambio
     previous_status = saved_change_to_status.first
     current_status = status
 
-    # Solo enviar notificación si el estado anterior es diferente al actual
-    # y si el estado anterior o actual es "up" (para notificar caídas y recuperaciones)
     return unless previous_status != current_status && (previous_status == 'up' || current_status == 'up')
 
     if current_status == 'up'
