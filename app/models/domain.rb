@@ -24,10 +24,13 @@ class Domain < ApplicationRecord
 
   def check_status!
     clean_url = url.to_s.strip
-    http_status = :error
+    http_status = :down
 
     begin
-      headers = { 'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
+      headers = {
+        'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+      }
       response = HTTParty.get(clean_url, timeout: 10, follow_redirects: true, headers: headers)
       http_status = (200..399).cover?(response.code) ? :up : :down
     rescue StandardError => e
@@ -49,12 +52,12 @@ class Domain < ApplicationRecord
   def check_ssl
     clean_url = url.to_s.strip
     uri = URI.parse(clean_url)
-    return { valid: false, error: 'No es HTTPS' } unless uri.scheme == 'https'
+    host = uri.host || clean_url
 
-    tcp_client = Socket.tcp(uri.host, 443, connect_timeout: 5)
+    tcp_client = Socket.tcp(host, 443, connect_timeout: 5)
     ssl_context = OpenSSL::SSL::SSLContext.new
     ssl_client = OpenSSL::SSL::SSLSocket.new(tcp_client, ssl_context)
-    ssl_client.hostname = uri.host
+    ssl_client.hostname = host
     ssl_client.connect
 
     cert = ssl_client.peer_cert
@@ -80,8 +83,9 @@ class Domain < ApplicationRecord
 
   def normalize_url
     return if url.blank?
-    self.url = url.strip
-    self.url = "https://#{url}" unless url.start_with?('http://', 'https://')
+    trimmed = url.to_s.strip
+    trimmed = "https://#{trimmed}" unless trimmed.match?(%r{\Ahttps?://}i)
+    self.url = trimmed
   end
 
   def generate_public_token
