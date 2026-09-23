@@ -32,7 +32,7 @@ class Domain < ApplicationRecord
         'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
       }
       response = HTTParty.get(clean_url, timeout: 10, follow_redirects: true, headers: headers)
-      http_status = (200..399).cover?(response.code) ? :up : :down
+      http_status = (200..499).cover?(response.code) ? :up : :down
     rescue StandardError => e
       Rails.logger.warn("HTTP check failed for #{clean_url}: #{e.message}")
       http_status = :down
