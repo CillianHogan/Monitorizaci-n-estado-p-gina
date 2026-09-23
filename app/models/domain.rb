@@ -9,34 +9,34 @@ class Domain < ApplicationRecord
   belongs_to :user
   has_many :status_histories, dependent: :destroy, class_name: 'DomainStatusHistory'
 
+  before_validation :normalize_url
+  before_validation :generate_public_token, on: :create
+
   validates :url, presence: true, format: { with: URI::DEFAULT_PARSER.make_regexp, message: 'must be a valid URL' }
   validates :name, presence: true
   validates :public_token, presence: true, uniqueness: true
 
   enum :status, { pending: 0, up: 1, down: 2, error: 3 }, prefix: true
 
-  before_validation :generate_public_token, on: :create
   after_create :check_initial_status
   after_save :create_status_history
-
   after_update_commit :notify_status_change, if: -> { saved_change_to_status? }
 
   def check_status!
-    # 1. Comprobación HTTP (sigue redirecciones y usa User-Agent para no ser bloqueado)
+    clean_url = url.to_s.strip
     http_status = :error
+
     begin
       headers = { 'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
-      response = HTTParty.get(url, timeout: 10, follow_redirects: true, headers: headers)
+      response = HTTParty.get(clean_url, timeout: 10, follow_redirects: true, headers: headers)
       http_status = (200..399).cover?(response.code) ? :up : :down
     rescue StandardError => e
-      Rails.logger.warn("HTTP check failed for #{url}: #{e.message}")
+      Rails.logger.warn("HTTP check failed for #{clean_url}: #{e.message}")
       http_status = :down
     end
 
-    # 2. Comprobación SSL
     ssl_data = check_ssl
 
-    # 3. Guardar todo junto
     update(
       status: http_status,
       ssl_valid: ssl_data[:valid] || false,
@@ -47,7 +47,8 @@ class Domain < ApplicationRecord
   end
 
   def check_ssl
-    uri = URI.parse(url)
+    clean_url = url.to_s.strip
+    uri = URI.parse(clean_url)
     return { valid: false, error: 'No es HTTPS' } unless uri.scheme == 'https'
 
     tcp_client = Socket.tcp(uri.host, 443, connect_timeout: 5)
@@ -71,11 +72,17 @@ class Domain < ApplicationRecord
       issuer: issuer
     }
   rescue StandardError => e
-    Rails.logger.warn("SSL check failed for #{url}: #{e.message}")
+    Rails.logger.warn("SSL check failed for #{clean_url}: #{e.message}")
     { valid: false, error: e.message }
   end
 
   private
+
+  def normalize_url
+    return if url.blank?
+    self.url = url.strip
+    self.url = "https://#{url}" unless url.start_with?('http://', 'https://')
+  end
 
   def generate_public_token
     self.public_token = loop do
