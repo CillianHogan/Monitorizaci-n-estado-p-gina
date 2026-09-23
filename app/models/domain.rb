@@ -3,6 +3,7 @@
 require 'securerandom'
 require 'socket'
 require 'openssl'
+require 'httparty'
 
 class Domain < ApplicationRecord
   belongs_to :user
@@ -21,14 +22,30 @@ class Domain < ApplicationRecord
   after_update_commit :notify_status_change, if: -> { saved_change_to_status? }
 
   def check_status!
-    response = HTTParty.head(url, timeout: 10)
-    update(status: response.success? ? :up : :down)
-  rescue StandardError => e
-    Rails.logger.error("Domain check failed for #{url}: #{e.message}")
-    update(status: :error)
+    # 1. Comprobación HTTP (sigue redirecciones y usa User-Agent para no ser bloqueado)
+    http_status = :error
+    begin
+      headers = { 'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
+      response = HTTParty.get(url, timeout: 10, follow_redirects: true, headers: headers)
+      http_status = (200..399).cover?(response.code) ? :up : :down
+    rescue StandardError => e
+      Rails.logger.warn("HTTP check failed for #{url}: #{e.message}")
+      http_status = :down
+    end
+
+    # 2. Comprobación SSL
+    ssl_data = check_ssl
+
+    # 3. Guardar todo junto
+    update(
+      status: http_status,
+      ssl_valid: ssl_data[:valid] || false,
+      ssl_issuer: ssl_data[:issuer],
+      ssl_expires_at: ssl_data[:expires_at],
+      ssl_days_remaining: ssl_data[:days_remaining]
+    )
   end
 
-  # Comprobación SSL usando la librería nativa OpenSSL de Ruby
   def check_ssl
     uri = URI.parse(url)
     return { valid: false, error: 'No es HTTPS' } unless uri.scheme == 'https'
@@ -78,10 +95,14 @@ class Domain < ApplicationRecord
     else
       DomainMailer.status_down_notification(self).deliver_now
     end
+  rescue StandardError => e
+    Rails.logger.error("Mailer notification failed: #{e.message}")
   end
 
   def create_status_history
     status_histories.create!(status: status, recorded_at: Time.current)
+  rescue StandardError => e
+    Rails.logger.error("History recording failed: #{e.message}")
   end
 
   def check_initial_status
