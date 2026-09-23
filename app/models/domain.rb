@@ -102,9 +102,9 @@ class Domain < ApplicationRecord
     return unless previous_status != current_status && (previous_status == 'up' || current_status == 'up')
 
     if current_status == 'up'
-      DomainMailer.status_up_notification(self).deliver_now
+      DomainMailer.status_up_notification(self).deliver_later
     else
-      DomainMailer.status_down_notification(self).deliver_now
+      DomainMailer.status_down_notification(self).deliver_later
     end
   rescue StandardError => e
     Rails.logger.error("Mailer notification failed: #{e.message}")
