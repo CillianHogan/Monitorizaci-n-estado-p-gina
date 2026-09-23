@@ -1,18 +1,18 @@
 # frozen_string_literal: true
 
-require 'securerandom'
-require 'socket'
-require 'openssl'
-require 'httparty'
+require "securerandom"
+require "socket"
+require "openssl"
+require "httparty"
 
 class Domain < ApplicationRecord
   belongs_to :user
-  has_many :status_histories, dependent: :destroy, class_name: 'DomainStatusHistory'
+  has_many :status_histories, dependent: :destroy, class_name: "DomainStatusHistory"
 
   before_validation :normalize_url
   before_validation :generate_public_token, on: :create
 
-  validates :url, presence: true, format: { with: URI::DEFAULT_PARSER.make_regexp, message: 'must be a valid URL' }
+  validates :url, presence: true, format: { with: URI::DEFAULT_PARSER.make_regexp, message: "must be a valid URL" }
   validates :name, presence: true
   validates :public_token, presence: true, uniqueness: true
 
@@ -28,8 +28,8 @@ class Domain < ApplicationRecord
 
     begin
       headers = {
-        'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-        'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+        "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
       }
       response = HTTParty.get(clean_url, timeout: 10, follow_redirects: true, headers: headers)
       http_status = (200..499).cover?(response.code) ? :up : :down
@@ -49,6 +49,25 @@ class Domain < ApplicationRecord
     )
   end
 
+  def check_ssl_expiration_alert!
+    return unless ssl_valid? && ssl_days_remaining.present?
+    return if ssl_alert_sent_at == Date.current
+
+    should_notify = case ssl_days_remaining
+                    when 30, 15
+                      true
+                    when 1..5
+                      true
+                    else
+                      false
+                    end
+
+    if should_notify
+      DomainMailer.ssl_expiration_warning_notification(self).deliver_later
+      update_column(:ssl_alert_sent_at, Date.current)
+    end
+  end
+
   def check_ssl
     clean_url = url.to_s.strip
     uri = URI.parse(clean_url)
@@ -63,10 +82,10 @@ class Domain < ApplicationRecord
     cert = ssl_client.peer_cert
     ssl_client.close
 
-    return { valid: false, error: 'Certificado no encontrado' } unless cert
+    return { valid: false, error: "Certificado no encontrado" } unless cert
 
     days_remaining = ((cert.not_after - Time.current) / 1.day).to_i
-    issuer = cert.issuer.to_a.find { |field| field[0] == 'O' }&.at(1) || 'Desconocido'
+    issuer = cert.issuer.to_a.find { |field| field[0] == "O" }&.at(1) || "Desconocido"
 
     {
       valid: days_remaining.positive?,
@@ -99,9 +118,9 @@ class Domain < ApplicationRecord
     previous_status = saved_change_to_status.first
     current_status = status
 
-    return unless previous_status != current_status && (previous_status == 'up' || current_status == 'up')
+    return unless previous_status != current_status && (previous_status == "up" || current_status == "up")
 
-    if current_status == 'up'
+    if current_status == "up"
       DomainMailer.status_up_notification(self).deliver_later
     else
       DomainMailer.status_down_notification(self).deliver_later
