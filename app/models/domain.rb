@@ -108,6 +108,15 @@ class Domain < ApplicationRecord
     { valid: false, error: e.message }
   end
 
+  
+  def last_response_time_ms
+    status_histories.order(recorded_at: :desc).first&.response_time_ms
+  end
+
+  def average_response_time_ms(since = 24.hours.ago)
+    status_histories.where("recorded_at >= ?", since).average(:response_time_ms)&.round
+  end
+
   private
 
   def normalize_url

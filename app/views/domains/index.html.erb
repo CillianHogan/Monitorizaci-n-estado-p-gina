@@ -1,25 +1,72 @@
 <div class="container">
   <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold text-indigo-800">Your Domains</h1>
-    <%= link_to 'Add New Domain', new_domain_path, class: 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-200' %>
+    <h1 class="text-3xl font-bold text-indigo-800">Tus Dominios</h1>
+    <%= link_to 'Añadir Dominio', new_domain_path, class: 'bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-200' %>
+  </div>
+
+  <%# Tarjetas de resumen / KPIs %>
+  <% 
+    total_domains = @domains.size
+    up_count = @domains.count(&:status_up?)
+    down_count = @domains.count { |d| d.status_down? || d.status_error? }
+    recent_histories = DomainStatusHistory.where(domain_id: @domains.map(&:id)).where("recorded_at >= ?", 24.hours.ago)
+    avg_global_latency = recent_histories.average(:response_time_ms)&.round
+  %>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="bg-white p-4 rounded-lg border border-gray-100 shadow-sm flex items-center justify-between">
+      <div>
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Dominios en Línea</p>
+        <p class="text-2xl font-bold text-green-600"><%= up_count %> / <%= total_domains %></p>
+      </div>
+      <div class="p-3 bg-green-50 rounded-full text-green-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+      </div>
+    </div>
+
+    <div class="bg-white p-4 rounded-lg border border-gray-100 shadow-sm flex items-center justify-between">
+      <div>
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Incidencias / Caídos</p>
+        <p class="text-2xl font-bold <%= down_count > 0 ? 'text-red-600' : 'text-gray-700' %>"><%= down_count %></p>
+      </div>
+      <div class="p-3 bg-red-50 rounded-full text-red-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+      </div>
+    </div>
+
+    <div class="bg-white p-4 rounded-lg border border-gray-100 shadow-sm flex items-center justify-between">
+      <div>
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Latencia Media (24h)</p>
+        <p class="text-2xl font-bold text-indigo-600">
+          <%= avg_global_latency.present? ? "#{avg_global_latency} ms" : "Sin datos" %>
+        </p>
+      </div>
+      <div class="p-3 bg-indigo-50 rounded-full text-indigo-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+      </div>
+    </div>
   </div>
 
   <div class="bg-white shadow-lg rounded-lg my-6 overflow-hidden border border-gray-100">
     <table class="min-w-full table-auto">
       <thead>
-        <tr class="bg-gradient-to-r from-gray-50 to-gray-100 text-gray-600 uppercase text-sm leading-normal">
-          <th class="py-3 px-6 text-left font-semibold">Name</th>
+        <tr class="bg-gradient-to-r from-gray-50 to-gray-100 text-gray-600 uppercase text-xs leading-normal">
+          <th class="py-3 px-6 text-left font-semibold">Nombre</th>
           <th class="py-3 px-6 text-left font-semibold">URL</th>
-          <th class="py-3 px-6 text-center font-semibold">Status</th>
+          <th class="py-3 px-6 text-center font-semibold">Estado</th>
+          <th class="py-3 px-6 text-center font-semibold">Latencia</th>
           <th class="py-3 px-6 text-center font-semibold">SSL</th>
-          <th class="py-3 px-6 text-center font-semibold">Actions</th>
+          <th class="py-3 px-6 text-center font-semibold">Acciones</th>
         </tr>
       </thead>
       <tbody class="text-gray-600 text-sm">
         <% @domains.each do |domain| %>
+          <% 
+            last_ms = domain.last_response_time_ms
+            avg_ms = domain.average_response_time_ms
+          %>
           <tr class="border-b border-gray-200 hover:bg-blue-50 transition duration-150">
             <td class="py-3 px-6 text-left whitespace-nowrap font-medium text-indigo-700">
-              <%= domain.name %>
+              <%= link_to domain.name, domain_path(domain), class: "hover:underline" %>
             </td>
             <td class="py-3 px-6 text-left">
               <%= link_to domain.url, domain.url, target: '_blank', class: 'text-blue-600 hover:text-blue-800 underline' %>
@@ -28,6 +75,27 @@
               <span class="<%= status_badge_class(domain.status) %>">
                 <%= domain.status.titleize %>
               </span>
+            </td>
+            <td class="py-3 px-6 text-center">
+              <% if last_ms.present? %>
+                <div class="flex flex-col items-center">
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-bold text-gray-800"><%= last_ms %> ms</span>
+                    <% if last_ms < 300 %>
+                      <span class="inline-block w-2 h-2 rounded-full bg-green-500" title="Rápido (< 300ms)"></span>
+                    <% elsif last_ms < 1000 %>
+                      <span class="inline-block w-2 h-2 rounded-full bg-amber-500" title="Normal (300-1000ms)"></span>
+                    <% else %>
+                      <span class="inline-block w-2 h-2 rounded-full bg-red-500" title="Lento (> 1000ms)"></span>
+                    <% end %>
+                  </div>
+                  <% if avg_ms.present? %>
+                    <span class="text-xs text-gray-400">media: <%= avg_ms %> ms</span>
+                  <% end %>
+                </div>
+              <% else %>
+                <span class="text-gray-400 text-xs">Sin registros</span>
+              <% end %>
             </td>
             <td class="py-3 px-6 text-center">
               <% if domain.respond_to?(:ssl_valid) && domain.ssl_valid? %>
@@ -47,10 +115,10 @@
               <% end %>
             </td>
             <td class="py-3 px-6 text-center">
-              <div class="flex item-center justify-center space-x-3">
-                <%= link_to 'View', domain_path(domain), class: 'text-blue-600 hover:text-blue-800 font-medium' %>
-                <%= link_to 'Edit', edit_domain_path(domain), class: 'text-indigo-600 hover:text-indigo-800 font-medium' %>
-                <%= button_to 'Delete', domain_path(domain), method: :delete, class: 'text-red-600 hover:text-red-800 font-medium', form: { data: { turbo_confirm: 'Are you sure?' } } %>
+              <div class="flex items-center justify-center space-x-3">
+                <%= link_to 'Ver', domain_path(domain), class: 'text-blue-600 hover:text-blue-800 font-medium' %>
+                <%= link_to 'Editar', edit_domain_path(domain), class: 'text-indigo-600 hover:text-indigo-800 font-medium' %>
+                <%= button_to 'Eliminar', domain_path(domain), method: :delete, class: 'text-red-600 hover:text-red-800 font-medium', form: { data: { turbo_confirm: '¿Estás seguro?' } } %>
               </div>
             </td>
           </tr>
