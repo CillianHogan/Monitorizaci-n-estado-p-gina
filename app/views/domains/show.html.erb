@@ -9,17 +9,17 @@
           <span class="inline-flex items-center px-4 py-2 rounded-lg text-base font-semibold shadow-sm <%= @domain.status_up? ? 'bg-green-100 text-green-800 ring-1 ring-green-500/20' : (@domain.status_error? ? 'bg-red-100 text-red-800 ring-1 ring-red-500/20' : 'bg-amber-100 text-amber-800 ring-1 ring-amber-500/20') %>">
             <% case @domain.status %>
             <% when 'up' %>
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
             <% when 'error' %>
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
             <% else %>
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             <% end %>
             <%= @domain.status.titleize %>
           </span>
         </div>
       </div>
-      <p class="mt-1 max-w-2xl text-sm text-gray-600">Domain monitoring details</p>
+      <p class="mt-1 max-w-2xl text-sm text-gray-600">Detalles de monitorización del dominio</p>
     </div>
     <div class="border-t border-gray-200">
       <div class="flex">
@@ -31,15 +31,27 @@
             </dd>
           </div>
           <div class="bg-gradient-to-r from-indigo-50 to-blue-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt class="text-sm font-medium text-gray-600">Created</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2">
-              <%= @domain.created_at.strftime("%B %d, %Y") %>
+            <dt class="text-sm font-medium text-gray-600">Última latencia registrada</dt>
+            <dd class="mt-1 text-sm sm:col-span-2 flex items-center gap-2">
+              <% last_history = @domain.status_histories.order(recorded_at: :desc).first %>
+              <% if last_history&.response_time_ms.present? %>
+                <span class="text-lg font-bold text-indigo-700"><%= last_history.response_time_ms %> ms</span>
+                <% if last_history.response_time_ms < 300 %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">Rápido</span>
+                <% elsif last_history.response_time_ms < 1000 %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800">Normal</span>
+                <% else %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">Lento</span>
+                <% end %>
+              <% else %>
+                <span class="text-gray-500">Pendiente de registro</span>
+              <% end %>
             </dd>
           </div>
           <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt class="text-sm font-medium text-gray-600">Last Updated</dt>
+            <dt class="text-sm font-medium text-gray-600">Última actualización</dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-2">
-              <%= @domain.updated_at.strftime("%B %d, %Y at %I:%M %p") %>
+              <%= @domain.updated_at.strftime("%B %d, %Y a las %I:%M %p") %>
             </dd>
           </div>
         </dl>
@@ -49,11 +61,11 @@
               <div class="inline-flex items-center justify-center w-24 h-24 rounded-full <%= @domain.status_up? ? 'bg-green-100' : (@domain.status_error? ? 'bg-red-100' : 'bg-amber-100') %>">
                 <% case @domain.status %>
                 <% when 'up' %>
-                  <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                  <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                 <% when 'error' %>
-                  <svg class="w-12 h-12 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                  <svg class="w-12 h-12 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                 <% else %>
-                  <svg class="w-12 h-12 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  <svg class="w-12 h-12 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 <% end %>
               </div>
             </div>
@@ -115,28 +127,31 @@
     </div>
   </div>
 
-  <div class="mt-8 bg-white shadow-lg rounded-lg overflow-hidden border border-gray-100" data-controller="domain-chart" data-domain-chart-data-value="<%= @domain.status_histories.to_json %>">
-    <div class="px-4 py-5 sm:px-6 bg-gradient-to-r from-indigo-50 to-blue-50">
-      <h2 class="text-xl font-semibold text-indigo-800">Domain Status History</h2>
-      <p class="mt-1 text-sm text-gray-600">Uptime monitoring over time</p>
-      <div class="mt-3">
-        <select data-action="change->domain-chart#changeTimeRange" class="mt-1 block w-full pl-3 pr-8 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-no-repeat bg-[right_0.8rem_center] appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Ctitle%3Edown-arrow%3C%2Ftitle%3E%3Cg%20fill%3D%22%23000000%22%3E%3Cpath%20d%3D%22M10.293%2C3.293%2C6%2C7.586%2C1.707%2C3.293A1%2C1%2C0%2C0%2C0%2C.293%2C4.707l5%2C5a1%2C1%2C0%2C0%2C0%2C1.414%2C0l5-5a1%2C1%2C0%2C1%2C0-1.414-1.414Z%22%20fill%3D%22%23404040%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E')]">
-          <option value="all">All Time</option>
-          <option value="week">Last Week</option>
-          <option value="month">Last Month</option>
-          <option value="3months">Last 3 Months</option>
-          <option value="6months">Last 6 Months</option>
-          <option value="year">Last Year</option>
+  <%# Gráfica de Latencia e Historial %>
+  <div class="mt-8 bg-white shadow-lg rounded-lg overflow-hidden border border-gray-100" data-controller="domain-chart" data-domain-chart-data-value="<%= @domain.status_histories.order(recorded_at: :asc).to_json %>">
+    <div class="px-4 py-5 sm:px-6 bg-gradient-to-r from-indigo-50 to-blue-50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <h2 class="text-xl font-semibold text-indigo-800">Historial y Latencia (ms)</h2>
+        <p class="mt-1 text-sm text-gray-600">Tiempo de respuesta y estado en cada verificación</p>
+      </div>
+      <div class="w-full sm:w-48">
+        <select data-action="change->domain-chart#changeTimeRange" class="block w-full pl-3 pr-8 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+          <option value="all">Todo el historial</option>
+          <option value="week">Última semana</option>
+          <option value="month">Último mes</option>
+          <option value="3months">Últimos 3 meses</option>
+          <option value="year">Último año</option>
         </select>
       </div>
     </div>
     <div class="p-6 overflow-x-auto">
-      <div class="w-full h-[250px] sm:h-[300px] md:h-80">
-        <canvas id="domainStatusChart" class="w-full h-full" data-domain-chart-options-value='{"responsive":true,"maintainAspectRatio":false,"interaction":{"mode":"nearest","intersect":false},"plugins":{"legend":{"position":"top","labels":{"boxWidth":10,"padding":10,"font":{"size":10,"family":"system-ui"}}},"tooltip":{"enabled":true,"mode":"index","intersect":false,"bodyFont":{"size":11},"titleFont":{"size":11}}},"scales":{"x":{"grid":{"display":false},"ticks":{"maxRotation":45,"minRotation":45,"font":{"size":9,"family":"system-ui"}}},"y":{"beginAtZero":true,"ticks":{"font":{"size":9,"family":"system-ui"}}}}}' />
+      <div class="w-full h-[280px] sm:h-[320px]">
+        <canvas id="domainStatusChart" class="w-full h-full"></canvas>
       </div>
     </div>
   </div>
 
+  <%# Página de estado pública %>
   <div class="mt-8 bg-white shadow-lg rounded-lg overflow-hidden border border-gray-100">
     <div class="px-4 py-5 sm:px-6 bg-gradient-to-r from-indigo-50 to-blue-50">
       <h2 class="text-xl font-semibold text-indigo-800">Página de estado pública</h2>
@@ -149,7 +164,7 @@
             <input type="text" readonly value="<%= public_status_url(@domain.public_token) %>" class="block w-full pr-10 border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" id="public-status-url">
             <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
               <button data-action="click->clipboard#copy" class="text-gray-400 hover:text-gray-500 focus:outline-none">
-                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z" />
                   <path d="M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z" />
                 </svg>

@@ -11,125 +11,137 @@ export default class extends Controller {
 
   initializeChart() {
     const canvas = document.getElementById('domainStatusChart')
+    if (!canvas) return
     this.ctx = canvas.getContext('2d')
     this._filteredData = this.filterDataByTimeRange('all')
-    
-    // Make it responsive
+
     const resizeObserver = new ResizeObserver(entries => {
       for (let entry of entries) {
         const { width, height } = entry.contentRect
+        if (width === 0 || height === 0) return
         canvas.width = width
         canvas.height = height
         this.drawChart()
       }
     })
-    
+
     resizeObserver.observe(canvas.parentElement)
     this.drawChart()
   }
 
   drawChart() {
+    if (!this.ctx) return
     const { width, height } = this.ctx.canvas
     this.ctx.clearRect(0, 0, width, height)
-    
-    const padding = 40
-    const bottomPadding = 100
-    const rightPadding = 30
-    const chartWidth = width - padding * 2 - rightPadding
+
+    const padding = 50
+    const bottomPadding = 80
+    const chartWidth = width - padding * 2
     const chartHeight = height - padding - bottomPadding
-    
-    // Draw axes
+
+    if (!this._filteredData || this._filteredData.length === 0) {
+      this.ctx.fillStyle = '#6b7280'
+      this.ctx.font = '14px system-ui'
+      this.ctx.textAlign = 'center'
+      this.ctx.fillText('No hay datos suficientes para graficar en este periodo', width / 2, height / 2)
+      return
+    }
+
+    const latencies = this._filteredData.map(d => d.response_time_ms || 0)
+    const maxLatency = Math.max(...latencies, 500)
+    const yMax = Math.ceil(maxLatency * 1.2)
+
+    // Ejes
     this.ctx.beginPath()
-    this.ctx.strokeStyle = '#666'
-    this.ctx.moveTo(padding, padding)
-    this.ctx.lineTo(padding, height - bottomPadding)
-    this.ctx.lineTo(width - padding, height - bottomPadding)
+    this.ctx.strokeStyle = '#e5e7eb'
+    this.ctx.lineWidth = 1
+
+    // Líneas guía horizontales
+    const gridSteps = 4
+    for (let i = 0; i <= gridSteps; i++) {
+      const yVal = Math.round((yMax / gridSteps) * i)
+      const yPos = height - bottomPadding - (chartHeight / gridSteps) * i
+
+      this.ctx.moveTo(padding, yPos)
+      this.ctx.lineTo(width - padding, yPos)
+
+      this.ctx.fillStyle = '#6b7280'
+      this.ctx.font = '11px system-ui'
+      this.ctx.textAlign = 'right'
+      this.ctx.fillText(`${yVal} ms`, padding - 10, yPos + 4)
+    }
     this.ctx.stroke()
-    
-    // Plot data points
-    if (this._filteredData && this._filteredData.length > 1) {
+
+    // Trazar línea de latencia
+    if (this._filteredData.length > 1) {
       const step = chartWidth / (this._filteredData.length - 1)
-      
-      // Draw line
+
       this.ctx.beginPath()
-      this.ctx.strokeStyle = 'rgb(59, 130, 246)'
+      this.ctx.strokeStyle = '#4f46e5'
       this.ctx.lineWidth = 2
-      
+
       this._filteredData.forEach((point, i) => {
         const x = padding + i * step
-        const y = height - bottomPadding - (point.status === 'up' ? chartHeight : 0)
-        
+        const lat = point.response_time_ms || 0
+        const y = height - bottomPadding - (lat / yMax) * chartHeight
+
         if (i === 0) {
           this.ctx.moveTo(x, y)
         } else {
           this.ctx.lineTo(x, y)
         }
       })
-      
       this.ctx.stroke()
-    }
-    
-    // Draw Y axis labels
-    this.ctx.fillStyle = '#666'
-    this.ctx.font = '12px Arial'
-    this.ctx.textAlign = 'right'
-    this.ctx.fillText('Up', padding - 5, padding + 4)
-    this.ctx.fillText('Down', padding - 5, height - bottomPadding + 4)
-    
-    // Draw X axis labels
-    this.ctx.textAlign = 'center'
-    if (this._filteredData && this._filteredData.length > 1) {
-      const step = chartWidth / (this._filteredData.length - 1)
-      
-      // Always draw first and last timestamps
-      this.drawTimestamp({ point: this._filteredData[0], index: 0 }, step, padding, height, bottomPadding)
-      this.drawTimestamp(
-        { point: this._filteredData[this._filteredData.length - 1], index: this._filteredData.length - 1 },
-        step, padding, height, bottomPadding
-      )
-      
-      // Group consecutive error/down points for intermediate timestamps
-      let currentGroup = []
-      this._filteredData.slice(1, -1).forEach((point, i) => {
-        const actualIndex = i + 1 // Adjust index for the sliced array
-        if (point.status === 'error' || point.status === 'down') {
-          currentGroup.push({ point, index: actualIndex })
-        } else if (currentGroup.length > 0) {
-          // Display only first and last points of the group
-          this.drawTimestamp(currentGroup[0], step, padding, height, bottomPadding)
-          if (currentGroup.length > 1) {
-            this.drawTimestamp(currentGroup[currentGroup.length - 1], step, padding, height, bottomPadding)
-          }
-          currentGroup = []
-        }
+
+      // Dibujar puntos con color según estado
+      this._filteredData.forEach((point, i) => {
+        const x = padding + i * step
+        const lat = point.response_time_ms || 0
+        const y = height - bottomPadding - (lat / yMax) * chartHeight
+
+        this.ctx.beginPath()
+        this.ctx.arc(x, y, 4, 0, 2 * Math.PI)
+        this.ctx.fillStyle = point.status === 'up' ? '#16a34a' : '#dc2626'
+        this.ctx.fill()
+        this.ctx.strokeStyle = '#ffffff'
+        this.ctx.lineWidth = 1.5
+        this.ctx.stroke()
       })
-      
-      // Handle the last intermediate group if it exists
-      if (currentGroup.length > 0) {
-        this.drawTimestamp(currentGroup[0], step, padding, height, bottomPadding)
-        if (currentGroup.length > 1) {
-          this.drawTimestamp(currentGroup[currentGroup.length - 1], step, padding, height, bottomPadding)
-        }
-      }
+    } else if (this._filteredData.length === 1) {
+      const point = this._filteredData[0]
+      const lat = point.response_time_ms || 0
+      const x = width / 2
+      const y = height - bottomPadding - (lat / yMax) * chartHeight
+
+      this.ctx.beginPath()
+      this.ctx.arc(x, y, 5, 0, 2 * Math.PI)
+      this.ctx.fillStyle = point.status === 'up' ? '#16a34a' : '#dc2626'
+      this.ctx.fill()
+    }
+
+    // Fechas en eje X
+    if (this._filteredData.length > 1) {
+      const step = chartWidth / (this._filteredData.length - 1)
+      this.drawTimestamp(this._filteredData[0], padding, height, bottomPadding)
+      this.drawTimestamp(this._filteredData[this._filteredData.length - 1], padding + chartWidth, height, bottomPadding)
     }
   }
 
-  drawTimestamp({ point, index }, step, padding, height, bottomPadding) {
-    const x = Math.max(padding, padding + index * step)
+  drawTimestamp(point, x, height, bottomPadding) {
+    if (!point || !point.recorded_at) return
     const date = new Date(point.recorded_at).toLocaleDateString('es-ES', {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
     })
-    this.ctx.fillStyle = point.status === 'up' ? '#16a34a' : point.status === 'error' ? '#dc2626' : '#d97706'
+    this.ctx.fillStyle = '#6b7280'
     this.ctx.save()
-    this.ctx.translate(x + 30, height - bottomPadding + 50)
-    this.ctx.rotate(45 * Math.PI / 180)
+    this.ctx.translate(x, height - bottomPadding + 35)
+    this.ctx.rotate(35 * Math.PI / 180)
+    this.ctx.textAlign = 'left'
     this.ctx.fillText(date, 0, 0)
     this.ctx.restore()
-    this.ctx.fillStyle = '#666'
   }
 
   changeTimeRange(event) {
@@ -139,7 +151,7 @@ export default class extends Controller {
 
   filterDataByTimeRange(range) {
     const now = new Date()
-    const data = this.dataValue
+    const data = this.dataValue || []
 
     switch (range) {
       case 'week':
@@ -148,8 +160,6 @@ export default class extends Controller {
         return data.filter(d => new Date(d.recorded_at) > new Date(now - 30 * 24 * 60 * 60 * 1000))
       case '3months':
         return data.filter(d => new Date(d.recorded_at) > new Date(now - 90 * 24 * 60 * 60 * 1000))
-      case '6months':
-        return data.filter(d => new Date(d.recorded_at) > new Date(now - 180 * 24 * 60 * 60 * 1000))
       case 'year':
         return data.filter(d => new Date(d.recorded_at) > new Date(now - 365 * 24 * 60 * 60 * 1000))
       default:
