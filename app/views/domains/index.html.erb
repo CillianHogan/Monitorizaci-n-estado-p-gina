@@ -53,6 +53,7 @@
           <th class="py-3 px-6 text-left font-semibold">Nombre</th>
           <th class="py-3 px-6 text-left font-semibold">URL</th>
           <th class="py-3 px-6 text-center font-semibold">Estado</th>
+          <th class="py-3 px-6 text-center font-semibold">HTTP</th>
           <th class="py-3 px-6 text-center font-semibold">Latencia</th>
           <th class="py-3 px-6 text-center font-semibold">SSL</th>
           <th class="py-3 px-6 text-center font-semibold">Acciones</th>
@@ -75,6 +76,9 @@
               <span class="<%= status_badge_class(domain.status) %>">
                 <%= domain.status.titleize %>
               </span>
+            </td>
+            <td class="py-3 px-6 text-center">
+              <%= http_code_badge(domain.status_histories.last&.http_code) %>
             </td>
             <td class="py-3 px-6 text-center">
               <% if last_ms.present? %>
