@@ -9,7 +9,7 @@ class Domain < ApplicationRecord
   belongs_to :user
   has_many :status_histories, dependent: :destroy, class_name: "DomainStatusHistory"
 
-  attr_accessor :current_response_time_ms
+  attr_accessor :current_response_time_ms, :current_http_code
 
   before_validation :normalize_url
   before_validation :generate_public_token, on: :create
@@ -31,16 +31,24 @@ class Domain < ApplicationRecord
 
     begin
       headers = {
-        "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        "Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+        "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+        "Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        "Accept-Language" => "es-ES,es;q=0.9,en;q=0.8",
+        "Cache-Control" => "no-cache",
+        "Pragma" => "no-cache"
       }
-      
+
       start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       response = HTTParty.get(clean_url, timeout: 10, follow_redirects: true, headers: headers)
       end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
       response_time = ((end_time - start_time) * 1000).to_i
-      http_status = (200..499).cover?(response.code) ? :up : :down
+      @last_http_code = response.code
+
+      is_valid_code = (200..399).cover?(@last_http_code)
+      keyword_matches = expected_keyword.blank? || response.body.to_s.include?(expected_keyword.to_s.strip)
+
+      http_status = (is_valid_code && keyword_matches) ? :up : :down
     rescue StandardError => e
       Rails.logger.warn("HTTP check failed for #{clean_url}: #{e.message}")
       http_status = :down
@@ -49,6 +57,7 @@ class Domain < ApplicationRecord
     ssl_data = check_ssl
 
     self.current_response_time_ms = response_time
+    self.current_http_code = @last_http_code
 
     update(
       status: http_status,
@@ -168,7 +177,8 @@ end
     status_histories.create!(
       status: status,
       recorded_at: Time.current,
-      response_time_ms: current_response_time_ms
+      response_time_ms: current_response_time_ms,
+      http_code: current_http_code
     )
   rescue StandardError => e
     Rails.logger.error("History recording failed: #{e.message}")
