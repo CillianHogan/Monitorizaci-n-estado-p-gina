@@ -36,6 +36,7 @@
               <% last_history = @domain.status_histories.order(recorded_at: :desc).first %>
               <% if last_history&.response_time_ms.present? %>
                 <span class="text-lg font-bold text-indigo-700"><%= last_history.response_time_ms %> ms</span>
+                <%= http_code_badge(last_history.http_code) %>
                 <% if last_history.response_time_ms < 300 %>
                   <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">Rápido</span>
                 <% elsif last_history.response_time_ms < 1000 %>
@@ -46,6 +47,20 @@
               <% else %>
                 <span class="text-gray-500">Pendiente de registro</span>
               <% end %>
+            </dd>
+          </div>
+          <% if @domain.expected_keyword.present? %>
+          <div class="bg-white px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-100">
+            <dt class="text-sm font-medium text-gray-600">Palabra requerida</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 font-mono bg-gray-50 px-2 py-1 rounded inline-block">
+              <%= @domain.expected_keyword %>
+            </dd>
+          </div>
+          <% end %>
+          <div class="bg-white px-4 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-b border-gray-100">
+            <dt class="text-sm font-medium text-gray-600">Umbral de alerta</dt>
+            <dd class="mt-1 text-sm text-gray-700 sm:col-span-2">
+              <%= @domain.max_latency_threshold_ms || 2000 %> ms
             </dd>
           </div>
           <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
