@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_09_24_092633) do
+ActiveRecord::Schema[8.0].define(version: 2026_09_24_103432) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -50,6 +50,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_24_092633) do
     t.datetime "ssl_expires_at"
     t.integer "ssl_days_remaining"
     t.date "ssl_alert_sent_at"
+    t.integer "max_latency_threshold_ms"
+    t.datetime "latency_alert_sent_at"
     t.index ["public_token"], name: "index_domains_on_public_token", unique: true
     t.index ["user_id"], name: "index_domains_on_user_id"
   end

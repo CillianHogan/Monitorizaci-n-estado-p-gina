@@ -57,7 +57,23 @@ class Domain < ApplicationRecord
       ssl_expires_at: ssl_data[:expires_at],
       ssl_days_remaining: ssl_data[:days_remaining]
     )
+    check_latency_alert!(response_time)
   end
+
+
+def check_latency_alert!(latency_ms)
+  return unless status_up? && latency_ms.present?
+  threshold = max_latency_threshold_ms.presence || 2000
+  return if latency_ms <= threshold
+
+  # Cooldown de 2 horas para evitar saturar la bandeja
+  return if latency_alert_sent_at.present? && latency_alert_sent_at > 2.hours.ago
+
+  DomainMailer.high_latency_notification(self, latency_ms).deliver_later
+  update_column(:latency_alert_sent_at, Time.current)
+rescue StandardError => e
+  Rails.logger.error("Error sending high latency notification for #{name}: #{e.message}")
+end
 
   def check_ssl_expiration_alert!
     return unless ssl_valid? && ssl_days_remaining.present?

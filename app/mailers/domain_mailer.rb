@@ -36,4 +36,14 @@ class DomainMailer < ApplicationMailer
       subject: "SSL Warning: El certificado de #{@domain.name} caduca en #{@domain.ssl_days_remaining} días"
     )
   end
+  def high_latency_notification(domain, latency_ms)
+    @domain = domain
+    @user = domain.user
+    @latency_ms = latency_ms
+    mail(
+      to: @user.email,
+      subject: "Alerta de rendimiento: #{@domain.name} responde con lentitud (#{@latency_ms} ms)"
+    )
+  end
+
 end
