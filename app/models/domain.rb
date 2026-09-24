@@ -9,6 +9,8 @@ class Domain < ApplicationRecord
   belongs_to :user
   has_many :status_histories, dependent: :destroy, class_name: "DomainStatusHistory"
 
+  attr_accessor :current_response_time_ms
+
   before_validation :normalize_url
   before_validation :generate_public_token, on: :create
 
@@ -25,13 +27,19 @@ class Domain < ApplicationRecord
   def check_status!
     clean_url = url.to_s.strip
     http_status = :down
+    response_time = nil
 
     begin
       headers = {
         "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
         "Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
       }
+      
+      start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       response = HTTParty.get(clean_url, timeout: 10, follow_redirects: true, headers: headers)
+      end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
+      response_time = ((end_time - start_time) * 1000).to_i
       http_status = (200..499).cover?(response.code) ? :up : :down
     rescue StandardError => e
       Rails.logger.warn("HTTP check failed for #{clean_url}: #{e.message}")
@@ -39,6 +47,8 @@ class Domain < ApplicationRecord
     end
 
     ssl_data = check_ssl
+
+    self.current_response_time_ms = response_time
 
     update(
       status: http_status,
@@ -130,7 +140,11 @@ class Domain < ApplicationRecord
   end
 
   def create_status_history
-    status_histories.create!(status: status, recorded_at: Time.current)
+    status_histories.create!(
+      status: status,
+      recorded_at: Time.current,
+      response_time_ms: current_response_time_ms
+    )
   rescue StandardError => e
     Rails.logger.error("History recording failed: #{e.message}")
   end

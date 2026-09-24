@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_09_22_104852) do
+ActiveRecord::Schema[8.0].define(version: 2026_09_24_092633) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -33,6 +33,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_104852) do
     t.datetime "recorded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "response_time_ms"
     t.index ["domain_id"], name: "index_domain_status_histories_on_domain_id"
   end
 
@@ -48,6 +49,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_104852) do
     t.string "ssl_issuer"
     t.datetime "ssl_expires_at"
     t.integer "ssl_days_remaining"
+    t.date "ssl_alert_sent_at"
     t.index ["public_token"], name: "index_domains_on_public_token", unique: true
     t.index ["user_id"], name: "index_domains_on_user_id"
   end
