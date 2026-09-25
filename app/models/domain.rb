@@ -24,7 +24,7 @@ class Domain < ApplicationRecord
   after_save :create_status_history
   after_update_commit :notify_status_change, if: -> { saved_change_to_status? }
 
-  def check_status!
+  def check_status!(record_down: true)
     clean_url = url.to_s.strip
     http_status = :down
     response_time = nil
@@ -54,6 +54,9 @@ class Domain < ApplicationRecord
       http_status = :down
     end
 
+    # Si ha fallado y estamos en intento transitorio, no guardamos caida en BD todavia
+    return false if http_status == :down && !record_down
+
     ssl_data = check_ssl
 
     self.current_response_time_ms = response_time
@@ -67,6 +70,9 @@ class Domain < ApplicationRecord
       ssl_days_remaining: ssl_data[:days_remaining]
     )
     check_latency_alert!(response_time)
+    check_ssl_expiration_alert!
+
+    http_status == :up
   end
 
 
