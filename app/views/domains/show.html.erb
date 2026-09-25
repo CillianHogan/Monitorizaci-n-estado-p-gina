@@ -143,7 +143,7 @@
   </div>
 
   <%# Gráfica de Latencia e Historial %>
-  <div class="mt-8 bg-white shadow-lg rounded-lg overflow-hidden border border-gray-100" data-controller="domain-chart" data-domain-chart-data-value="<%= @domain.status_histories.order(recorded_at: :asc).to_json %>">
+  <div class="mt-8 bg-white shadow-lg rounded-lg overflow-hidden border border-gray-100" data-controller="domain-chart" data-domain-chart-data-value="<%= (@chart_data || @domain.status_histories.order(recorded_at: :desc).limit(300).reverse).to_json %>">
     <div class="px-4 py-5 sm:px-6 bg-gradient-to-r from-indigo-50 to-blue-50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
         <h2 class="text-xl font-semibold text-indigo-800">Historial y Latencia (ms)</h2>

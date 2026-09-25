@@ -7,7 +7,21 @@ class DomainsController < ApplicationController
     @domains = current_user.domains
   end
 
-  def show; end
+  def show
+    # Traemos un maximo de 500 puntos recientes con solo los campos necesarios para la grafica
+    @chart_data = @domain.status_histories
+                         .select(:id, :recorded_at, :response_time_ms, :http_code, :status)
+                         .where("recorded_at >= ?", 7.days.ago)
+                         .order(recorded_at: :asc)
+    # Si tiene menos de 50 registros en 7 dias, aseguramos los ultimos 100 disponibles
+    if @chart_data.size < 50
+      @chart_data = @domain.status_histories
+                           .select(:id, :recorded_at, :response_time_ms, :http_code, :status)
+                           .order(recorded_at: :desc)
+                           .limit(100)
+                           .reverse
+    end
+  end
 
   def new
     @domain = current_user.domains.build
