@@ -4,6 +4,11 @@ production:
     queue: default
     schedule: "every 5 minutes"
 
-check_ssl_expirations:
-  class: SslCheckerJob
-  schedule: every day at 8:00am
+  check_ssl_expirations:
+    class: SslCheckerJob
+    schedule: "every day at 8:00am"
+
+  cleanup_database:
+    class: CleanupDatabaseJob
+    queue: default
+    schedule: "every day at 3:00am"
