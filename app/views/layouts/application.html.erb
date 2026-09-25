@@ -33,6 +33,10 @@
             <% end %>
           </div>
           <div class="flex items-center space-x-4">
+  <%= link_to status_path, class: "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-white bg-white/10 hover:bg-white/20 transition backdrop-blur-sm border border-white/20" do %>
+    <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+    Estado Público
+  <% end %>
             <% if user_signed_in? %>
               <div class="relative" data-controller="dropdown">
                 <button type="button" class="flex items-center space-x-2 text-white hover:text-blue-100" data-action="click->dropdown#toggle">

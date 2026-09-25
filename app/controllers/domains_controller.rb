@@ -19,7 +19,7 @@ class DomainsController < ApplicationController
     @domain = current_user.domains.build(domain_params)
 
     if @domain.save
-      @domain.check_status!
+      CheckDomainStatusJob.perform_later(@domain)
       redirect_to @domain, notice: 'Domain was successfully created.'
     else
       render :new, status: :unprocessable_entity
@@ -28,7 +28,7 @@ class DomainsController < ApplicationController
 
   def update
     if @domain.update(domain_params)
-      @domain.check_status!
+      CheckDomainStatusJob.perform_later(@domain)
       redirect_to @domain, notice: 'Domain was successfully updated.'
     else
       render :edit, status: :unprocessable_entity
