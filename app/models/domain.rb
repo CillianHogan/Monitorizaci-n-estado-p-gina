@@ -8,6 +8,7 @@ require "httparty"
 class Domain < ApplicationRecord
   belongs_to :user
   has_many :status_histories, dependent: :destroy, class_name: "DomainStatusHistory"
+  has_one :latest_status_history, -> { order(recorded_at: :desc) }, class_name: "DomainStatusHistory"
 
   attr_accessor :current_response_time_ms, :current_http_code
 
