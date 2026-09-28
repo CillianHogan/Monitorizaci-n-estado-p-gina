@@ -8,13 +8,16 @@ class DiscordNotificationJob < ApplicationJob
   def perform(webhook_url, payload)
     return if webhook_url.blank?
 
-    uri = URI.parse(webhook_url)
+    uri = URI.parse(webhook_url.to_s.strip)
+    return unless uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)
+
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = (uri.scheme == "https")
     http.open_timeout = 5
     http.read_timeout = 5
 
-    request = Net::HTTP::Post.new(uri.request_uri, {
+    path = uri.request_uri.presence || "/"
+    request = Net::HTTP::Post.new(path, {
       "Content-Type" => "application/json",
       "User-Agent" => "DomainMonitor/1.0"
     })
@@ -25,6 +28,6 @@ class DiscordNotificationJob < ApplicationJob
       Rails.logger.error "[DiscordNotificationJob] Error al enviar a Discord: #{response.code} #{response.body}"
     end
   rescue StandardError => e
-    Rails.logger.error "[DiscordNotificationJob] Excepción enviando alerta a Discord: #{e.message}"
+    Rails.logger.error "[DiscordNotificationJob] Excepcion enviando alerta a Discord: #{e.message}"
   end
 end
