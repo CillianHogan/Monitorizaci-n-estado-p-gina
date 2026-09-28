@@ -242,7 +242,7 @@ def send_discord_ssl_alert(days)
       {
         title: "🔐 Advertencia SSL: #{name}",
         description: "El certificado SSL de **#{url}** está próximo a caducar.",
-        color: 16753920, # Color ámbar / naranja
+        color: 16753920,
         timestamp: Time.current.iso8601,
         fields: [
           { name: "Días restantes", value: "#{days} días", inline: true },
@@ -261,76 +261,23 @@ end
 def send_telegram_ssl_alert(days)
   return unless notify_telegram? && telegram_bot_token.present? && telegram_chat_id.present?
 
-  msg = <<~TEXT
-    🔐 *Advertencia de Certificado SSL: #{name}*
+  formatted_date = ssl_expires_at ? ssl_expires_at.strftime("%d/%m/%Y") : "N/D"
+  issuer_name = ssl_issuer.presence || "Desconocido"
 
-    El certificado SSL está próximo a caducar.
-    • *Días restantes:* *#{days} días*
-    • *Emisor:* #{ssl_issuer.presence || Desconocido}
-    • *Caduca el:* `#{ssl_expires_at ? ssl_expires_at.strftime(%d/%m/%Y) : N/D}`
-    • *URL:* #{url}
-  TEXT
+  msg = "🔐 *Advertencia de Certificado SSL: " + name.to_s + "*
+
+"         "El certificado SSL está próximo a caducar.
+"         "• *Días restantes:* *" + days.to_s + " días*
+"         "• *Emisor:* " + issuer_name.to_s + "
+"         "• *Caduca el:* `" + formatted_date.to_s + "`
+"         "• *URL:* " + url.to_s + "
+"
 
   TelegramNotificationJob.perform_later(telegram_bot_token, telegram_chat_id, msg)
 rescue StandardError => e
   Rails.logger.error("Error al preparar alerta SSL Telegram para #{name}: #{e.message}")
 end
 
-  private
+private
 
-  def normalize_url
-    return if url.blank?
-    trimmed = url.to_s.strip
-    trimmed = "https://#{trimmed}" unless trimmed.match?(%r{\Ahttps?://}i)
-    self.url = trimmed
-  end
-
-  def generate_public_token
-    self.public_token = loop do
-      token = SecureRandom.urlsafe_base64(16)
-      break token unless Domain.exists?(public_token: token)
-    end
-  end
-
-  def notify_status_change
-    previous_status = saved_change_to_status&.first
-    current_status = status
-
-    return if previous_status == current_status
-
-    if status_up?
-      # Solo notificar recuperacion si previamente se habia avisado de una caida
-      if down_alert_sent_at.present? || previous_status.in?(%w[down error])
-        DomainMailer.status_up_notification(self).deliver_later if notify_email?
-        send_discord_alert(:up)
-        send_telegram_alert(:up)
-        update_column(:down_alert_sent_at, nil)
-      end
-    elsif status_down? || status_error?
-      # Cooldown estricto de 4 horas para caidas consecutivas
-      return if down_alert_sent_at.present? && down_alert_sent_at > 4.hours.ago
-
-      DomainMailer.status_down_notification(self).deliver_later if notify_email?
-      send_discord_alert(:down)
-      send_telegram_alert(:down)
-      update_column(:down_alert_sent_at, Time.current)
-    end
-  rescue StandardError => e
-    Rails.logger.error("Mailer notification failed for #{name}: #{e.message}")
-  end
-
-  def create_status_history
-    status_histories.create!(
-      status: status,
-      recorded_at: Time.current,
-      response_time_ms: current_response_time_ms,
-      http_code: current_http_code
-    )
-  rescue StandardError => e
-    Rails.logger.error("History recording failed: #{e.message}")
-  end
-
-  def check_initial_status
-    check_status!
-  end
 end
