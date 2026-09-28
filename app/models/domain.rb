@@ -148,6 +148,55 @@ def check_latency_alert!(latency_ms)
   def average_response_time_ms(since = 24.hours.ago)
     status_histories.where("recorded_at >= ?", since).average(:response_time_ms)&.round
   end
+def send_discord_alert(type)
+  return unless notify_discord? && discord_webhook_url.present?
+
+  color = type == :up ? 3066993 : 15158332 # Verde o Rojo
+  title = type == :up ? "🟢 Dominio Recuperado: #{name}" : "🔴 Dominio Caído: #{name}"
+  desc  = type == :up ? "El dominio **#{url}** vuelve a responder con normalidad." : "El dominio **#{url}** no responde o devuelve un código de error."
+
+  payload = {
+    embeds: [
+      {
+        title: title,
+        description: desc,
+        color: color,
+        timestamp: Time.current.iso8601,
+        fields: [
+          { name: "Estado actual", value: status.to_s.upcase, inline: true },
+          { name: "URL", value: url, inline: true }
+        ]
+      }
+    ]
+  }
+
+  DiscordNotificationJob.perform_later(discord_webhook_url, payload)
+rescue StandardError => e
+  Rails.logger.error("Error al preparar alerta de Discord para #{name}: #{e.message}")
+end
+
+def send_discord_latency_alert(latency_ms)
+  return unless notify_discord? && discord_webhook_url.present?
+
+  payload = {
+    embeds: [
+      {
+        title: "⚠️ Latencia Alta Detectada: #{name}",
+        description: "El dominio **#{url}** ha registrado una latencia de **#{latency_ms} ms**, superando el límite configurado.",
+        color: 15105570, # Ámbar
+        timestamp: Time.current.iso8601,
+        fields: [
+          { name: "Latencia medida", value: "#{latency_ms} ms", inline: true },
+          { name: "URL", value: url, inline: true }
+        ]
+      }
+    ]
+  }
+
+  DiscordNotificationJob.perform_later(discord_webhook_url, payload)
+rescue StandardError => e
+  Rails.logger.error("Error al preparar alerta de latencia Discord para #{name}: #{e.message}")
+end
 
   private
 
@@ -175,6 +224,7 @@ def check_latency_alert!(latency_ms)
       # Solo notificar recuperacion si previamente se habia avisado de una caida
       if down_alert_sent_at.present? || previous_status.in?(%w[down error])
         DomainMailer.status_up_notification(self).deliver_later
+        send_discord_alert(:up)
         update_column(:down_alert_sent_at, nil)
       end
     elsif status_down? || status_error?
@@ -182,6 +232,7 @@ def check_latency_alert!(latency_ms)
       return if down_alert_sent_at.present? && down_alert_sent_at > 4.hours.ago
 
       DomainMailer.status_down_notification(self).deliver_later
+      send_discord_alert(:down)
       update_column(:down_alert_sent_at, Time.current)
     end
   rescue StandardError => e
