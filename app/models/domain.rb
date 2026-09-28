@@ -105,8 +105,10 @@ def check_latency_alert!(latency_ms)
                     end
 
     if should_notify
-      DomainMailer.ssl_expiration_warning_notification(self).deliver_later
-      update_column(:ssl_alert_sent_at, Date.current)
+      DomainMailer.ssl_expiration_warning_notification(self).deliver_later if notify_email?
+    send_discord_ssl_alert(ssl_days_remaining)
+    send_telegram_ssl_alert(ssl_days_remaining)
+    update_column(:ssl_alert_sent_at, Date.current)
     end
   end
 
@@ -232,6 +234,47 @@ end
   rescue StandardError => e
     Rails.logger.error("Error al preparar alerta de latencia Telegram para #{name}: #{e.message}")
   end
+def send_discord_ssl_alert(days)
+  return unless notify_discord? && discord_webhook_url.present?
+
+  payload = {
+    embeds: [
+      {
+        title: "🔐 Advertencia SSL: #{name}",
+        description: "El certificado SSL de **#{url}** está próximo a caducar.",
+        color: 16753920, # Color ámbar / naranja
+        timestamp: Time.current.iso8601,
+        fields: [
+          { name: "Días restantes", value: "#{days} días", inline: true },
+          { name: "Emisor", value: ssl_issuer.to_s.presence || "Desconocido", inline: true },
+          { name: "Caduca el", value: ssl_expires_at ? ssl_expires_at.strftime("%d/%m/%Y") : "N/D", inline: false }
+        ]
+      }
+    ]
+  }
+
+  DiscordNotificationJob.perform_later(discord_webhook_url, payload)
+rescue StandardError => e
+  Rails.logger.error("Error al preparar alerta SSL Discord para #{name}: #{e.message}")
+end
+
+def send_telegram_ssl_alert(days)
+  return unless notify_telegram? && telegram_bot_token.present? && telegram_chat_id.present?
+
+  msg = <<~TEXT
+    🔐 *Advertencia de Certificado SSL: #{name}*
+
+    El certificado SSL está próximo a caducar.
+    • *Días restantes:* *#{days} días*
+    • *Emisor:* #{ssl_issuer.presence || Desconocido}
+    • *Caduca el:* `#{ssl_expires_at ? ssl_expires_at.strftime(%d/%m/%Y) : N/D}`
+    • *URL:* #{url}
+  TEXT
+
+  TelegramNotificationJob.perform_later(telegram_bot_token, telegram_chat_id, msg)
+rescue StandardError => e
+  Rails.logger.error("Error al preparar alerta SSL Telegram para #{name}: #{e.message}")
+end
 
   private
 
