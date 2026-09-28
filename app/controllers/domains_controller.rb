@@ -3,9 +3,14 @@
 class DomainsController < ApplicationController
   before_action :set_domain, only: %i[show edit update destroy]
 
-  def index
-    @domains = current_user.domains
-  end
+def index
+  @domains = current_user.domains.includes(:status_histories)
+  # Precargamos estadisticas rapidas para evitar N+1
+  @total_domains = @domains.size
+  @up_count = @domains.count { |d| d.status_up? }
+  @down_count = @domains.count { |d| d.status_down? || d.status_error? }
+end
+
 
   def show
     # Traemos un maximo de 500 puntos recientes con solo los campos necesarios para la grafica
