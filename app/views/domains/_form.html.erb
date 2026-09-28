@@ -53,6 +53,28 @@
   </div>
 </div>
 
+    <%# Notificaciones por Telegram %>
+<div class="p-4 bg-sky-50 rounded-lg border border-sky-200 space-y-3">
+  <div class="flex items-center">
+    <%= f.check_box :notify_telegram, class: "h-4 w-4 text-sky-600 focus:ring-sky-500 border-gray-300 rounded" %>
+    <%= f.label :notify_telegram, "Activar notificaciones en Telegram", class: "ml-2.5 block text-sm font-semibold text-gray-900" %>
+  </div>
+  <p class="text-xs text-gray-500">Recibe alertas instantáneas en tu chat o grupo de Telegram.</p>
+  
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+    <div>
+      <%= f.label :telegram_bot_token, "Bot Token", class: "block text-xs font-medium text-gray-700 mb-1" %>
+      <%= f.text_field :telegram_bot_token, placeholder: "123456789:ABCdefGhI...", class: "block w-full rounded-md border border-gray-200 shadow-sm text-sm hover:border-gray-300 focus:border-sky-500 focus:ring-sky-500 transition-all duration-200" %>
+      <p class="mt-1 text-xs text-gray-400">Obtenido de @BotFather en Telegram.</p>
+    </div>
+    <div>
+      <%= f.label :telegram_chat_id, "Chat ID", class: "block text-xs font-medium text-gray-700 mb-1" %>
+      <%= f.text_field :telegram_chat_id, placeholder: "Ej: 987654321 o -100...", class: "block w-full rounded-md border border-gray-200 shadow-sm text-sm hover:border-gray-300 focus:border-sky-500 focus:ring-sky-500 transition-all duration-200" %>
+      <p class="mt-1 text-xs text-gray-400">ID del usuario o del grupo.</p>
+    </div>
+  </div>
+</div>
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="transition-all duration-200 ease-in-out transform hover:scale-[1.01]">
         <%= f.label :max_latency_threshold_ms, "Umbral de degradación (ms)", class: "block text-sm font-medium text-gray-700 mb-1" %>

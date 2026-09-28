@@ -197,6 +197,41 @@ def send_discord_latency_alert(latency_ms)
 rescue StandardError => e
   Rails.logger.error("Error al preparar alerta de latencia Discord para #{name}: #{e.message}")
 end
+  def send_telegram_alert(type)
+    return unless notify_telegram? && telegram_bot_token.present? && telegram_chat_id.present?
+
+    title = type == :up ? "🟢 *Dominio Recuperado: #{name}*" : "🔴 *Dominio Caído: #{name}*"
+    status_desc = type == :up ? "El dominio vuelve a responder con normalidad." : "El dominio no responde o devuelve un código de error."
+
+    msg = <<~TEXT
+      #{title}
+
+      #{status_desc}
+      • *Estado actual:* `#{status.to_s.upcase}`
+      • *URL:* #{url}
+      • *Fecha:* `#{Time.current.strftime("%d/%m/%Y %H:%M:%S")}`
+    TEXT
+
+    TelegramNotificationJob.perform_later(telegram_bot_token, telegram_chat_id, msg)
+  rescue StandardError => e
+    Rails.logger.error("Error al preparar alerta Telegram para #{name}: #{e.message}")
+  end
+
+  def send_telegram_latency_alert(latency_ms)
+    return unless notify_telegram? && telegram_bot_token.present? && telegram_chat_id.present?
+
+    msg = <<~TEXT
+      ⚠️ *Alerta de Latencia Alta: #{name}*
+
+      El dominio ha registrado una latencia de *#{latency_ms} ms*, superando el umbral.
+      • *URL:* #{url}
+      • *Fecha:* `#{Time.current.strftime("%d/%m/%Y %H:%M:%S")}`
+    TEXT
+
+    TelegramNotificationJob.perform_later(telegram_bot_token, telegram_chat_id, msg)
+  rescue StandardError => e
+    Rails.logger.error("Error al preparar alerta de latencia Telegram para #{name}: #{e.message}")
+  end
 
   private
 
@@ -225,6 +260,7 @@ end
       if down_alert_sent_at.present? || previous_status.in?(%w[down error])
         DomainMailer.status_up_notification(self).deliver_later
         send_discord_alert(:up)
+        send_telegram_alert(:up)
         update_column(:down_alert_sent_at, nil)
       end
     elsif status_down? || status_error?
@@ -233,6 +269,7 @@ end
 
       DomainMailer.status_down_notification(self).deliver_later
       send_discord_alert(:down)
+      send_telegram_alert(:down)
       update_column(:down_alert_sent_at, Time.current)
     end
   rescue StandardError => e

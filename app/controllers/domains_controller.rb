@@ -65,6 +65,6 @@ end
   end
 
   def domain_params
-    params.expect(domain: %i[name url latency_alert_enabled max_latency_threshold_ms expected_keyword])
+    params.expect(domain: %i[name url latency_alert_enabled max_latency_threshold_ms expected_keyword notify_discord discord_webhook_url notify_telegram telegram_bot_token telegram_chat_id])
   end
 end
