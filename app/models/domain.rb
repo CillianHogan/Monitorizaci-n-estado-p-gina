@@ -278,6 +278,17 @@ rescue StandardError => e
   Rails.logger.error("Error al preparar alerta SSL Telegram para #{name}: #{e.message}")
 end
 
-private
+  private
 
+  def normalize_url
+    return if url.blank?
+
+    clean_url = url.to_s.strip
+    clean_url = "https://#{clean_url}" unless clean_url.match?(%r{\Ahttps?://}i)
+    self.url = clean_url
+  end
+
+  def generate_public_token
+    self.public_token ||= SecureRandom.alphanumeric(32)
+  end
 end
