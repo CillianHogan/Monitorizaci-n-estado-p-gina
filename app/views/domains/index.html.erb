@@ -9,8 +9,7 @@
     total_domains = @domains.size
     up_count = @domains.count(&:status_up?)
     down_count = @domains.count { |d| d.status_down? || d.status_error? }
-    recent_histories = DomainStatusHistory.where(domain_id: @domains.map(&:id)).where("recorded_at >= ?", 24.hours.ago)
-    avg_global_latency = recent_histories.average(:response_time_ms)&.round
+        avg_global_latency = nil
   %>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
     <div class="bg-white p-4 rounded-lg border border-gray-100 shadow-sm flex items-center justify-between">
@@ -61,7 +60,7 @@
       </thead>
       <tbody class="text-gray-600 text-sm">
         <% @domains.each do |domain| %>
-          <% last_history = domain.latest_status_history; last_ms = last_history&.response_time_ms %>
+          <% last_ms = nil %>
           <tr class="border-b border-gray-200 hover:bg-blue-50 transition duration-150">
             <td class="py-3 px-6 text-left whitespace-nowrap font-medium text-indigo-700">
               <%= link_to domain.name, domain_path(domain), class: "hover:underline" %>
@@ -75,7 +74,7 @@
               </span>
             </td>
             <td class="py-3 px-6 text-center">
-              <%= http_code_badge(last_history&.http_code) %>
+              <span class="text-xs text-gray-400">-</span>
             </td>
             <td class="py-3 px-6 text-center">
               <% if last_ms.present? %>
