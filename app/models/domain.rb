@@ -77,18 +77,18 @@ class Domain < ApplicationRecord
 
 
 def check_latency_alert!(latency_ms)
-  return unless status_up? && latency_ms.present?
-  threshold = max_latency_threshold_ms.presence || 2000
-  return if latency_ms <= threshold
+    return unless latency_alert_enabled? && status_up? && latency_ms.present?
+    threshold = max_latency_threshold_ms.presence || 2000
+    return if latency_ms <= threshold
 
-  # Cooldown de 2 horas para evitar saturar la bandeja
-  return if latency_alert_sent_at.present? && latency_alert_sent_at > 2.hours.ago
+    # Cooldown estricto de 4 horas por dominio
+    return if latency_alert_sent_at.present? && latency_alert_sent_at > 4.hours.ago
 
-  DomainMailer.high_latency_notification(self, latency_ms).deliver_later
-  update_column(:latency_alert_sent_at, Time.current)
-rescue StandardError => e
-  Rails.logger.error("Error sending high latency notification for #{name}: #{e.message}")
-end
+    DomainMailer.high_latency_notification(self, latency_ms).deliver_later
+    update_column(:latency_alert_sent_at, Time.current)
+  rescue StandardError => e
+    Rails.logger.error("Error sending high latency notification for #{name}: #{e.message}")
+  end
 
   def check_ssl_expiration_alert!
     return unless ssl_valid? && ssl_days_remaining.present?
@@ -165,18 +165,26 @@ end
   end
 
   def notify_status_change
-    previous_status = saved_change_to_status.first
+    previous_status = saved_change_to_status&.first
     current_status = status
 
-    return unless previous_status != current_status && (previous_status == "up" || current_status == "up")
+    return if previous_status == current_status
 
-    if current_status == "up"
-      DomainMailer.status_up_notification(self).deliver_later
-    else
+    if status_up?
+      # Solo notificar recuperacion si previamente se habia avisado de una caida
+      if down_alert_sent_at.present? || previous_status.in?(%w[down error])
+        DomainMailer.status_up_notification(self).deliver_later
+        update_column(:down_alert_sent_at, nil)
+      end
+    elsif status_down? || status_error?
+      # Cooldown estricto de 4 horas para caidas consecutivas
+      return if down_alert_sent_at.present? && down_alert_sent_at > 4.hours.ago
+
       DomainMailer.status_down_notification(self).deliver_later
+      update_column(:down_alert_sent_at, Time.current)
     end
   rescue StandardError => e
-    Rails.logger.error("Mailer notification failed: #{e.message}")
+    Rails.logger.error("Mailer notification failed for #{name}: #{e.message}")
   end
 
   def create_status_history

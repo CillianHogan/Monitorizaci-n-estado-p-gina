@@ -61,6 +61,6 @@ class DomainsController < ApplicationController
   end
 
   def domain_params
-    params.expect(domain: %i[name url])
+    params.expect(domain: %i[name url latency_alert_enabled max_latency_threshold_ms expected_keyword])
   end
 end
