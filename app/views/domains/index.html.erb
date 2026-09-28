@@ -58,6 +58,11 @@
     <div class="grid grid-cols-1 gap-4">
       <% @domains.each do |domain| %>
         <% is_up = domain.status == 'up' %>
+        <%# Obtenemos la latencia de forma segura sin romper %>
+        <% latency = domain.respond_to?(:last_response_time_ms) && domain.last_response_time_ms.present? ? domain.last_response_time_ms : (domain.status_histories.last&.response_time_ms) %>
+        <%# Obtenemos los días restantes de SSL de forma segura %>
+        <% days_ssl = domain.respond_to?(:ssl_days_remaining) ? domain.ssl_days_remaining : (domain.ssl_expires_at ? ((domain.ssl_expires_at.to_date - Date.current).to_i) : nil) %>
+
         <div class="group relative bg-stone-900/70 hover:bg-stone-900/90 border border-white/[0.08] hover:border-amber-500/40 rounded-2xl p-5 backdrop-blur-md transition-all duration-200 shadow-lg hover:shadow-amber-500/5">
           <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             
@@ -92,17 +97,17 @@
               <%# Latencia %>
               <div>
                 <span class="text-[11px] font-medium text-stone-400 block">Respuesta</span>
-                <span class="text-sm font-bold font-mono <%= (domain.current_response_time_ms.to_i > 800) ? 'text-amber-400' : 'text-stone-200' %>">
-                  <%= domain.current_response_time_ms.present? ? "#{domain.current_response_time_ms} ms" : "—" %>
+                <span class="text-sm font-bold font-mono <%= (latency.to_i > 800) ? 'text-amber-400' : 'text-stone-200' %>">
+                  <%= latency.present? ? "#{latency} ms" : "—" %>
                 </span>
               </div>
 
               <%# SSL %>
               <div>
                 <span class="text-[11px] font-medium text-stone-400 block">Certificado SSL</span>
-                <% if domain.ssl_days_remaining.present? %>
-                  <span class="text-xs font-semibold font-mono <%= domain.ssl_days_remaining <= 15 ? 'text-amber-400' : 'text-emerald-400' %>">
-                    <%= domain.ssl_days_remaining %> días
+                <% if days_ssl.present? %>
+                  <span class="text-xs font-semibold font-mono <%= days_ssl <= 15 ? 'text-amber-400' : 'text-emerald-400' %>">
+                    <%= days_ssl %> días
                   </span>
                 <% else %>
                   <span class="text-xs text-stone-400">No detectado</span>
