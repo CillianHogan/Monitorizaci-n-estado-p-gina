@@ -61,10 +61,7 @@
       </thead>
       <tbody class="text-gray-600 text-sm">
         <% @domains.each do |domain| %>
-          <% 
-            last_ms = domain.last_response_time_ms
-            avg_ms = domain.average_response_time_ms
-          %>
+          <% last_history = domain.latest_status_history; last_ms = last_history&.response_time_ms %>
           <tr class="border-b border-gray-200 hover:bg-blue-50 transition duration-150">
             <td class="py-3 px-6 text-left whitespace-nowrap font-medium text-indigo-700">
               <%= link_to domain.name, domain_path(domain), class: "hover:underline" %>
@@ -78,7 +75,7 @@
               </span>
             </td>
             <td class="py-3 px-6 text-center">
-              <%= http_code_badge(domain.status_histories.last&.http_code) %>
+              <%= http_code_badge(last_history&.http_code) %>
             </td>
             <td class="py-3 px-6 text-center">
               <% if last_ms.present? %>
