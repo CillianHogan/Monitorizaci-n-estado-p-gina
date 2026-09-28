@@ -258,7 +258,7 @@ end
     if status_up?
       # Solo notificar recuperacion si previamente se habia avisado de una caida
       if down_alert_sent_at.present? || previous_status.in?(%w[down error])
-        DomainMailer.status_up_notification(self).deliver_later
+        DomainMailer.status_up_notification(self).deliver_later if notify_email?
         send_discord_alert(:up)
         send_telegram_alert(:up)
         update_column(:down_alert_sent_at, nil)
@@ -267,7 +267,7 @@ end
       # Cooldown estricto de 4 horas para caidas consecutivas
       return if down_alert_sent_at.present? && down_alert_sent_at > 4.hours.ago
 
-      DomainMailer.status_down_notification(self).deliver_later
+      DomainMailer.status_down_notification(self).deliver_later if notify_email?
       send_discord_alert(:down)
       send_telegram_alert(:down)
       update_column(:down_alert_sent_at, Time.current)

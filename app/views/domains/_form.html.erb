@@ -30,6 +30,16 @@
       <%= f.text_field :url, class: "mt-1 block w-full rounded-md border border-gray-200 shadow-sm hover:border-gray-300 focus:border-blue-500 focus:ring-blue-500 transition-all duration-200" %>
     </div>
 
+    <%# Notificaciones por Email %>
+<div class="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-2">
+  <div class="flex items-center">
+    <%= f.check_box :notify_email, class: "h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" %>
+    <%= f.label :notify_email, "Activar notificaciones por Email", class: "ml-2.5 block text-sm font-semibold text-gray-900" %>
+  </div>
+  <p class="text-xs text-gray-500">Recibe informes y alertas en el correo asociado a tu cuenta de usuario.</p>
+</div>
+
+
     <div class="p-4 bg-indigo-50/50 rounded-lg border border-indigo-100">
   <div class="flex items-center">
     <%= f.check_box :latency_alert_enabled, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
