@@ -25,7 +25,7 @@ class PublicStatusController < ApplicationController
     @uptime_30d = calculate_sql_uptime(30.days.ago)
     @uptime_90d = calculate_sql_uptime(90.days.ago)
 
-    @incidents = calculate_incidents
+    @incidents = @domain.status_histories.where.not(status: "up").order(recorded_at: :desc).limit(10)
   end
 
   private
@@ -40,11 +40,7 @@ class PublicStatusController < ApplicationController
     total = @domain.status_histories.where("recorded_at >= ?", since_time).count
     return 100.0 if total.zero?
 
-    up_count = @domain.status_histories.where("recorded_at >= ? AND status = 'up' OR status = 0", since_time).count
+    up_count = @domain.status_histories.where("recorded_at >= ?", since_time).where(status: "up").count
     ((up_count.to_f / total) * 100).round(2)
-  end
-
-  def calculate_incidents
-    @domain.status_histories.where("status != 'up' AND status != 0").order(recorded_at: :desc).limit(10)
   end
 end
