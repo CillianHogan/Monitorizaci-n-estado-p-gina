@@ -1,68 +1,55 @@
-<div class="max-w-3xl mrx-auto px-4 py-8 space-y-6">
-  <!-- Botón Volver Atrás -->
-  <div >
-    <= link_to api_endpoints_path, class: "inline-flex items-center text-sm font-semibold text-amber-400 hover:text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400 rounded-md px-2 py-1 -ml-2 transition-colors" do %>
-      <svg class="w-5 h-5 mr-2 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-      </svg>
-      <span>Volver a Endpoints API</span>
-    <% end %>
+<div class="max-w-3xl mx-auto px-4 py-8 space-y-6">
+  <div>
+    <%= link_to "← Volver a Endpoints API", api_endpoints_path, class: "inline-flex items-center text-sm font-semibold text-amber-400 hover:text-amber-300 focus:outline-none rounded-md px-2 py-1 -ml-2 transition-colors" %>
   </div>
 
-  <!-- Tarjeta de Detalle -->
   <% is_up = @api_endpoint.status.to_s == "up" %>
   <main class="bg-[#1a120b] border-2 border-amber-700/60 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-amber-700/40 gap-4">
       <div>
         <div class="flex items-center gap-3">
           <span class="px-2.5 py-0.5 text-xs font-mono font-bold rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase">
-            <= @api_endpoint.http_method %>
+            <%= @api_endpoint.http_method %>
           </span>
-          <h1 class="text-2l font-bold tracking-tight text-white"><= @api_endpoint.name %></h1>
+          <h1 class="text-2xl font-bold tracking-tight text-white"><%= @api_endpoint.name %></h1>
         </div>
-        <p class="text-xs font-mono text-amber-200/70 mt-2 break-all"><= @api_endpoint.url %></p>
+        <p class="text-xs font-mono text-amber-200/70 mt-2 break-all"><%= @api_endpoint.url %></p>
       </div>
       <div>
-        <span class="px-3 py-1 text-xs font-extrabold rounded-full <= is_up ? 'bg-emerald-950/90 text-emerald-400 border border-emerald-500/50' : 'bg-red-950/90 text-red-300 border border-red-500/50' %> uppercase tracking-wider">
-          <= is_up ? 'ONLINE / OPERATIVO' : 'CAÄDO / INCIDENTE' %>
+        <span class="px-3 py-1 text-xs font-extrabold rounded-full <%= is_up ? "bg-emerald-950/90 text-emerald-400 border border-emerald-500/50" : "bg-red-950/90 text-red-300 border border-red-500/50" %> uppercase tracking-wider">
+          <%= is_up ? "ONLINE / OPERATIVO" : "CAÍDO / INCIDENTE" %>
         </span>
       </div>
     </div>
 
-    <!-- ParÁmetros -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div class="p-4 rounded-xl bg-[#0d0905] border border-amber-800/40">
         <span class="text-xs font-bold uppercase tracking-wider text-amber-300/70">Método HTTP</span>
-        <div class="text-xl font-bold text-white font-mono mt-1 uppercase"><= @api_endpoint.http_method %></div>
+        <div class="text-xl font-bold text-white font-mono mt-1 uppercase"><%= @api_endpoint.http_method %></div>
       </div>
       <div class="p-4 rounded-xl bg-[#0d0905] border border-amber-800/40">
         <span class="text-xs font-bold uppercase tracking-wider text-amber-300/70">Estado Actual</span>
-        <div class="text-xl font-bold <= is_up ? 'text-emerald-400' : 'text-red-400' %> font-mono mt-1 uppercase"><= @api_endpoint.status %></div>
+        <div class="text-xl font-bold <%= is_up ? "text-emerald-400" : "text-red-400" %> font-mono mt-1 uppercase"><%= @api_endpoint.status %></div>
       </div>
     </div>
 
     <% if @api_endpoint.headers.present? %>
       <div class="space-y-2">
         <span class="text-xs font-bold uppercase tracking-wider text-amber-300/80">Cabeceras HTTP (Headers)</span>
-        <pre class="p-4 rounded-xl bg-[#0d0905] border border-amber-800/40 text-amber-200 text-xs font-mono overflow-x-auto"><= @api_endpoint.headers %></pre>
+        <pre class="p-4 rounded-xl bg-[#0d0905] border border-amber-800/40 text-amber-200 text-xs font-mono overflow-x-auto"><%= @api_endpoint.headers %></pre>
       </div>
     <% end %>
 
     <% if @api_endpoint.expected_response.present? %>
       <div class="space-y-2">
         <span class="text-xs font-bold uppercase tracking-wider text-amber-300/80">Respuesta Esperada</span>
-        <pre class="p-4 rounded-xl bg-[#0d0905] border border-amber-800/40 text-amber-200 text-xs font-mono overflow-x-auto"><= @api_endpoint.expected_response %></pre>
+        <pre class="p-4 rounded-xl bg-[#0d0905] border border-amber-800/40 text-amber-200 text-xs font-mono overflow-x-auto"><%= @api_endpoint.expected_response %></pre>
       </div>
     <% end %>
 
-    <!-- Botones -->
     <div class="pt-4 flex items-center justify-end gap-3 border-t border-amber-700/40">
-      <= link_to edit_api_endpoint_path(@api_endpoint), class: "px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-sm transition-all" do %>
-        Editar Endpoint
-      <% end %>
-      <= button_to api_endpoint_path(@api_endpoint), method: :delete, data: { turbo_confirm: "¿Deseas eliminar este endpoint?" }, class: "px-4 py-2.5 rounded-xl bg-red-950/60 border border-red-600/70 text-red-200 hover:bg-red-900 text-xs font-bold transition-all cursor-pointer" do %>
-        Eliminar
-      <% end %>
+      <%= link_to "Editar Endpoint", edit_api_endpoint_path(@api_endpoint), class: "px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-sm transition-all" %>
+      <%= button_to "Eliminar", api_endpoint_path(@api_endpoint), method: :delete, data: { turbo_confirm: "¿Deseas eliminar este endpoint?" }, class: "px-4 py-2.5 rounded-xl bg-red-950/60 border border-red-600/70 text-red-200 hover:bg-red-900 text-xs font-bold transition-all cursor-pointer" %>
     </div>
   </main>
 </div>
