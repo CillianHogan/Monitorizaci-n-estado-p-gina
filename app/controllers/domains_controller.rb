@@ -4,7 +4,7 @@ class DomainsController < ApplicationController
   before_action :set_domain, only: %i[show edit update destroy]
 
 def index
-  @domains = current_user.domains.order(:name)
+    @domains = current_user.domains.includes(:latest_status_history).order(:name)
   @total_domains = @domains.size
   @up_count = @domains.count { |d| d.status_up? }
   @down_count = @domains.count { |d| d.status_down? || d.status_error? }
