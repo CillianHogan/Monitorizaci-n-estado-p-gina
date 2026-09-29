@@ -134,7 +134,7 @@
                 <% if incident[:ongoing] %><span class="text-red-500 font-bold">(Ongoing)</span><% end %>
               </h3>
               <div class="text-sm text-gray-500 mt-1">
-                <%= incident[:start].strftime("%B %d, %Y, %H:%M") %> - 
+                <%= (incident[:start] || Time.current).strftime("%B %d, %Y, %H:%M") %> - 
                 <% if incident[:ongoing] %>
                   <span class="text-red-500">Currently ongoing</span>
                 <% else %>

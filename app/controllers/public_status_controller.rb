@@ -25,7 +25,7 @@ class PublicStatusController < ApplicationController
     @uptime_30d = calculate_sql_uptime(30.days.ago)
     @uptime_90d = calculate_sql_uptime(90.days.ago)
 
-    @incidents = @domain.status_histories.where.not(status: "up").order(recorded_at: :desc).limit(10)
+    @incidents = calculate_incidents
   end
 
   private
@@ -42,5 +42,36 @@ class PublicStatusController < ApplicationController
 
     up_count = @domain.status_histories.where("recorded_at >= ?", since_time).where(status: "up").count
     ((up_count.to_f / total) * 100).round(2)
+  end
+
+  def calculate_incidents
+    incidents = []
+    current_incident = nil
+
+    # Evaluamos solo los ultimos 100 registros para evitar consumo de RAM
+    sample = @domain.status_histories.order(recorded_at: :desc).limit(100).to_a.reverse
+
+    sample.each do |h|
+      if h.status != "up"
+        if current_incident.nil?
+          current_incident = {
+            title: "Outage detected",
+            start: h.recorded_at,
+            end: nil,
+            duration: nil,
+            ongoing: true
+          }
+        end
+      elsif current_incident.present?
+        current_incident[:end] = h.recorded_at
+        current_incident[:duration] = ((current_incident[:end] - current_incident[:start]) / 60).round
+        current_incident[:ongoing] = false
+        incidents << current_incident
+        current_incident = nil
+      end
+    end
+
+    incidents << current_incident if current_incident.present?
+    incidents.reverse
   end
 end
