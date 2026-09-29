@@ -1,13 +1,13 @@
 <div class="space-y-8">
-  <%# Banner / Header con KPIs globales %>
-  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-6 border-b border-white/10">
+  <%# Header %>
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-6 border-b border-amber-500/20">
     <div>
       <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">Servicios Monitorizados</h1>
-      <p class="mt-1 text-sm text-stone-400">Supervisión en tiempo real de disponibilidad, certificados SSL y latencia.</p>
+      <p class="mt-1 text-sm text-amber-200/70">Supervisión en tiempo real de disponibilidad, certificados SSL y latencia.</p>
     </div>
 
     <div class="flex items-center gap-3">
-      <%= link_to new_domain_path, class: "inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs tracking-wide text-stone-950 bg-gradient-to-r from-amber-400 via-amber-300 to-orange-400 hover:from-amber-300 hover:to-orange-300 shadow-lg shadow-amber-500/20 hover:scale-[1.02] transition-all cursor-pointer" do %>
+      <%= link_to new_domain_path, class: "inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs tracking-wide text-stone-950 bg-gradient-to-r from-amber-400 via-amber-300 to-orange-400 hover:from-amber-300 hover:to-orange-300 shadow-lg shadow-amber-500/25 hover:scale-[1.02] transition-all cursor-pointer" do %>
         <svg class="w-4 h-4 text-stone-950" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
         </svg>
@@ -16,74 +16,70 @@
     </div>
   </div>
 
-  <%# Tarjetas de resumen rápido %>
+  <%# Tarjetas de resumen %>
   <% up_count = @domains.count { |d| d.status == 'up' } %>
   <% down_count = @domains.count { |d| d.status == 'down' } %>
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-    <div class="bg-stone-900/60 border border-white/10 rounded-2xl p-4 backdrop-blur-sm">
-      <div class="text-xs font-semibold text-stone-400 uppercase tracking-wider">Total Sitios</div>
+    <div class="bg-[#241a16]/80 border border-amber-500/20 rounded-2xl p-4 backdrop-blur-sm shadow-sm">
+      <div class="text-xs font-semibold text-amber-200/70 uppercase tracking-wider">Total Sitios</div>
       <div class="mt-1 text-2xl font-black text-white font-mono"><%= @domains.size %></div>
     </div>
-    <div class="bg-stone-900/60 border border-emerald-500/20 rounded-2xl p-4 backdrop-blur-sm">
+    <div class="bg-[#241a16]/80 border border-emerald-500/30 rounded-2xl p-4 backdrop-blur-sm shadow-sm">
       <div class="text-xs font-semibold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
         <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
         Operativos
       </div>
-      <div class="mt-1 text-2xl font-black text-emerald-400 font-mono"><%= up_count %></div>
+      <div class="mt-1 text-2xl font-black text-emerald-300 font-mono"><%= up_count %></div>
     </div>
-    <div class="bg-stone-900/60 border border-rose-500/20 rounded-2xl p-4 backdrop-blur-sm">
+    <div class="bg-[#241a16]/80 border border-rose-500/30 rounded-2xl p-4 backdrop-blur-sm shadow-sm">
       <div class="text-xs font-semibold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
         <span class="h-2 w-2 rounded-full bg-rose-500"></span>
         Incidentes
       </div>
-      <div class="mt-1 text-2xl font-black text-rose-400 font-mono"><%= down_count %></div>
+      <div class="mt-1 text-2xl font-black text-rose-300 font-mono"><%= down_count %></div>
     </div>
   </div>
 
-  <%# Listado de tarjetas de dominios %>
+  <%# Listado %>
   <% if @domains.empty? %>
-    <div class="bg-stone-900/50 border border-dashed border-white/15 rounded-3xl p-12 text-center">
-      <div class="h-16 w-16 mx-auto mb-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+    <div class="bg-[#241a16]/60 border border-dashed border-amber-500/25 rounded-3xl p-12 text-center">
+      <div class="h-16 w-16 mx-auto mb-4 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-300">
         <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
         </svg>
       </div>
       <h3 class="text-lg font-bold text-white">No tienes dominios en monitorización</h3>
-      <p class="mt-1 text-sm text-stone-400 max-w-sm mx-auto">Añade tu primera URL o servicio web para empezar a registrar su rendimiento en tiempo real.</p>
+      <p class="mt-1 text-sm text-amber-200/70 max-w-sm mx-auto">Añade tu primera URL para empezar a vigilar su disponibilidad y latencia.</p>
       <div class="mt-6">
         <%= link_to "Añadir Primer Dominio", new_domain_path, class: "inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs text-stone-950 bg-amber-400 hover:bg-amber-300 shadow-md transition" %>
       </div>
     </div>
   <% else %>
-    <div class="grid grid-cols-1 gap-4">
+    <div class="grid grid-cols-1 gap-3.5">
       <% @domains.each do |domain| %>
         <% is_up = domain.status == 'up' %>
-        <%# Obtenemos la latencia de forma segura sin romper %>
         <% latency = domain.respond_to?(:last_response_time_ms) && domain.last_response_time_ms.present? ? domain.last_response_time_ms : (domain.status_histories.last&.response_time_ms) %>
-        <%# Obtenemos los días restantes de SSL de forma segura %>
         <% days_ssl = domain.respond_to?(:ssl_days_remaining) ? domain.ssl_days_remaining : (domain.ssl_expires_at ? ((domain.ssl_expires_at.to_date - Date.current).to_i) : nil) %>
 
-        <div class="group relative bg-stone-900/70 hover:bg-stone-900/90 border border-white/[0.08] hover:border-amber-500/40 rounded-2xl p-5 backdrop-blur-md transition-all duration-200 shadow-lg hover:shadow-amber-500/5">
+        <div class="group relative bg-[#2a1f1b]/90 hover:bg-[#322520] border border-amber-500/20 hover:border-amber-400/50 rounded-2xl p-5 backdrop-blur-md transition-all duration-200 shadow-md">
           <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             
-            <%# Columna Info Principal %>
+            <%# Info principal %>
             <div class="flex items-start gap-4">
-              <div class="mt-1 h-3.5 w-3.5 rounded-full flex-shrink-0 flex items-center justify-center <%= is_up ? 'bg-emerald-500/20' : 'bg-rose-500/20' %>">
-                <div class="h-2 w-2 rounded-full <%= is_up ? 'bg-emerald-400 animate-pulse' : 'bg-rose-500' %>"></div>
-              </div>
+              <div class="mt-1.5 h-3 w-3 rounded-full flex-shrink-0 <%= is_up ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]' : 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.8)]' %>"></div>
               <div class="space-y-1">
                 <div class="flex items-center gap-3 flex-wrap">
                   <%= link_to domain_path(domain), class: "text-base font-bold text-white group-hover:text-amber-300 transition-colors" do %>
                     <%= domain.name %>
                   <% end %>
-                  <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md <%= is_up ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20' %>">
+                  <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md <%= is_up ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30' %>">
                     <%= is_up ? 'ONLINE' : 'CAÍDO' %>
                   </span>
                 </div>
-                <div class="flex items-center gap-2 text-xs text-stone-400">
-                  <a href="<%= domain.url %>" target="_blank" rel="noopener noreferrer" class="hover:text-amber-400 transition-colors flex items-center gap-1 font-mono">
+                <div class="flex items-center gap-2 text-xs text-amber-200/60">
+                  <a href="<%= domain.url %>" target="_blank" rel="noopener noreferrer" class="hover:text-amber-300 transition-colors flex items-center gap-1 font-mono">
                     <%= domain.url %>
-                    <svg class="w-3 h-3 text-stone-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-3 h-3 text-amber-400/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
                   </a>
@@ -91,44 +87,40 @@
               </div>
             </div>
 
-            <%# Métricas en vivo (Latencia, SSL, Canales) %>
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-6 py-2 lg:py-0 border-y lg:border-y-0 border-white/5 text-xs">
-              
-              <%# Latencia %>
+            <%# Métricas %>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-6 py-2 lg:py-0 border-y lg:border-y-0 border-amber-500/15 text-xs">
               <div>
-                <span class="text-[11px] font-medium text-stone-400 block">Respuesta</span>
-                <span class="text-sm font-bold font-mono <%= (latency.to_i > 800) ? 'text-amber-400' : 'text-stone-200' %>">
+                <span class="text-[11px] font-medium text-amber-200/60 block">Respuesta</span>
+                <span class="text-sm font-bold font-mono <%= (latency.to_i > 800) ? 'text-amber-400' : 'text-amber-100' %>">
                   <%= latency.present? ? "#{latency} ms" : "—" %>
                 </span>
               </div>
 
-              <%# SSL %>
               <div>
-                <span class="text-[11px] font-medium text-stone-400 block">Certificado SSL</span>
+                <span class="text-[11px] font-medium text-amber-200/60 block">Certificado SSL</span>
                 <% if days_ssl.present? %>
-                  <span class="text-xs font-semibold font-mono <%= days_ssl <= 15 ? 'text-amber-400' : 'text-emerald-400' %>">
+                  <span class="text-xs font-semibold font-mono <%= days_ssl <= 15 ? 'text-amber-400' : 'text-emerald-300' %>">
                     <%= days_ssl %> días
                   </span>
                 <% else %>
-                  <span class="text-xs text-stone-400">No detectado</span>
+                  <span class="text-xs text-amber-200/40">No detectado</span>
                 <% end %>
               </div>
 
-              <%# Canales %>
               <div class="col-span-2 sm:col-span-1">
-                <span class="text-[11px] font-medium text-stone-400 block">Canales</span>
+                <span class="text-[11px] font-medium text-amber-200/60 block">Canales</span>
                 <div class="flex items-center gap-1.5 mt-0.5">
-                  <span class="px-1.5 py-0.5 rounded text-[10px] font-mono <%= domain.notify_email? ? 'bg-amber-500/20 text-amber-300' : 'bg-white/5 text-stone-400' %>">Mail</span>
-                  <span class="px-1.5 py-0.5 rounded text-[10px] font-mono <%= domain.notify_discord? ? 'bg-indigo-500/20 text-indigo-300' : 'bg-white/5 text-stone-400' %>">Discord</span>
-                  <span class="px-1.5 py-0.5 rounded text-[10px] font-mono <%= domain.notify_telegram? ? 'bg-sky-500/20 text-sky-300' : 'bg-white/5 text-stone-400' %>">TG</span>
+                  <span class="px-1.5 py-0.5 rounded text-[10px] font-mono <%= domain.notify_email? ? 'bg-amber-500/30 text-amber-200 border border-amber-500/30' : 'bg-black/20 text-amber-200/30' %>">Mail</span>
+                  <span class="px-1.5 py-0.5 rounded text-[10px] font-mono <%= domain.notify_discord? ? 'bg-indigo-500/30 text-indigo-200 border border-indigo-500/30' : 'bg-black/20 text-amber-200/30' %>">Discord</span>
+                  <span class="px-1.5 py-0.5 rounded text-[10px] font-mono <%= domain.notify_telegram? ? 'bg-sky-500/30 text-sky-200 border border-sky-500/30' : 'bg-black/20 text-amber-200/30' %>">TG</span>
                 </div>
               </div>
             </div>
 
-            <%# Botones de Acción %>
+            <%# Botones %>
             <div class="flex items-center gap-2 self-end lg:self-center">
               <% if domain.public_token.present? %>
-                <%= link_to public_status_path(domain.public_token), target: "_blank", title: "Ver página pública", class: "p-2 rounded-xl text-stone-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/5 transition" do %>
+                <%= link_to public_status_path(domain.public_token), target: "_blank", title: "Ver página pública", class: "p-2 rounded-xl text-amber-200/70 hover:text-white bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 transition" do %>
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -136,16 +128,16 @@
                 <% end %>
               <% end %>
 
-              <%= link_to edit_domain_path(domain), title: "Configurar", class: "p-2 rounded-xl text-stone-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/5 transition" do %>
+              <%= link_to edit_domain_path(domain), title: "Configurar", class: "p-2 rounded-xl text-amber-200/70 hover:text-white bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 transition" do %>
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
               <% end %>
 
-              <%= link_to domain_path(domain), class: "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs text-stone-200 hover:text-white bg-white/10 hover:bg-amber-500/20 border border-white/10 hover:border-amber-500/30 transition" do %>
+              <%= link_to domain_path(domain), class: "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs text-amber-100 hover:text-white bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 transition" do %>
                 <span>Panel</span>
-                <svg class="w-3.5 h-3.5 text-stone-400 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="w-3.5 h-3.5 text-amber-300 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
               <% end %>

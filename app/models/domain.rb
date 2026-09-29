@@ -277,8 +277,19 @@ def send_telegram_ssl_alert(days)
 rescue StandardError => e
   Rails.logger.error("Error al preparar alerta SSL Telegram para #{name}: #{e.message}")
 end
+  def create_status_history
+    status_histories.create(
+      status: status,
+      response_time_ms: current_response_time_ms || last_response_time_ms || 0,
+      http_code: current_http_code || 200,
+      recorded_at: Time.current
+    )
+  rescue StandardError => e
+    Rails.logger.error("Error al registrar status history para #{name}: #{e.message}")
+  end
 
   private
+
 
   def normalize_url
     return if url.blank?
