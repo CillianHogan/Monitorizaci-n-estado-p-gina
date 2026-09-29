@@ -142,7 +142,7 @@
                 <% end %>
               </div>
               <div class="mt-2">
-                <div class="text-gray-700">The reason was <span class="font-medium"><%= incident[:status].titleize %></span></div>
+                <div class="text-gray-700">The reason was <span class="font-medium"><%= (incident[:status] || "down").titleize %></span></div>
                 <div class="text-sm text-gray-500 mt-1">Details: <%= incident[:details] || (incident[:status] == 'error' ? 'The server returned an error response.' : 'The server did not respond.') %></div>
               </div>
             </div>

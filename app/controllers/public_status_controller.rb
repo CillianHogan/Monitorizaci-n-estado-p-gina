@@ -55,6 +55,7 @@ class PublicStatusController < ApplicationController
         if current_incident.nil?
           current_incident = {
             title: "Caída o fallo detectado",
+            status: (h.status.presence || "down"),
             start: h.recorded_at || Time.current,
             end: nil,
             duration: 0,
