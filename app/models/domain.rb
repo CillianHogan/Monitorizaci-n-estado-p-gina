@@ -287,8 +287,7 @@ end
     http_code: current_http_code || 200,
     recorded_at: Time.current
   )
-rescue StandardError
- => e
+rescue StandardError => e
     Rails.logger.error("Error al registrar status history para #{name}: #{e.message}")
   end
 
