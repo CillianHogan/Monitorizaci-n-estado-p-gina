@@ -1,9 +1,9 @@
-#frozen_string_literal: true
+# frozen_string_literal: true
 
 class NotificationChannel < ApplicationRecord
   belongs_to :user
 
-  CHANNEL_TYPES = Mww[email discord telegram].freeze
+  CHANNEL_TYPES = %w[email discord telegram].freeze
 
   validates :channel_type, presence: true, inclusion: { in: CHANNEL_TYPES }
   validates :destination, presence: true
