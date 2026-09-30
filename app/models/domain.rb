@@ -8,7 +8,7 @@ require "httparty"
 class Domain < ApplicationRecord
 
 def target_email
-  return notify_email if respond_to?(:notify_email) && notify_email.present?
+  return notify_email_address if respond_to?(:notify_email_address) && notify_email_address.present?
   return user.notification_channels.default_for(:email)&.destination if user.present? && user.notification_channels.default_for(:email).present?
   user&.email
 end
