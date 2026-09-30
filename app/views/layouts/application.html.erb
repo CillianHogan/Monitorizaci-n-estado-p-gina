@@ -66,6 +66,7 @@
             <% end %>
 
             <% if user_signed_in? %>
+              <%= link_to "Canales", notification_channels_path, class: "px-3 py-1.5 rounded-lg border border-amber-600/50 text-amber-300 hover:text-white hover:border-amber-400 text-xs font-bold transition-all" %>
               <nav class="hidden md:flex items-center gap-1.5 pl-4 border-l border-amber-500/20">
                 <%= link_to "Dominios", domains_path, class: "px-3.5 py-1.5 text-xs font-semibold rounded-lg #{current_page?(domains_path) ? 'text-amber-200 bg-amber-500/20 border border-amber-500/40' : 'text-amber-100/70 hover:text-white hover:bg-white/5'} transition-all" %>
                 <%= link_to "Endpoints API", api_endpoints_path, class: "px-3.5 py-1.5 text-xs font-semibold rounded-lg #{current_page?(api_endpoints_path) ? 'text-amber-200 bg-amber-500/20 border border-amber-500/40' : 'text-amber-100/70 hover:text-white hover:bg-white/5'} transition-all" %>

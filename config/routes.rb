@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  resources :notification_channels, only: [:index, :create, :destroy] do
+    member do
+      patch :set_default
+    end
+  end
+
   devise_for :users
   resources :domains do
     member do
