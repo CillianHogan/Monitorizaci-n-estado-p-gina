@@ -6,6 +6,23 @@ require "openssl"
 require "httparty"
 
 class Domain < ApplicationRecord
+
+def target_email
+  return notify_email if respond_to?(:notify_email) && notify_email.present?
+  return user.notification_channels.default_for(:email)&.destination if user.present? && user.notification_channels.default_for(:email).present?
+  user&.email
+end
+
+def target_discord_webhook
+  return discord_webhook_url if discord_webhook_url.present?
+  user&.notification_channels&.default_for(:discord)&.destination
+end
+
+def target_telegram_chat_id
+  return telegram_chat_id if telegram_chat_id.present?
+  user&.notification_channels&.default_for(:telegram)&.destination
+end
+
   belongs_to :user
   has_many :status_histories, dependent: :destroy, class_name: "DomainStatusHistory"
   has_one :latest_status_history, -> { order(recorded_at: :desc) }, class_name: "DomainStatusHistory"
