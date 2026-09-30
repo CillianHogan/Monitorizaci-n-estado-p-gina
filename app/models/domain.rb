@@ -168,7 +168,7 @@ def check_latency_alert!(latency_ms)
     status_histories.where("recorded_at >= ?", since).average(:response_time_ms)&.round
   end
 def send_discord_alert(type)
-  return unless notify_discord? && discord_webhook_url.present?
+  return unless notify_discord? && target_discord_webhook.present?
 
   color = type == :up ? 3066993 : 15158332 # Verde o Rojo
   title = type == :up ? "🟢 Dominio Recuperado: #{name}" : "🔴 Dominio Caído: #{name}"
@@ -189,13 +189,13 @@ def send_discord_alert(type)
     ]
   }
 
-  DiscordNotificationJob.perform_later(discord_webhook_url, payload)
+  DiscordNotificationJob.perform_later(target_discord_webhook, payload)
 rescue StandardError => e
   Rails.logger.error("Error al preparar alerta de Discord para #{name}: #{e.message}")
 end
 
 def send_discord_latency_alert(latency_ms)
-  return unless notify_discord? && discord_webhook_url.present?
+  return unless notify_discord? && target_discord_webhook.present?
 
   payload = {
     embeds: [
@@ -212,12 +212,12 @@ def send_discord_latency_alert(latency_ms)
     ]
   }
 
-  DiscordNotificationJob.perform_later(discord_webhook_url, payload)
+  DiscordNotificationJob.perform_later(target_discord_webhook, payload)
 rescue StandardError => e
   Rails.logger.error("Error al preparar alerta de latencia Discord para #{name}: #{e.message}")
 end
   def send_telegram_alert(type)
-    return unless notify_telegram? && telegram_bot_token.present? && telegram_chat_id.present?
+    return unless notify_telegram? && telegram_bot_token.present? && target_telegram_chat_id.present?
 
     title = type == :up ? "🟢 *Dominio Recuperado: #{name}*" : "🔴 *Dominio Caído: #{name}*"
     status_desc = type == :up ? "El dominio vuelve a responder con normalidad." : "El dominio no responde o devuelve un código de error."
@@ -231,13 +231,13 @@ end
       • *Fecha:* `#{Time.current.strftime("%d/%m/%Y %H:%M:%S")}`
     TEXT
 
-    TelegramNotificationJob.perform_later(telegram_bot_token, telegram_chat_id, msg)
+    TelegramNotificationJob.perform_later(target_telegram_bot_token, target_telegram_chat_id, msg)
   rescue StandardError => e
     Rails.logger.error("Error al preparar alerta Telegram para #{name}: #{e.message}")
   end
 
   def send_telegram_latency_alert(latency_ms)
-    return unless notify_telegram? && telegram_bot_token.present? && telegram_chat_id.present?
+    return unless notify_telegram? && telegram_bot_token.present? && target_telegram_chat_id.present?
 
     msg = <<~TEXT
       ⚠️ *Alerta de Latencia Alta: #{name}*
@@ -247,12 +247,12 @@ end
       • *Fecha:* `#{Time.current.strftime("%d/%m/%Y %H:%M:%S")}`
     TEXT
 
-    TelegramNotificationJob.perform_later(telegram_bot_token, telegram_chat_id, msg)
+    TelegramNotificationJob.perform_later(target_telegram_bot_token, target_telegram_chat_id, msg)
   rescue StandardError => e
     Rails.logger.error("Error al preparar alerta de latencia Telegram para #{name}: #{e.message}")
   end
 def send_discord_ssl_alert(days)
-  return unless notify_discord? && discord_webhook_url.present?
+  return unless notify_discord? && target_discord_webhook.present?
 
   payload = {
     embeds: [
@@ -270,13 +270,13 @@ def send_discord_ssl_alert(days)
     ]
   }
 
-  DiscordNotificationJob.perform_later(discord_webhook_url, payload)
+  DiscordNotificationJob.perform_later(target_discord_webhook, payload)
 rescue StandardError => e
   Rails.logger.error("Error al preparar alerta SSL Discord para #{name}: #{e.message}")
 end
 
 def send_telegram_ssl_alert(days)
-  return unless notify_telegram? && telegram_bot_token.present? && telegram_chat_id.present?
+  return unless notify_telegram? && telegram_bot_token.present? && target_telegram_chat_id.present?
 
   formatted_date = ssl_expires_at ? ssl_expires_at.strftime("%d/%m/%Y") : "N/D"
   issuer_name = ssl_issuer.presence || "Desconocido"
@@ -290,7 +290,7 @@ def send_telegram_ssl_alert(days)
 "         "• *URL:* " + url.to_s + "
 "
 
-  TelegramNotificationJob.perform_later(telegram_bot_token, telegram_chat_id, msg)
+  TelegramNotificationJob.perform_later(target_telegram_bot_token, target_telegram_chat_id, msg)
 rescue StandardError => e
   Rails.logger.error("Error al preparar alerta SSL Telegram para #{name}: #{e.message}")
 end
