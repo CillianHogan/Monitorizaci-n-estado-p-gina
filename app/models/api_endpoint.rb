@@ -58,9 +58,22 @@ class ApiEndpoint < ApplicationRecord
       last_response_time_ms: latency,
       last_http_code: response.code
     )
+
+    status_histories.create(
+      status: new_status,
+      response_time_ms: latency,
+      http_code: response.code,
+      recorded_at: Time.current
+    )
   rescue StandardError => e
     Rails.logger.error("API Endpoint check failed for #{clean_url}: #{e.message}")
     update(status: :error, last_http_code: nil)
+    status_histories.create(
+      status: :error,
+      response_time_ms: nil,
+      http_code: nil,
+      recorded_at: Time.current
+    )
   end
 
   # --- Disparadores de Notificaciones ---
