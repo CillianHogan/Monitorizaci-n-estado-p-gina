@@ -16,4 +16,4 @@ production:
   cleanup_database:
     class: CleanupDatabaseJob
     queue: default
-    schedule: "every day at 3:00am"
+    schedule: "every 1 hour"

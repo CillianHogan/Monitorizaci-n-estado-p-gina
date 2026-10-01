@@ -7,4 +7,13 @@ class DomainStatusHistory < ApplicationRecord
 
   validates :status, presence: true
   validates :recorded_at, presence: true
+
+  after_create :prune_excess_records
+
+  private
+
+  def prune_excess_records
+    excess_ids = domain.status_histories.order(recorded_at: :desc).offset(100).pluck(:id)
+    domain.status_histories.where(id: excess_ids).delete_all if excess_ids.any?
+  end
 end
