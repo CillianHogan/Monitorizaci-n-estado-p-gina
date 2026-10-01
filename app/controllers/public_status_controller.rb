@@ -13,19 +13,35 @@ class PublicStatusController < ApplicationController
   end
 
   def show
-    @status_histories = @domain.status_histories.order(recorded_at: :desc).limit(30)
+    if @domain.respond_to?(:status_histories)
+      @status_histories = @domain.status_histories.order(recorded_at: :desc).limit(30)
+      @last_90_days_histories = @domain.status_histories.where("recorded_at >= ?", 90.days.ago).order(recorded_at: :asc).limit(200)
+      @last_30_days_histories = @last_90_days_histories
+      @last_7_days_histories  = @domain.status_histories.where("recorded_at >= ?", 7.days.ago).order(recorded_at: :asc).limit(100)
+      @last_24_hours_histories = @domain.status_histories.where("recorded_at >= ?", 24.hours.ago).order(recorded_at: :asc).limit(50)
 
-    @last_90_days_histories = @domain.status_histories.where("recorded_at >= ?", 90.days.ago).order(recorded_at: :asc).limit(200)
-    @last_30_days_histories = @last_90_days_histories
-    @last_7_days_histories  = @domain.status_histories.where("recorded_at >= ?", 7.days.ago).order(recorded_at: :asc).limit(100)
-    @last_24_hours_histories = @domain.status_histories.where("recorded_at >= ?", 24.hours.ago).order(recorded_at: :asc).limit(50)
+      @uptime_24h = calculate_sql_uptime(24.hours.ago)
+      @uptime_7d  = calculate_sql_uptime(7.days.ago)
+      @uptime_30d = calculate_sql_uptime(30.days.ago)
+      @uptime_90d = calculate_sql_uptime(90.days.ago)
 
-    @uptime_24h = calculate_sql_uptime(24.hours.ago)
-    @uptime_7d  = calculate_sql_uptime(7.days.ago)
-    @uptime_30d = calculate_sql_uptime(30.days.ago)
-    @uptime_90d = calculate_sql_uptime(90.days.ago)
+      @incidents = calculate_incidents
+    else
+      # Soporte seguro para ApiEndpoint (sin histórico relacional)
+      @status_histories = []
+      @last_90_days_histories = []
+      @last_30_days_histories = []
+      @last_7_days_histories  = []
+      @last_24_hours_histories = []
 
-    @incidents = calculate_incidents
+      current_uptime = @domain.status_up? ? 100.0 : 0.0
+      @uptime_24h = current_uptime
+      @uptime_7d  = current_uptime
+      @uptime_30d = current_uptime
+      @uptime_90d = current_uptime
+
+      @incidents = []
+    end
   end
 
   private
@@ -38,6 +54,8 @@ class PublicStatusController < ApplicationController
   end
 
   def calculate_sql_uptime(since_time)
+    return (@domain.status.to_s == "up" ? 100.0 : 0.0) unless @domain.respond_to?(:status_histories)
+
     total = @domain.status_histories.where("recorded_at >= ?", since_time).count
     return (@domain.status.to_s == "up" ? 100.0 : 0.0) if total.zero?
 
@@ -46,6 +64,8 @@ class PublicStatusController < ApplicationController
   end
 
   def calculate_incidents
+    return [] unless @domain.respond_to?(:status_histories)
+
     incidents = []
     current_incident = nil
 
