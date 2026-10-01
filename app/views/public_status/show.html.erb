@@ -1,175 +1,156 @@
-<div class="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50 text-gray-800 py-8 px-4">
-  <div class="container mx-auto max-w-6xl">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
-      <div class="flex items-center">
-        <h1 class="text-xl font-bold text-indigo-800"><%= @domain.name %></h1>
+<div class="space-y-8 max-w-5xl mx-auto py-6 px-4">
+  <% is_up = @domain.status_up? %>
+
+  <%# Header Principal %>
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-amber-500/20">
+    <div>
+      <div class="flex items-center gap-3">
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white"><%= @domain.name %></h1>
+        <span class="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md <%= is_up ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30' %>">
+          <%= is_up ? 'OPERATIVO' : 'INCIDENTE' %>
+        </span>
       </div>
-      <div class="text-sm text-gray-600">
-        Service status
-        <div>Last updated: <%= Time.current.strftime("%H:%M:%S") %> | Next update in 30 sec</div>
-      </div>
+      <p class="mt-1 text-xs sm:text-sm text-amber-200/60 font-mono"><%= @domain.url %></p>
     </div>
 
-    <!-- Status Card -->
-    <div class="bg-white rounded-lg p-6 mb-8">
-      <div class="flex items-center">
-        <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center mr-4">
-          <% if @domain.status_up? %>
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-          <% elsif @domain.status_error? || @domain.status_down? %>
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-          <% else %>
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          <% end %>
-        </div>
-        <div>
-          <div class="flex items-center">
-            <h2 class="text-xl font-bold text-gray-900">All systems 
-              <% if @domain.status_up? %>
-                <span class="text-green-500">operational</span>
-              <% elsif @domain.status_error? || @domain.status_down? %>
-                <span class="text-red-500">down</span>
-              <% else %>
-                <span class="text-yellow-500">pending</span>
-              <% end %>
-            </h2>
-          </div>
-          <% if @status_histories.any? && @status_histories.first.status != 'up' %>
-            <div class="text-sm text-gray-500 mt-1">Latest downtime detected <%= time_ago_in_words(@status_histories.first.recorded_at) %> ago.</div>
-          <% else %>
-            <div class="text-sm text-gray-500 mt-1">No downtime detected in the last 30 days.</div>
-          <% end %>
-        </div>
-      </div>
+    <div class="text-left md:text-right text-xs text-amber-200/60 font-mono">
+      <div>Estado del servicio en vivo</div>
+      <div class="text-amber-200/40 text-[11px] mt-0.5">Última comprobación: <%= Time.current.strftime("%H:%M:%S") %> UTC</div>
     </div>
+  </div>
 
-    <!-- Uptime Section -->
-    <div class="mb-8">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-lg font-bold">Uptime <span class="text-sm font-normal">Last 90 days</span></h2>
-      </div>
-
-      <!-- Uptime Bars for Website -->
-      <div class="bg-white rounded-lg p-6 mb-4">
-        <div class="flex items-center justify-between mb-2">
-          <div class="flex items-center">
-            <span class="text-gray-700 mr-2">Website</span>
-            <span class="text-xs text-gray-500">↑ <%= (@uptime_90d || 100.0) %>%</span>
-          </div>
-          <div class="<%= @domain.status_up? ? 'text-green-500' : 'text-red-500' %> text-sm font-medium">
-            <%= @domain.status_up? ? 'Operational' : 'Down' %>
-          </div>
-        </div>
-        <div class="flex w-full">
-          <% if @last_90_days_histories.any? %>
-            <% # Group by day to show one bar per day %>
-            <% histories_by_day = @last_90_days_histories.group_by { |h| h.recorded_at.to_date } %>
-            <% # Fill in missing days with the last known status %>
-            <% (0..89).each do |days_ago| %>
-              <% date = days_ago.days.ago.to_date %>
-              <% 
-                # Determine status for this day
-                day_status = if histories_by_day[date].present?
-                  # If we have records for this day, use the most common status
-                  statuses = histories_by_day[date].map(&:status)
-                  statuses.max_by { |s| statuses.count(s) }
-                elsif days_ago == 0 && @domain.status.present?
-                  # For today, use current status if no history
-                  @domain.status
-                else
-                  # For past days with no records, use 'up' as default
-                  'up'
-                end
-              %>
-              <div class="h-6 flex-grow <%= day_status == 'up' ? 'bg-green-500' : 'bg-red-500' %> mx-px" title="<%= date.strftime('%d %b, %Y') %>"></div>
-            <% end %>
-          <% else %>
-            <% # If no history, show all as up %>
-            <% 90.times do %>
-              <div class="h-6 flex-grow bg-green-500 mx-px"></div>
-            <% end %>
-          <% end %>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Overall Uptime Stats -->
-    <div class="mb-8">
-      <h2 class="text-lg font-bold mb-4">Overall Uptime</h2>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div class="bg-white rounded-lg p-6 text-center">
-          <div class="text-xl font-bold text-gray-900"><%= (@uptime_24h || 100.0) %>%</div>
-          <div class="text-sm text-gray-500">Last 24 hours</div>
-        </div>
-        <div class="bg-white rounded-lg p-6 text-center">
-          <div class="text-xl font-bold text-gray-900"><%= (@uptime_7d || 100.0) %>%</div>
-          <div class="text-sm text-gray-500">Last 7 days</div>
-        </div>
-        <div class="bg-white rounded-lg p-6 text-center">
-          <div class="text-xl font-bold text-gray-900"><%= (@uptime_30d || 100.0) %>%</div>
-          <div class="text-sm text-gray-500">Last 30 days</div>
-        </div>
-        <div class="bg-white rounded-lg p-6 text-center">
-          <div class="text-xl font-bold text-gray-900"><%= (@uptime_90d || 100.0) %>%</div>
-          <div class="text-sm text-gray-500">Last 90 days</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Status Updates -->
-    <div class="mb-8">
-      <h2 class="text-lg font-bold mb-4">Status updates</h2>
-      <% if @incidents.any? %>
-        <% @incidents.first(5).each do |incident| %>
-        <div class="bg-white rounded-lg p-6 mb-4">
-          <div class="flex items-start">
-            <div class="text-red-500 mr-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            </div>
-            <div>
-              <h3 class="text-gray-900 font-medium">
-                <%= @domain.name %> was down for <%= (incident[:duration] || 0) %> minutes
-                <% if incident[:ongoing] %><span class="text-red-500 font-bold">(Ongoing)</span><% end %>
-              </h3>
-              <div class="text-sm text-gray-500 mt-1">
-                <%= (incident[:start] || Time.current).strftime("%B %d, %Y, %H:%M") %> - 
-                <% if incident[:ongoing] %>
-                  <span class="text-red-500">Currently ongoing</span>
-                <% else %>
-                  <%= incident[:end]&.strftime("%B %d, %Y, %H:%M") %>
-                <% end %>
-              </div>
-              <div class="mt-2">
-                <div class="text-gray-700">The reason was <span class="font-medium"><%= (incident[:status] || "down").titleize %></span></div>
-                <div class="text-sm text-gray-500 mt-1">Details: <%= incident[:details] || (incident[:status] == 'error' ? 'The server returned an error response.' : 'The server did not respond.') %></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <% end %>
-        <% if @incidents.size > 5 %>
-          <div class="text-center text-sm text-gray-500 mt-2">
-            <%= @incidents.size - 5 %> more incidents not shown
-          </div>
-        <% end %>
+  <%# Banner de Estado Global %>
+  <div class="bg-[#241a16]/80 border <%= is_up ? 'border-emerald-500/30' : 'border-rose-500/30' %> rounded-2xl p-5 sm:p-6 backdrop-blur-sm shadow-sm flex items-center gap-4">
+    <div class="w-12 h-12 rounded-2xl <%= is_up ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30' %> flex items-center justify-center flex-shrink-0">
+      <% if is_up %>
+        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
       <% else %>
-        <div class="bg-white rounded-lg p-6 text-center text-gray-500">
-          No incidents reported in the last 30 days.
-        </div>
+        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
       <% end %>
     </div>
-
-    <!-- Footer -->
-    <div class="text-center text-sm text-gray-600 mt-12 mb-4">
-      That's all folks!
+    <div>
+      <h2 class="text-lg font-bold text-white flex items-center gap-2">
+        <%= is_up ? 'Todos los sistemas operativos' : 'Incidente de servicio en curso' %>
+      </h2>
+      <p class="text-xs text-amber-200/70 mt-0.5">
+        <% if @incidents.present? && @incidents.any? && @incidents.first[:ongoing] %>
+          Interrupción del servicio detectada recientemente. El equipo técnico está monitorizándolo.
+        <% else %>
+          No se han registrado incidencias críticas en los últimos 30 días.
+        <% end %>
+      </p>
     </div>
+  </div>
 
-    <div class="flex justify-between items-center text-xs text-gray-600">
-      <div>
-        Powered by <span class="text-indigo-800 font-medium">Domain Checker</span>
+  <%# Métricas de Uptime (Overall Uptime) %>
+  <div>
+    <h3 class="text-xs font-semibold text-amber-200/70 uppercase tracking-wider mb-3">Disponibilidad Histórica</h3>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div class="bg-[#241a16]/80 border border-amber-500/20 rounded-2xl p-4 backdrop-blur-sm shadow-sm text-center">
+        <div class="text-[11px] font-semibold text-amber-200/60 uppercase tracking-wider">Últimas 24h</div>
+        <div class="mt-1 text-2xl font-black text-emerald-300 font-mono"><%= @uptime_24h || 100.0 %>%</div>
+      </div>
+      <div class="bg-[#241a16]/80 border border-amber-500/20 rounded-2xl p-4 backdrop-blur-sm shadow-sm text-center">
+        <div class="text-[11px] font-semibold text-amber-200/60 uppercase tracking-wider">Últimos 7 días</div>
+        <div class="mt-1 text-2xl font-black text-emerald-300 font-mono"><%= @uptime_7d || 100.0 %>%</div>
+      </div>
+      <div class="bg-[#241a16]/80 border border-amber-500/20 rounded-2xl p-4 backdrop-blur-sm shadow-sm text-center">
+        <div class="text-[11px] font-semibold text-amber-200/60 uppercase tracking-wider">Últimos 30 días</div>
+        <div class="mt-1 text-2xl font-black text-emerald-300 font-mono"><%= @uptime_30d || 100.0 %>%</div>
+      </div>
+      <div class="bg-[#241a16]/80 border border-amber-500/20 rounded-2xl p-4 backdrop-blur-sm shadow-sm text-center">
+        <div class="text-[11px] font-semibold text-amber-200/60 uppercase tracking-wider">Últimos 90 días</div>
+        <div class="mt-1 text-2xl font-black text-emerald-300 font-mono"><%= @uptime_90d || 100.0 %>%</div>
       </div>
     </div>
+  </div>
+
+  <%# Gráfico de barras de 90 días %>
+  <div class="bg-[#241a16]/80 border border-amber-500/20 rounded-2xl p-5 sm:p-6 backdrop-blur-sm shadow-sm space-y-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-bold text-white uppercase tracking-wider">Disponibilidad Diaria</span>
+        <span class="text-xs font-mono text-emerald-400">↑ <%= @uptime_90d || 100.0 %>%</span>
+      </div>
+      <span class="text-[11px] font-mono text-amber-200/50">Últimos 90 días</span>
+    </div>
+
+    <div class="flex w-full items-center gap-[2px] h-8 bg-[#140e0c]/60 p-1.5 rounded-xl border border-amber-500/10">
+      <% if @last_90_days_histories.present? && @last_90_days_histories.any? %>
+        <% histories_by_day = @last_90_days_histories.group_by { |h| h.recorded_at.to_date } %>
+        <% (0..89).to_a.reverse.each do |days_ago| %>
+          <% date = days_ago.days.ago.to_date %>
+          <% 
+            day_records = histories_by_day[date]
+            day_status = if day_records.present?
+              statuses = day_records.map(&:status)
+              statuses.max_by { |s| statuses.count(s) }
+            elsif days_ago == 0 && @domain.status.present?
+              @domain.status
+            else
+              'up'
+            end
+          %>
+          <div class="h-full flex-grow rounded-sm <%= day_status == 'up' ? 'bg-emerald-500 hover:bg-emerald-400' : 'bg-rose-500 hover:bg-rose-400' %> transition-colors cursor-pointer" title="<%= date.strftime('%d %b, %Y') %>: <%= day_status.to_s.upcase %>"></div>
+        <% end %>
+      <% else %>
+        <% 90.times do %>
+          <div class="h-full flex-grow rounded-sm bg-emerald-500/80 hover:bg-emerald-400 transition-colors"></div>
+        <% end %>
+      <% end %>
+    </div>
+    
+    <div class="flex justify-between text-[10px] text-amber-200/40 font-mono pt-1">
+      <span>Hace 90 días</span>
+      <span>Hoy</span>
+    </div>
+  </div>
+
+  <%# Historial de Incidencias %>
+  <div class="space-y-3">
+    <h3 class="text-xs font-semibold text-amber-200/70 uppercase tracking-wider">Registro de Incidentes</h3>
+    
+    <% if @incidents.present? && @incidents.any? %>
+      <div class="space-y-3">
+        <% @incidents.first(5).each do |incident| %>
+          <div class="bg-[#241a16]/80 border border-rose-500/30 rounded-2xl p-4 sm:p-5 backdrop-blur-sm shadow-sm flex items-start gap-3.5">
+            <div class="w-8 h-8 rounded-xl bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <h4 class="text-sm font-bold text-white">Caída de servicio detectada</h4>
+                <% if incident[:ongoing] %>
+                  <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">En curso</span>
+                <% else %>
+                  <span class="text-[10px] font-bold text-amber-200/60 font-mono">Duración: <%= incident[:duration] || 0 %> min</span>
+                <% end %>
+              </div>
+              <p class="text-xs text-amber-200/70">
+                <%= (incident[:start] || Time.current).strftime("%d/%m/%Y a las %H:%M") %>
+                <% if !incident[:ongoing] && incident[:end] %>
+                  — <%= incident[:end].strftime("%H:%M") %>
+                <% end %>
+              </p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="bg-[#241a16]/50 border border-amber-500/15 rounded-2xl p-6 text-center text-amber-200/50 text-xs">
+        Sin incidencias registradas en los últimos 30 días.
+      </div>
+    <% end %>
+  </div>
+
+  <%# Footer público %>
+  <div class="text-center pt-8 border-t border-amber-500/10 text-xs text-amber-200/40">
+    Supervisado por <span class="text-amber-300 font-semibold">Domain Checker</span>
   </div>
 </div>
