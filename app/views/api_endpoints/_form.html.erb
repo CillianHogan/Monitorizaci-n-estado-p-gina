@@ -23,58 +23,105 @@
     </div>
   </div>
 
-  <!-- Canales de Notificación -->
-  <div class="bg-[#1f1612]/80 border border-amber-500/20 rounded-2xl p-6 backdrop-blur-sm space-y-6">
+  <!-- Canales de Alerta -->
+  <div class="bg-[#1f1612]/80 border border-amber-500/20 rounded-2xl p-6 backdrop-blur-sm space-y-4">
     <div>
       <h3 class="text-sm font-bold uppercase tracking-wider text-amber-400/80">Canales de Alerta</h3>
       <p class="text-xs text-amber-200/60 mt-1">Configura por dónde recibir avisos si este endpoint no responde o devuelve un código HTTP de error.</p>
     </div>
 
     <!-- Email -->
-    <div class="border border-stone-800/80 rounded-xl p-4 bg-[#140e0b]/60 space-y-3">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <%= f.check_box :notify_email, class: "rounded border-amber-500/40 text-amber-500 focus:ring-amber-500/30 bg-[#1f1612]" %>
-          <%= f.label :notify_email, "Notificar por Correo Electrónico", class: "text-sm font-medium text-white cursor-pointer" %>
+    <div class="p-3.5 rounded-xl bg-[#1c1512] border border-amber-500/20 space-y-2">
+      <label class="flex items-center gap-3 cursor-pointer">
+        <%= f.check_box :notify_email, class: "h-4 w-4 rounded border-amber-500 text-amber-500 focus:ring-amber-400" %>
+        <div>
+          <span class="text-xs font-bold text-white block">Notificación por Email</span>
+          <span class="text-[11px] text-amber-200/60 block">Recibe un correo ante caídas o códigos de error HTTP.</span>
         </div>
-        <span class="text-xs text-amber-400/60 font-mono">Recomendado</span>
-      </div>
-      <div>
-        <%= f.label :notify_email_address, "Dirección específica (deja vacío para canal predeterminado)", class: "block text-xs text-amber-200/70 mb-1" %>
-        <%= f.email_field :notify_email_address, placeholder: "Dejar vacío para usar canal predeterminado", class: "w-full bg-[#1a1310] border border-stone-800 rounded-lg px-3 py-1.5 text-xs text-white placeholder-stone-600 focus:outline-none focus:border-amber-400" %>
+      </label>
+      <div class="pl-7 space-y-2">
+        <% if current_user&.notification_channels&.by_type(:email)&.any? %>
+          <div>
+            <label class="block text-[11px] font-semibold text-amber-300/80 mb-1">Seleccionar Canal Guardado:</label>
+            <select onchange="document.getElementById('api_endpoint_notify_email_address').value = this.value" class="w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none cursor-pointer">
+              <option value="">Canal predeterminado del sistema</option>
+              <% current_user.notification_channels.by_type(:email).each do |ch| %>
+                <option value="<%= ch.destination %>" <%= "selected" if api_endpoint.notify_email_address == ch.destination %>>
+                  <%= ch.name %> (<%= ch.destination %>) <%= "★ Predeterminado" if ch.is_default? %>
+                </option>
+              <% end %>
+            </select>
+          </div>
+        <% end %>
+        <div>
+          <label class="block text-[11px] font-semibold text-amber-300/60 mb-1">Destino específico (opcional):</label>
+          <%= f.text_field :notify_email_address, id: "api_endpoint_notify_email_address", placeholder: "Dejar en blanco para usar predeterminado", class: "w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white placeholder-amber-200/30 focus:outline-none font-mono" %>
+        </div>
       </div>
     </div>
 
     <!-- Discord -->
-    <div class="border border-stone-800/80 rounded-xl p-4 bg-[#140e0b]/60 space-y-3">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <%= f.check_box :notify_discord, class: "rounded border-amber-500/40 text-amber-500 focus:ring-amber-500/30 bg-[#1f1612]" %>
-          <%= f.label :notify_discord, "Notificar por Discord Webhook", class: "text-sm font-medium text-white cursor-pointer" %>
+    <div class="p-3.5 rounded-xl bg-[#1c1512] border border-amber-500/20 space-y-2">
+      <label class="flex items-center gap-3 cursor-pointer">
+        <%= f.check_box :notify_discord, class: "h-4 w-4 rounded border-amber-500 text-amber-500 focus:ring-amber-400" %>
+        <div>
+          <span class="text-xs font-bold text-white block">Alertas por Discord</span>
+          <span class="text-[11px] text-amber-200/60 block">Envío automático mediante Webhook.</span>
         </div>
-      </div>
-      <div>
-        <%= f.label :discord_webhook_url, "Webhook específico (deja vacío para canal predeterminado)", class: "block text-xs text-amber-200/70 mb-1" %>
-        <%= f.text_field :discord_webhook_url, placeholder: "Dejar vacío para usar canal predeterminado", class: "w-full bg-[#1a1310] border border-stone-800 rounded-lg px-3 py-1.5 text-xs text-white placeholder-stone-600 focus:outline-none focus:border-amber-400 font-mono" %>
+      </label>
+      <div class="pl-7 space-y-2">
+        <% if current_user&.notification_channels&.by_type(:discord)&.any? %>
+          <div>
+            <label class="block text-[11px] font-semibold text-amber-300/80 mb-1">Seleccionar Webhook Guardado:</label>
+            <select onchange="document.getElementById('api_endpoint_discord_webhook_url').value = this.value" class="w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none cursor-pointer">
+              <option value="">Canal predeterminado del sistema</option>
+              <% current_user.notification_channels.by_type(:discord).each do |ch| %>
+                <option value="<%= ch.destination %>" <%= "selected" if api_endpoint.discord_webhook_url == ch.destination %>>
+                  <%= ch.name %> <%= "★ Predeterminado" if ch.is_default? %>
+                </option>
+              <% end %>
+            </select>
+          </div>
+        <% end %>
+        <div>
+          <label class="block text-[11px] font-semibold text-amber-300/60 mb-1">Webhook específico (opcional):</label>
+          <%= f.text_field :discord_webhook_url, id: "api_endpoint_discord_webhook_url", placeholder: "https://discord.com/api/webhooks/...", class: "w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white placeholder-amber-200/30 focus:outline-none font-mono" %>
+        </div>
       </div>
     </div>
 
     <!-- Telegram -->
-    <div class="border border-stone-800/80 rounded-xl p-4 bg-[#140e0b]/60 space-y-3">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <%= f.check_box :notify_telegram, class: "rounded border-amber-500/40 text-amber-500 focus:ring-amber-500/30 bg-[#1f1612]" %>
-          <%= f.label :notify_telegram, "Notificar por Telegram Bot", class: "text-sm font-medium text-white cursor-pointer" %>
-        </div>
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <div class="p-3.5 rounded-xl bg-[#1c1512] border border-amber-500/20 space-y-2">
+      <label class="flex items-center gap-3 cursor-pointer">
+        <%= f.check_box :notify_telegram, class: "h-4 w-4 rounded border-amber-500 text-amber-500 focus:ring-amber-400" %>
         <div>
-          <%= f.label :telegram_chat_id, "Chat ID de Telegram", class: "block text-xs text-amber-200/70 mb-1" %>
-          <%= f.text_field :telegram_chat_id, placeholder: "Dejar vacío para canal predeterminado", class: "w-full bg-[#1a1310] border border-stone-800 rounded-lg px-3 py-1.5 text-xs text-white placeholder-stone-600 focus:outline-none focus:border-amber-400 font-mono" %>
+          <span class="text-xs font-bold text-white block">Alertas por Telegram</span>
+          <span class="text-[11px] text-amber-200/60 block">Notificaciones directas vía Bot de Telegram.</span>
         </div>
-        <div>
-          <%= f.label :telegram_bot_token, "Bot Token (opcional)", class: "block text-xs text-amber-200/70 mb-1" %>
-          <%= f.password_field :telegram_bot_token, placeholder: "Usa token del sistema si se deja vacío", class: "w-full bg-[#1a1310] border border-stone-800 rounded-lg px-3 py-1.5 text-xs text-white placeholder-stone-600 focus:outline-none focus:border-amber-400 font-mono" %>
+      </label>
+      <div class="pl-7 space-y-2">
+        <% if current_user&.notification_channels&.by_type(:telegram)&.any? %>
+          <div>
+            <label class="block text-[11px] font-semibold text-amber-300/80 mb-1">Seleccionar Canal Telegram Guardado:</label>
+            <select onchange="document.getElementById('api_endpoint_telegram_chat_id').value = this.value" class="w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none cursor-pointer">
+              <option value="">Canal predeterminado del sistema</option>
+              <% current_user.notification_channels.by_type(:telegram).each do |ch| %>
+                <option value="<%= ch.destination %>" <%= "selected" if api_endpoint.telegram_chat_id == ch.destination %>>
+                  <%= ch.name %> (<%= ch.destination %>) <%= "★ Predeterminado" if ch.is_default? %>
+                </option>
+              <% end %>
+            </select>
+          </div>
+        <% end %>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] font-semibold text-amber-300/60 mb-1">Chat ID de Telegram:</label>
+            <%= f.text_field :telegram_chat_id, id: "api_endpoint_telegram_chat_id", placeholder: "Dejar en blanco para predeterminado", class: "w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white placeholder-amber-200/30 focus:outline-none font-mono" %>
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-amber-300/60 mb-1">Bot Token (opcional):</label>
+            <%= f.password_field :telegram_bot_token, placeholder: "Usa token predeterminado si está vacío", class: "w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white placeholder-amber-200/30 focus:outline-none font-mono" %>
+          </div>
         </div>
       </div>
     </div>

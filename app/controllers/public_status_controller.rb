@@ -31,9 +31,10 @@ class PublicStatusController < ApplicationController
   private
 
   def set_domain
-    @domain = Domain.find_by!(public_token: params[:token])
-  rescue ActiveRecord::RecordNotFound
-    redirect_to status_path, alert: "Página de estado no encontrada"
+    @domain = Domain.find_by(public_token: params[:token]) || ApiEndpoint.find_by(public_token: params[:token])
+    if @domain.nil?
+      redirect_to status_path, alert: "Página de estado no encontrada"
+    end
   end
 
   def calculate_sql_uptime(since_time)

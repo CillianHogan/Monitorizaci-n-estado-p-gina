@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ApiEndpoint < ApplicationRecord
+  before_validation :generate_public_token, on: :create
+  validates :public_token, uniqueness: true, allow_nil: true
   belongs_to :user
 
   validates :url, presence: true, format: { with: URI::DEFAULT_PARSER.make_regexp, message: 'must be a valid URL' }
@@ -135,5 +137,8 @@ class ApiEndpoint < ApplicationRecord
     return true if expected_response.blank?
 
     expected_response.all? { |key, value| response[key] == value }
+  end
+  def generate_public_token
+    self.public_token ||= SecureRandom.alphanumeric(32)
   end
 end
