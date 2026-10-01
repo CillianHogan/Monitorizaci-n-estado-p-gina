@@ -2,39 +2,28 @@
 
 class ApiEndpointsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_api_endpoint, only: %i[show edit update destroy]
+  before_action :set_api_endpoint, only: %i[show edit update destroy check_status]
 
   def index
-    @api_endpoints = current_user.api_endpoints
-    respond_to do |format|
-      format.html
-    end
+    @api_endpoints = current_user.api_endpoints.order(created_at: :desc)
+    @total_count = @api_endpoints.count
+    @up_count = @api_endpoints.count(&:status_up?)
+    @down_count = @api_endpoints.count { |e| e.status_down? || e.status_error? }
   end
 
-  def show
-    respond_to do |format|
-      format.html
-      format.json { render json: @api_endpoint }
-    end
-  end
+  def show; end
 
   def new
     @api_endpoint = current_user.api_endpoints.build
-    render :new
   end
 
-  def edit
-    respond_to do |format|
-      format.html { render :edit }
-    end
-  end
+  def edit; end
 
   def create
     @api_endpoint = current_user.api_endpoints.build(api_endpoint_params)
 
     if @api_endpoint.save
-      @api_endpoint.check_status!
-      redirect_to @api_endpoint, notice: 'API endpoint was successfully created.'
+      redirect_to @api_endpoint, notice: "Endpoint API creado exitosamente."
     else
       render :new, status: :unprocessable_entity
     end
@@ -42,8 +31,7 @@ class ApiEndpointsController < ApplicationController
 
   def update
     if @api_endpoint.update(api_endpoint_params)
-      @api_endpoint.check_status!
-      redirect_to @api_endpoint, notice: 'API endpoint was successfully updated.'
+      redirect_to @api_endpoint, notice: "Endpoint API actualizado exitosamente."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -51,7 +39,12 @@ class ApiEndpointsController < ApplicationController
 
   def destroy
     @api_endpoint.destroy
-    redirect_to api_endpoints_url, notice: 'API endpoint was successfully deleted.'
+    redirect_to api_endpoints_path, notice: "Endpoint API eliminado exitosamente."
+  end
+
+  def check_status
+    @api_endpoint.check_status!
+    redirect_back fallback_location: api_endpoints_path, notice: "Estado de #{@api_endpoint.name} comprobado."
   end
 
   private
@@ -61,6 +54,11 @@ class ApiEndpointsController < ApplicationController
   end
 
   def api_endpoint_params
-    params.expect(api_endpoint: [:name, :url, :http_method, { headers: {}, expected_response: {} }])
+    params.require(:api_endpoint).permit(
+      :name, :url, :http_method, :headers, :expected_response,
+      :notify_email, :notify_email_address,
+      :notify_discord, :discord_webhook_url,
+      :notify_telegram, :telegram_chat_id, :telegram_bot_token
+    )
   end
 end
