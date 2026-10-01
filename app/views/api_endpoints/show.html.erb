@@ -96,8 +96,18 @@
       </div>
     </div>
 
+    <div class="flex items-center justify-between pb-2">
+      <span class="text-xs font-mono text-amber-200/60">Período temporal</span>
+      <select data-action="change->domain-chart#changeTimeRange" class="bg-[#140e0c] border border-amber-500/30 rounded-lg text-xs font-medium text-amber-200 px-3 py-1.5 focus:ring-1 focus:ring-amber-500 focus:outline-none">
+        <option value="all">Todo el historial</option>
+        <option value="week">Última semana</option>
+        <option value="month">Último mes</option>
+        <option value="3months">Últimos 3 meses</option>
+      </select>
+    </div>
+
     <div class="h-64 w-full relative">
-      <canvas data-domain-chart-target="canvas"></canvas>
+      <canvas id="domainStatusChart" class="w-full h-full block"></canvas>
     </div>
   </div>
 
