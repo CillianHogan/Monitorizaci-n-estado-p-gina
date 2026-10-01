@@ -1,4 +1,9 @@
 production:
+  check_all_api_endpoints:
+    class: CheckApiEndpointStatusJob
+    queue: default
+    schedule: "every 5 minutes"
+
   check_all_domains:
     class: CheckDomainStatusJob
     queue: default
