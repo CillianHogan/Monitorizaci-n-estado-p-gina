@@ -4,6 +4,7 @@ class ApiEndpoint < ApplicationRecord
   before_validation :generate_public_token, on: :create
   validates :public_token, uniqueness: true, allow_nil: true
   belongs_to :user
+  has_many :status_histories, class_name: 'ApiEndpointStatusHistory', dependent: :destroy
 
   validates :url, presence: true, format: { with: URI::DEFAULT_PARSER.make_regexp, message: 'must be a valid URL' }
   validates :name, presence: true

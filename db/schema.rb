@@ -10,9 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_10_01_095501) do
+ActiveRecord::Schema[8.0].define(version: 2026_10_01_110234) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "api_endpoint_status_histories", force: :cascade do |t|
+    t.bigint "api_endpoint_id", null: false
+    t.integer "status", default: 0
+    t.integer "response_time_ms"
+    t.integer "http_code"
+    t.datetime "recorded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["api_endpoint_id", "recorded_at"], name: "idx_on_api_endpoint_id_recorded_at_f741e75b85"
+    t.index ["api_endpoint_id"], name: "index_api_endpoint_status_histories_on_api_endpoint_id"
+  end
 
   create_table "api_endpoints", force: :cascade do |t|
     t.string "name"
@@ -110,6 +122,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_01_095501) do
     t.index ["role"], name: "index_users_on_role"
   end
 
+  add_foreign_key "api_endpoint_status_histories", "api_endpoints"
   add_foreign_key "api_endpoints", "users"
   add_foreign_key "domain_status_histories", "domains"
   add_foreign_key "domains", "users"
