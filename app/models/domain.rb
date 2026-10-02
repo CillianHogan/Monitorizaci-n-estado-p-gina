@@ -332,6 +332,15 @@ rescue StandardError => e
 
   private
 
+  def check_initial_status
+    if defined?(CheckSingleDomainJob)
+      CheckSingleDomainJob.perform_later(id)
+    else
+      # Chequeo directo de respaldo seguro
+      check_status! rescue nil
+    end
+  end
+
 
 
   def normalize_url

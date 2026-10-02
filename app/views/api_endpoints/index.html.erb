@@ -6,20 +6,55 @@
       <p class="mt-1 text-sm text-amber-200/70">Supervisión en tiempo real de servicios REST, códigos HTTP y latencia.</p>
     </div>
 
-    <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3">
       <% if current_user %>
-        <span class="text-xs px-3 py-1.5 rounded-lg border font-medium <%= current_user.can_create_api_endpoint? ? 'border-stone-700 text-stone-400 bg-stone-900/50' : 'border-amber-500/40 text-amber-400 bg-amber-500/10' %>">
-          <%= current_user.api_endpoints.count %> / <%= current_user.api_endpoint_limit %> endpoints
+        <span class="text-xs px-3 py-1.5 rounded-lg border font-medium <%= current_user.can_create_api_endpoint? ? 'border-stone-700 text-stone-400 bg-stone-900/50' : 'border-amber-500/60 text-amber-300 bg-amber-500/10 font-bold' %>">
+          <%= current_user.api_endpoints.count %> / <%= current_user.api_endpoint_limit %> endpoints <%= ' (Límite alcanzado)' unless current_user.can_create_api_endpoint? %>
         </span>
       <% end %>
-      <%= link_to new_api_endpoint_path, class: "inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs tracking-wide text-stone-950 bg-gradient-to-r from-amber-400 via-amber-300 to-orange-400 hover:from-amber-300 hover:to-orange-300 shadow-lg shadow-amber-500/25 hover:scale-[1.02] transition-all cursor-pointer" do %>
-        <svg class="w-4 h-4 text-stone-950" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-        </svg>
-        <span>Nuevo Endpoint</span>
+
+      <% if current_user&.can_create_api_endpoint? %>
+        <%= link_to new_api_endpoint_path, class: "inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs tracking-wide text-stone-950 bg-gradient-to-r from-amber-400 via-amber-300 to-orange-400 hover:from-amber-300 hover:to-orange-300 shadow-lg shadow-amber-500/25 hover:scale-[1.02] transition-all cursor-pointer" do %>
+          <svg class="w-4 h-4 text-stone-950" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>Nuevo Endpoint</span>
+        <% end %>
+      <% else %>
+        <span class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs tracking-wide text-stone-500 bg-stone-800/80 border border-stone-700 cursor-not-allowed select-none" title="Has alcanzado el límite de 3 endpoints de tu plan">
+          <svg class="w-4 h-4 text-stone-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          <span>Límite del Plan</span>
+        </span>
       <% end %>
     </div>
   </div>
+
+  <%# Banner / Tarjeta de Upgrade a PRO para Endpoints %>
+  <% if current_user && !current_user.can_create_api_endpoint? && !current_user.admin? && !current_user.manager? %>
+    <div class="relative overflow-hidden rounded-2xl border border-amber-500/30 bg-gradient-to-r from-[#2a1e17] via-[#221712] to-[#1a120e] p-6 shadow-xl">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <div class="space-y-2">
+          <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+            <span>✨ PLAN PRO DISPONIBLE</span>
+          </div>
+          <h2 class="text-lg font-extrabold text-white tracking-tight">¿Monitoreas múltiples microservicios o APIs?</h2>
+          <p class="text-xs sm:text-sm text-stone-300 max-w-2xl">
+            Has alcanzado los <span class="text-amber-300 font-semibold">3 endpoints gratuitos</span>. Con el plan PRO amplías a <span class="text-amber-300 font-semibold">50 endpoints</span>, detección y alertas avanzadas de latencia (&gt;2000ms), headers personalizados y más.
+          </p>
+        </div>
+        <div class="flex items-center gap-3">
+          <a href="mailto:soporte@domainmonitor.com?subject=Solicitud%20Plan%20PRO%20Endpoints%20-%20<%= current_user.email %>" class="px-5 py-2.5 rounded-xl font-bold text-xs tracking-wide text-stone-950 bg-amber-400 hover:bg-amber-300 transition-all shadow-md hover:scale-[1.02] flex items-center gap-2 whitespace-nowrap cursor-pointer">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Solicitar Plan PRO
+          </a>
+        </div>
+      </div>
+    </div>
+  <% end %>
 
   <%# Tarjetas de resumen %>
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
