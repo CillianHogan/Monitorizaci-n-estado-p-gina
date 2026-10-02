@@ -155,4 +155,16 @@ class ApiEndpoint < ApplicationRecord
   def generate_public_token
     self.public_token ||= SecureRandom.alphanumeric(32)
   end
+
+  validate :check_user_api_endpoint_limit, on: :create
+
+  private
+
+  def check_user_api_endpoint_limit
+    return unless user
+    if user.api_endpoints.count >= user.api_endpoint_limit
+      errors.add(:base, "Has alcanzado el límite máximo de #{user.api_endpoint_limit} endpoints API para tu plan actual.")
+    end
+  end
+
 end

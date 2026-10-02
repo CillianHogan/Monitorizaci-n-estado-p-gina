@@ -7,6 +7,11 @@
     </div>
 
     <div class="flex items-center gap-3">
+      <% if current_user %>
+        <span class="text-xs px-3 py-1.5 rounded-lg border font-medium <%= current_user.can_create_api_endpoint? ? 'border-stone-700 text-stone-400 bg-stone-900/50' : 'border-amber-500/40 text-amber-400 bg-amber-500/10' %>">
+          <%= current_user.api_endpoints.count %> / <%= current_user.api_endpoint_limit %> endpoints
+        </span>
+      <% end %>
       <%= link_to new_api_endpoint_path, class: "inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs tracking-wide text-stone-950 bg-gradient-to-r from-amber-400 via-amber-300 to-orange-400 hover:from-amber-300 hover:to-orange-300 shadow-lg shadow-amber-500/25 hover:scale-[1.02] transition-all cursor-pointer" do %>
         <svg class="w-4 h-4 text-stone-950" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />

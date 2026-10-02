@@ -31,4 +31,22 @@ class User < ApplicationRecord
   def role?(requested_role)
     role == requested_role.to_s
   end
+
+  # Límites de monitores según plan/rol
+  def domain_limit
+    (admin? || manager?) ? 50 : 3
+  end
+
+  def api_endpoint_limit
+    (admin? || manager?) ? 50 : 3
+  end
+
+  def can_create_domain?
+    domains.count < domain_limit
+  end
+
+  def can_create_api_endpoint?
+    api_endpoints.count < api_endpoint_limit
+  end
+
 end

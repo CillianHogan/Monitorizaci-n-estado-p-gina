@@ -322,4 +322,16 @@ rescue StandardError => e
   def generate_public_token
     self.public_token ||= SecureRandom.alphanumeric(32)
   end
+
+  validate :check_user_domain_limit, on: :create
+
+  private
+
+  def check_user_domain_limit
+    return unless user
+    if user.domains.count >= user.domain_limit
+      errors.add(:base, "Has alcanzado el límite máximo de #{user.domain_limit} dominios para tu plan actual.")
+    end
+  end
+
 end
