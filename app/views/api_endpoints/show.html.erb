@@ -130,6 +130,63 @@
     </div>
   <% end %>
 
+  
+  <%# Línea temporal de incidentes recientes (cero coste BD) %>
+  <% incidents = @api_endpoint.recent_incidents %>
+  <div class="bg-[#241a16]/80 border border-amber-500/20 rounded-2xl p-6 backdrop-blur-sm space-y-4 shadow-sm">
+    <div class="flex items-center justify-between">
+      <div>
+        <h3 class="text-sm font-bold text-white uppercase tracking-wider">Historial de Incidentes y Transiciones</h3>
+        <p class="text-xs text-amber-200/60 mt-0.5">Últimos eventos de disponibilidad y cambios de estado registrados en memoria.</p>
+      </div>
+      <span class="text-xs font-mono px-2.5 py-1 rounded-lg bg-[#140e0c] border border-amber-500/30 text-amber-300">
+        <%= incidents.any? ? "#{incidents.size} eventos" : "100% operativo" %>
+      </span>
+    </div>
+
+    <% if incidents.any? %>
+      <div class="relative pl-6 border-l-2 border-stone-800 space-y-4 my-2">
+        <% incidents.each do |event| %>
+          <div class="relative group">
+            <% if event[:type] == :up %>
+              <div class="absolute -left-[31px] top-1 h-4 w-4 rounded-full bg-emerald-500/20 border-2 border-emerald-400"></div>
+            <% else %>
+              <div class="absolute -left-[31px] top-1 h-4 w-4 rounded-full bg-rose-500/20 border-2 border-rose-500"></div>
+            <% end %>
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs">
+              <div class="flex items-center gap-2">
+                <span class="font-bold <%= event[:type] == :up ? 'text-emerald-400' : 'text-rose-400' %>">
+                  <%= event[:type] == :up ? '🟢 Recuperado' : '🔴 Fallo Detectado' %>
+                </span>
+                <span class="text-stone-300 font-medium"><%= event[:message] %></span>
+                <% if event[:http_code].present? %>
+                  <span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-stone-900 border border-stone-800 text-stone-300">
+                    HTTP <%= event[:http_code] %>
+                  </span>
+                <% end %>
+                <% if event[:response_time_ms].present? %>
+                  <span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-stone-900 border border-stone-800 text-stone-400">
+                    <%= event[:response_time_ms] %> ms
+                  </span>
+                <% end %>
+              </div>
+              <time class="text-stone-500 font-mono text-[11px] whitespace-nowrap">
+                <%= event[:recorded_at]&.strftime("%d/%m/%Y %H:%M:%S") || "N/A" %>
+              </time>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="flex items-center gap-3 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs">
+        <svg class="w-4 h-4 shrink-0 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>No se han registrado incidentes ni caídas en las últimas 100 comprobaciones de este endpoint.</span>
+      </div>
+    <% end %>
+  </div>
+
   <%# Zona de peligro %>
   <div class="pt-4 flex items-center justify-end">
     <%= button_to api_endpoint_path(@api_endpoint), method: :delete, data: { turbo_confirm: "¿Deseas eliminar este endpoint por completo?" }, class: "px-4 py-2 rounded-xl text-xs font-bold text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 transition cursor-pointer" do %>

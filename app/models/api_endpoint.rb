@@ -162,6 +162,36 @@ class ApiEndpoint < ApplicationRecord
   endpoint #{name}: #{e.message}")
   end
 
+
+  # Historial no persistente de transiciones e incidentes recientes (cero impacto en BD)
+  def recent_incidents(limit = 5)
+    histories = status_histories.order(recorded_at: :desc).limit(100).to_a
+    return [] if histories.empty?
+
+    events = []
+    histories.reverse.each_cons(2) do |prev, curr|
+      if prev.status != curr.status
+        events << {
+          type: curr.status.to_sym,
+          recorded_at: curr.recorded_at || curr.created_at,
+          http_code: curr.http_code,
+          response_time_ms: curr.response_time_ms,
+          message: curr.status == 'up' ? 'Recuperación del servicio' : 'Caída o fallo de verificación'
+        }
+      elsif curr.status != 'up'
+        events << {
+          type: :down,
+          recorded_at: curr.recorded_at || curr.created_at,
+          http_code: curr.http_code,
+          response_time_ms: curr.response_time_ms,
+          message: 'Error en respuesta HTTP'
+        }
+      end
+    end
+
+    events.reverse.take(limit)
+  end
+
   private
 
   def notify_status_change
