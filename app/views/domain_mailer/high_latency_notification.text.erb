@@ -1,0 +1,8 @@
+Alerta de Degradación de Rendimiento: <%= @domain.name %>
+
+Hemos detectado que tu dominio <%= @domain.name %> (<%= @domain.url %>) está respondiendo con lentitud.
+
+Tiempo de respuesta actual: <%= @latency_ms %> ms
+Umbral configurado: <%= @domain.max_latency_threshold_ms || 2000 %> ms
+
+Puedes ver los detalles e historial aquí: <%= domain_url(@domain) %>

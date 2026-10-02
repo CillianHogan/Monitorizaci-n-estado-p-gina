@@ -1,31 +1,203 @@
-<div class="container mx-auto px-4 py-8">
-  <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-    <div class="px-4 py-5 sm:px-6">
-      <h1 class="text-2xl font-bold"><%= @api_endpoint.name %></h1>
+<div class="space-y-8" data-controller="domain-chart" data-domain-chart-data-value="<%= (@chart_data || @api_endpoint.status_histories.order(recorded_at: :desc).limit(300).reverse).to_json %>">
+  
+  <%# Barra superior del endpoint %>
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-6 border-b border-amber-500/20">
+    <div class="space-y-1">
+      <div class="flex items-center gap-3">
+        <%= link_to api_endpoints_path, class: "p-2 rounded-xl text-amber-200/70 hover:text-white bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 transition" do %>
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+        <% end %>
+        <span class="px-2.5 py-0.5 text-xs font-mono font-bold rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase">
+          <%= @api_endpoint.http_method %>
+        </span>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white"><%= @api_endpoint.name %></h1>
+        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md <%= @api_endpoint.status.to_s == 'up' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30' %>">
+          <%= @api_endpoint.status.to_s == 'up' ? 'OPERATIVO' : 'INCIDENTE' %>
+        </span>
+      </div>
+      <div class="flex items-center gap-2 text-xs text-amber-200/70 font-mono pl-11">
+        <a href="<%= @api_endpoint.url %>" target="_blank" rel="noopener noreferrer" class="hover:text-amber-300 flex items-center gap-1 transition break-all">
+          <%= @api_endpoint.url %>
+          <svg class="w-3.5 h-3.5 text-amber-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+        </a>
+      </div>
     </div>
-    <div class="border-t border-gray-200">
-      <dl>
-        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-500">URL</dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:col-span-2"><%= @api_endpoint.url %></dd>
-        </div>
-        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-500">HTTP Method</dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:col-span-2"><%= @api_endpoint.http_method.upcase %></dd>
-        </div>
-        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-500">Status</dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:col-span-2">
-            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= @api_endpoint.status == 'up' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
-              <%= @api_endpoint.status.upcase %>
-            </span>
-          </dd>
-        </div>
-      </dl>
+
+    <div class="flex items-center gap-3 flex-wrap">
+      <% if @api_endpoint.public_token.present? %>
+        <%= link_to public_status_path(@api_endpoint.public_token), target: "_blank", rel: "noopener", title: "Ver estado público", class: "p-2 rounded-xl text-amber-200/70 hover:text-white bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 transition" do %>
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+        <% end %>
+      <% end %>
+
+            <%= link_to export_csv_api_endpoint_path(@api_endpoint), class: "inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-amber-200 hover:text-white bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 transition cursor-pointer", title: "Descargar historial en CSV" do %>
+        <svg class="w-4 h-4 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+        <span>Exportar CSV</span>
+      <% end %>
+
+      <%= button_to check_status_api_endpoint_path(@api_endpoint), method: :post, class: "inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-amber-100 hover:text-white bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 transition cursor-pointer" do %>
+        <svg class="w-4 h-4 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        <span>Comprobar ahora</span>
+      <% end %>
+
+      <%= link_to edit_api_endpoint_path(@api_endpoint), class: "inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-stone-950 bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 shadow-md transition" do %>
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+        <span>Editar</span>
+      <% end %>
     </div>
   </div>
-  <div class="mt-4 flex">
-    <%= link_to 'Edit', edit_api_endpoint_path(@api_endpoint), class: 'bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2' %>
-    <%= link_to 'Back', api_endpoints_path, class: 'bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded' %>
+
+  <%# Tarjetas de KPIs %>
+  <% latency = @api_endpoint.last_response_time_ms || @api_endpoint.status_histories.last&.response_time_ms %>
+  <% http_code = @api_endpoint.last_http_code || @api_endpoint.status_histories.last&.http_code %>
+
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div class="bg-[#241a16]/80 border border-amber-500/20 rounded-2xl p-5 backdrop-blur-sm">
+      <div class="text-xs font-semibold text-amber-200/70 uppercase tracking-wider">Latencia Actual</div>
+      <div class="mt-2 text-2xl font-black text-white font-mono flex items-baseline gap-2">
+        <span><%= latency.present? ? latency : "—" %></span>
+        <span class="text-xs font-normal text-amber-200/60 font-sans">milisegundos</span>
+      </div>
+    </div>
+
+    <div class="bg-[#241a16]/80 border border-amber-500/20 rounded-2xl p-5 backdrop-blur-sm">
+      <div class="text-xs font-semibold text-amber-200/70 uppercase tracking-wider">Último Código HTTP</div>
+      <div class="mt-2 text-2xl font-black font-mono flex items-baseline gap-2 <%= http_code.to_i.between?(200, 299) ? 'text-emerald-300' : 'text-rose-400' %>">
+        <span><%= http_code.present? ? http_code : "—" %></span>
+        <span class="text-xs font-normal text-amber-200/60 font-sans">status code</span>
+      </div>
+    </div>
+
+    <div class="bg-[#241a16]/80 border border-amber-500/20 rounded-2xl p-5 backdrop-blur-sm">
+      <div class="text-xs font-semibold text-amber-200/70 uppercase tracking-wider">Total de Muestras</div>
+      <div class="mt-2 text-2xl font-black text-amber-300 font-mono flex items-baseline gap-2">
+        <span><%= @api_endpoint.status_histories.count %></span>
+        <span class="text-xs font-normal text-amber-200/60 font-sans">registros</span>
+      </div>
+    </div>
+  </div>
+
+  <%# Gráfico de Latencia %>
+  <div class="bg-[#241a16]/80 border border-amber-500/20 rounded-2xl p-5 sm:p-6 backdrop-blur-sm space-y-4">
+    <div class="flex items-center justify-between flex-wrap gap-2">
+      <div>
+        <h2 class="text-sm font-bold uppercase tracking-wider text-white">Rendimiento y Latencia</h2>
+        <p class="text-xs text-amber-200/60 font-mono mt-0.5">Evolución de tiempos de respuesta en milisegundos</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+        <span class="text-xs font-mono text-amber-200/70">Tiempo de respuesta (ms)</span>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between pb-2">
+      <span class="text-xs font-mono text-amber-200/60">Período temporal</span>
+      <select data-action="change->domain-chart#changeTimeRange" class="bg-[#140e0c] border border-amber-500/30 rounded-lg text-xs font-medium text-amber-200 px-3 py-1.5 focus:ring-1 focus:ring-amber-500 focus:outline-none">
+        <option value="all">Todo el historial</option>
+        <option value="week">Última semana</option>
+        <option value="month">Último mes</option>
+        <option value="3months">Últimos 3 meses</option>
+      </select>
+    </div>
+
+    <div class="h-64 w-full relative">
+      <canvas id="domainStatusChart" class="w-full h-full block"></canvas>
+    </div>
+  </div>
+
+  <%# Configuraciones avanzadas (Headers y Payload) %>
+  <% if @api_endpoint.headers.present? || @api_endpoint.expected_response.present? %>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <% if @api_endpoint.headers.present? %>
+        <div class="bg-[#241a16]/80 border border-amber-500/20 rounded-2xl p-5 backdrop-blur-sm space-y-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-300/80">Cabeceras HTTP (Headers)</span>
+          <pre class="p-3 rounded-xl bg-[#140e0c]/80 border border-amber-500/10 text-amber-200 text-xs font-mono overflow-x-auto"><%= @api_endpoint.headers %></pre>
+        </div>
+      <% end %>
+
+      <% if @api_endpoint.expected_response.present? %>
+        <div class="bg-[#241a16]/80 border border-amber-500/20 rounded-2xl p-5 backdrop-blur-sm space-y-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-300/80">Respuesta Esperada</span>
+          <pre class="p-3 rounded-xl bg-[#140e0c]/80 border border-amber-500/10 text-amber-200 text-xs font-mono overflow-x-auto"><%= @api_endpoint.expected_response %></pre>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  
+  <%# Línea temporal de incidentes recientes (cero coste BD) %>
+  <% incidents = @api_endpoint.recent_incidents %>
+  <div class="bg-[#241a16]/80 border border-amber-500/20 rounded-2xl p-6 backdrop-blur-sm space-y-4 shadow-sm">
+    <div class="flex items-center justify-between">
+      <div>
+        <h3 class="text-sm font-bold text-white uppercase tracking-wider">Historial de Incidentes y Transiciones</h3>
+        <p class="text-xs text-amber-200/60 mt-0.5">Últimos eventos de disponibilidad y cambios de estado registrados en memoria.</p>
+      </div>
+      <span class="text-xs font-mono px-2.5 py-1 rounded-lg bg-[#140e0c] border border-amber-500/30 text-amber-300">
+        <%= incidents.any? ? "#{incidents.size} eventos" : "100% operativo" %>
+      </span>
+    </div>
+
+    <% if incidents.any? %>
+      <div class="relative pl-6 border-l-2 border-stone-800 space-y-4 my-2">
+        <% incidents.each do |event| %>
+          <div class="relative group">
+            <% if event[:type] == :up %>
+              <div class="absolute -left-[31px] top-1 h-4 w-4 rounded-full bg-emerald-500/20 border-2 border-emerald-400"></div>
+            <% else %>
+              <div class="absolute -left-[31px] top-1 h-4 w-4 rounded-full bg-rose-500/20 border-2 border-rose-500"></div>
+            <% end %>
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-xs">
+              <div class="flex items-center gap-2">
+                <span class="font-bold <%= event[:type] == :up ? 'text-emerald-400' : 'text-rose-400' %>">
+                  <%= event[:type] == :up ? '🟢 Recuperado' : '🔴 Fallo Detectado' %>
+                </span>
+                <span class="text-stone-300 font-medium"><%= event[:message] %></span>
+                <% if event[:http_code].present? %>
+                  <span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-stone-900 border border-stone-800 text-stone-300">
+                    HTTP <%= event[:http_code] %>
+                  </span>
+                <% end %>
+                <% if event[:response_time_ms].present? %>
+                  <span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-stone-900 border border-stone-800 text-stone-400">
+                    <%= event[:response_time_ms] %> ms
+                  </span>
+                <% end %>
+              </div>
+              <time class="text-stone-500 font-mono text-[11px] whitespace-nowrap">
+                <%= event[:recorded_at]&.strftime("%d/%m/%Y %H:%M:%S") || "N/A" %>
+              </time>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="flex items-center gap-3 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs">
+        <svg class="w-4 h-4 shrink-0 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>No se han registrado incidentes ni caídas en las últimas 100 comprobaciones de este endpoint.</span>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Zona de peligro %>
+  <div class="pt-4 flex items-center justify-end">
+    <%= button_to api_endpoint_path(@api_endpoint), method: :delete, data: { turbo_confirm: "¿Deseas eliminar este endpoint por completo?" }, class: "px-4 py-2 rounded-xl text-xs font-bold text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 transition cursor-pointer" do %>
+      Eliminar Endpoint
+    <% end %>
   </div>
 </div>

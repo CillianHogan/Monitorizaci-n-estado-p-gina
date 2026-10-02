@@ -1,13 +1,31 @@
 # frozen_string_literal: true
 
 class DomainsController < ApplicationController
-  before_action :set_domain, only: %i[show edit update destroy]
+  before_action :set_domain, only: %i[show edit update destroy check_status export_csv]
 
-  def index
-    @domains = current_user.domains
+def index
+  @domains = current_user.domains.order(:name)
+  @total_domains = @domains.size
+  @up_count = @domains.count { |d| d.status_up? }
+  @down_count = @domains.count { |d| d.status_down? || d.status_error? }
+end
+
+
+  def show
+    # Traemos un maximo de 500 puntos recientes con solo los campos necesarios para la grafica
+    @chart_data = @domain.status_histories
+                         .select(:id, :recorded_at, :response_time_ms, :http_code, :status)
+                         .where("recorded_at >= ?", 7.days.ago)
+                         .order(recorded_at: :asc)
+    # Si tiene menos de 50 registros en 7 dias, aseguramos los ultimos 100 disponibles
+    if @chart_data.size < 50
+      @chart_data = @domain.status_histories
+                           .select(:id, :recorded_at, :response_time_ms, :http_code, :status)
+                           .order(recorded_at: :desc)
+                           .limit(100)
+                           .reverse
+    end
   end
-
-  def show; end
 
   def new
     @domain = current_user.domains.build
@@ -19,7 +37,7 @@ class DomainsController < ApplicationController
     @domain = current_user.domains.build(domain_params)
 
     if @domain.save
-      @domain.check_status!
+      CheckDomainStatusJob.perform_later(@domain)
       redirect_to @domain, notice: 'Domain was successfully created.'
     else
       render :new, status: :unprocessable_entity
@@ -28,7 +46,7 @@ class DomainsController < ApplicationController
 
   def update
     if @domain.update(domain_params)
-      @domain.check_status!
+      CheckDomainStatusJob.perform_later(@domain)
       redirect_to @domain, notice: 'Domain was successfully updated.'
     else
       render :edit, status: :unprocessable_entity
@@ -40,6 +58,18 @@ class DomainsController < ApplicationController
     redirect_to domains_url, notice: 'Domain was successfully deleted.'
   end
 
+
+  def check_status
+    @domain.check_status!
+    redirect_to @domain, notice: "Estado de '#{@domain.name}' verificado en tiempo real."
+  end
+
+
+  def export_csv
+    filename = "reporte-#{@domain.name.parameterize}-#{Time.current.strftime('%Y%m%d%H%M')}.csv"
+    send_data @domain.to_csv(500), filename: filename, type: "text/csv; charset=utf-8; header=present", disposition: "attachment"
+  end
+
   private
 
   def set_domain
@@ -47,6 +77,6 @@ class DomainsController < ApplicationController
   end
 
   def domain_params
-    params.expect(domain: %i[name url])
+    params.expect(domain: %i[name url latency_alert_enabled max_latency_threshold_ms expected_keyword notify_email notify_discord discord_webhook_url notify_telegram telegram_bot_token telegram_chat_id])
   end
 end

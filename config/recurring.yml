@@ -1,9 +1,19 @@
 production:
+  check_all_api_endpoints:
+    class: CheckApiEndpointStatusJob
+    queue: default
+    schedule: "every 5 minutes"
+
   check_all_domains:
     class: CheckDomainStatusJob
     queue: default
     schedule: "every 5 minutes"
 
-check_ssl_expirations:
-  class: SslCheckerJob
-  schedule: every day at 8:00am
+  check_ssl_expirations:
+    class: SslCheckerJob
+    schedule: "every day at 8:00am"
+
+  cleanup_database:
+    class: CleanupDatabaseJob
+    queue: default
+    schedule: "every 1 hour"

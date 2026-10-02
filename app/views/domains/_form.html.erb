@@ -1,38 +1,136 @@
-<%= form_with(model: domain, class: "space-y-6 bg-white p-8 rounded-xl shadow-lg border border-gray-100") do |f| %>
-  <% if domain.errors.any? %>
-    <div class="bg-red-100 border border-red-400 text-red-800 px-4 py-3 rounded-md mb-4 shadow-sm animate-fade-in">
-      <div class="flex items-start">
-        <div class="mr-3 flex-shrink-0 pt-0.5">
-          <svg class="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-          </svg>
-        </div>
-        <div>
-          <h2 class="text-sm font-medium text-red-800">Found <%= pluralize(domain.errors.count, "error") %></h2>
-          <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
-            <% domain.errors.full_messages.each do |message| %>
-              <li><%= message %></li>
-            <% end %>
-          </ul>
-        </div>
+<%= form_with(model: domain, class: "space-y-6") do |f| %>
+  <%= render 'shared/validation_errors', model: domain %>
+
+  <%# Bloque 1: Datos Básicos %>
+  <div class="bg-[#261c18]/90 border border-amber-500/20 rounded-2xl p-6 backdrop-blur-md space-y-4 shadow-md">
+    <h3 class="text-sm font-bold text-white border-b border-amber-500/20 pb-3">Parámetros del Dominio</h3>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <%= f.label :name, "Nombre del Servicio", class: "block text-xs font-semibold text-amber-200/80 mb-1" %>
+        <%= f.text_field :name, placeholder: "ej. Mi Tienda Online", class: "w-full bg-[#1c1512] border border-amber-500/30 focus:border-amber-400 rounded-xl px-3.5 py-2 text-xs text-white placeholder-amber-200/30 focus:outline-none" %>
       </div>
-    </div>
-  <% end %>
 
-  <div class="space-y-4">
-    <div class="transition-all duration-200 ease-in-out transform hover:scale-[1.01]">
-      <%= f.label :name, class: "block text-sm font-medium text-gray-700 mb-1" %>
-      <%= f.text_field :name, class: "mt-1 block w-full rounded-md border border-gray-200 shadow-sm hover:border-gray-300 focus:border-blue-500 focus:ring-blue-500 transition-all duration-200" %>
-    </div>
-
-    <div class="transition-all duration-200 ease-in-out transform hover:scale-[1.01]">
-      <%= f.label :url, class: "block text-sm font-medium text-gray-700 mb-1" %>
-      <%= f.text_field :url, class: "mt-1 block w-full rounded-md border border-gray-200 shadow-sm hover:border-gray-300 focus:border-blue-500 focus:ring-blue-500 transition-all duration-200" %>
+      <div>
+        <%= f.label :url, "URL Completa", class: "block text-xs font-semibold text-amber-200/80 mb-1" %>
+        <%= f.text_field :url, placeholder: "https://ejemplo.com", class: "w-full bg-[#1c1512] border border-amber-500/30 focus:border-amber-400 rounded-xl px-3.5 py-2 text-xs text-white placeholder-amber-200/30 focus:outline-none font-mono" %>
+      </div>
     </div>
   </div>
 
-  <div class="flex justify-end space-x-3 pt-4 border-t border-gray-100 mt-6">
-    <%= link_to 'Cancel', domains_path, class: 'inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200' %>
-    <%= f.submit class: 'inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-[1.02]' %>
+  <%# Bloque 2: Reglas Avanzadas %>
+  <div class="bg-[#261c18]/90 border border-amber-500/20 rounded-2xl p-6 backdrop-blur-md space-y-4 shadow-md">
+    <h3 class="text-sm font-bold text-white border-b border-amber-500/20 pb-3">Criterios de Verificación</h3>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div>
+        <%= f.label :expected_http_code, "Código HTTP Esperado", class: "block text-xs font-semibold text-amber-200/80 mb-1" %>
+        <%= f.number_field :expected_http_code, placeholder: "200", class: "w-full bg-[#1c1512] border border-amber-500/30 focus:border-amber-400 rounded-xl px-3.5 py-2 text-xs text-white placeholder-amber-200/30 focus:outline-none font-mono" %>
+      </div>
+
+      <div>
+        <%= f.label :expected_keyword, "Palabra Clave en HTML (Opcional)", class: "block text-xs font-semibold text-amber-200/80 mb-1" %>
+        <%= f.text_field :expected_keyword, placeholder: "ej. Bienvenido", class: "w-full bg-[#1c1512] border border-amber-500/30 focus:border-amber-400 rounded-xl px-3.5 py-2 text-xs text-white placeholder-amber-200/30 focus:outline-none" %>
+      </div>
+
+      <div>
+        <%= f.label :max_latency_threshold_ms, "Alerta de Latencia Máx (ms)", class: "block text-xs font-semibold text-amber-200/80 mb-1" %>
+        <%= f.number_field :max_latency_threshold_ms, placeholder: "1000", class: "w-full bg-[#1c1512] border border-amber-500/30 focus:border-amber-400 rounded-xl px-3.5 py-2 text-xs text-white placeholder-amber-200/30 focus:outline-none font-mono" %>
+      </div>
+    </div>
+  </div>
+
+  <%# Bloque 3: Notificaciones %>
+  <div class="bg-[#261c18]/90 border border-amber-500/20 rounded-2xl p-6 backdrop-blur-md space-y-5 shadow-md">
+    <div class="flex items-center justify-between border-b border-amber-500/20 pb-3"><h3 class="text-sm font-bold text-white">Canales de Alerta</h3><%= link_to "Gestionar Canales →", notification_channels_path, class: "text-xs font-semibold text-amber-400 hover:text-amber-300" %></div>
+
+    <div class="space-y-4">
+      <%# Email %>
+<div class="p-3.5 rounded-xl bg-[#1c1512] border border-amber-500/20 space-y-3">
+  <label class="flex items-center gap-3 cursor-pointer">
+    <%= f.check_box :notify_email, class: "h-4 w-4 rounded border-amber-500 text-amber-500 focus:ring-amber-400" %>
+    <div>
+      <span class="text-xs font-bold text-white block">Notificación por Email</span>
+      <span class="text-[11px] text-amber-200/60 block">Recibe un correo ante caídas o latencias excesivas.</span>
+    </div>
+  </label>
+  <div class="pl-7 space-y-2">
+    <% if current_user&.notification_channels&.by_type(:email)&.any? %>
+      <div>
+        <label class="block text-[11px] font-semibold text-amber-300/80 mb-1">Seleccionar Canal Guardado:</label>
+        <select onchange="document.getElementById('domain_notify_email_address').value = this.value" class="w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
+          <option value="">Canal predeterminado del sistema</option>
+          <% current_user.notification_channels.by_type(:email).each do |ch| %>
+            <option value="<%= ch.destination %>" <%= "selected" if domain.notify_email_address == ch.destination %>>
+              <%= ch.name %> (<%= ch.destination %>) <%= "★ Predeterminado" if ch.is_default? %>
+            </option>
+          <% end %>
+        </select>
+      </div>
+    <% end %>
+    <div>
+      <label class="block text-[11px] font-semibold text-amber-300/60 mb-1">Destino específico (opcional):</label>
+      <%= f.text_field :notify_email_address, id: "domain_notify_email_address", placeholder: "Dejar en blanco para usar predeterminado", class: "w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white placeholder-amber-200/30 focus:outline-none font-mono" %>
+    </div>
+  </div>
+</div>
+
+      <%# Discord %>
+      <div class="p-3 rounded-xl bg-[#1c1512] border border-amber-500/20 space-y-2">
+        <label class="flex items-center gap-3 cursor-pointer">
+          <%= f.check_box :notify_discord, class: "h-4 w-4 rounded border-amber-500 text-amber-500 focus:ring-amber-400" %>
+          <div>
+            <span class="text-xs font-bold text-white block">Alertas por Discord</span>
+            <span class="text-[11px] text-amber-200/60 block">Envío automático a un canal mediante Webhook.</span>
+          </div>
+        </label>
+        <div>
+          <% if current_user&.notification_channels&.by_type(:discord)&.any? %>
+  <div>
+    <label class="block text-[11px] font-semibold text-amber-300/80 mb-1">Seleccionar Webhook Guardado:</label>
+    <select onchange="document.getElementById('domain_discord_webhook_url').value = this.value" class="w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
+      <option value="">Canal predeterminado del sistema</option>
+      <% current_user.notification_channels.by_type(:discord).each do |ch| %>
+        <option value="<%= ch.destination %>" <%= "selected" if domain.discord_webhook_url == ch.destination %>><%= ch.name %> <%= "★ Predeterminado" if ch.is_default? %></option>
+      <% end %>
+    </select>
+  </div>
+<% end %>
+        <%= f.text_field :discord_webhook_url, id: "domain_discord_webhook_url", placeholder: "https://discord.com/api/webhooks/...", class: "w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white placeholder-amber-200/30 focus:outline-none font-mono mt-1" %>
+        </div>
+      </div>
+
+      <%# Telegram %>
+      <div class="p-3 rounded-xl bg-[#1c1512] border border-amber-500/20 space-y-2">
+        <label class="flex items-center gap-3 cursor-pointer">
+          <%= f.check_box :notify_telegram, class: "h-4 w-4 rounded border-amber-500 text-amber-500 focus:ring-amber-400" %>
+          <div>
+            <span class="text-xs font-bold text-white block">Alertas por Telegram</span>
+            <span class="text-[11px] text-amber-200/60 block">Notificaciones directas vía Bot de Telegram.</span>
+          </div>
+        </label>
+        <% if current_user&.notification_channels&.by_type(:telegram)&.any? %>
+  <div class="mb-3">
+    <label class="block text-[11px] font-semibold text-amber-300/80 mb-1">Seleccionar Chat Guardado:</label>
+    <select onchange="document.getElementById('domain_telegram_chat_id').value = this.value" class="w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
+      <option value="">Chat predeterminado del sistema</option>
+      <% current_user.notification_channels.by_type(:telegram).each do |ch| %>
+        <option value="<%= ch.destination %>" <%= "selected" if domain.telegram_chat_id == ch.destination %>><%= ch.name %> (<%= ch.destination %>) <%= "★ Predeterminado" if ch.is_default? %></option>
+      <% end %>
+    </select>
+  </div>
+<% end %>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+          <%= f.text_field :telegram_bot_token, placeholder: "Bot Token (ej. 123456:ABC...)", class: "w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white placeholder-amber-200/30 focus:outline-none font-mono" %>
+          <%= f.text_field :telegram_chat_id, id: "domain_telegram_chat_id", placeholder: "Chat ID (ej. 987654321)", class: "w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white placeholder-amber-200/30 focus:outline-none font-mono" %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# Botonera %>
+  <div class="flex items-center justify-end gap-3 pt-4">
+    <%= link_to "Cancelar", domains_path, class: "px-4 py-2.5 rounded-xl text-xs font-semibold text-amber-200/80 hover:text-white bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 transition" %>
+    <%= f.submit (domain.persisted? ? "Actualizar Dominio" : "Crear Dominio"), class: "px-6 py-2.5 rounded-xl font-bold text-xs text-stone-950 bg-gradient-to-r from-amber-400 via-amber-300 to-orange-400 hover:from-amber-300 hover:to-orange-300 shadow-lg shadow-amber-500/20 hover:scale-[1.02] transition-all cursor-pointer" %>
   </div>
 <% end %>

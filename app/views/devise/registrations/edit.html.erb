@@ -1,52 +1,78 @@
-<div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-  <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-sm p-8">
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900">Mi Perfil</h1>
-      <p class="mt-2 text-gray-600">Administra tu información personal y configuración de cuenta.</p>
-    </div>
+<div class="max-w-2xl mx-auto px-4 py-8">
+  <!-- Botón Volver Atrás con alto contraste y área táctil accesible -->
+  <div class="mb-6">
+    <%= link_to domains_path, class: "inline-flex items-center text-sm font-semibold text-amber-400 hover:text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-[#120c06] rounded-md px-2 py-1 -ml-2 transition-colors" do %>
+      <svg class="w-5 h-5 mr-2 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      <span>Volver al panel principal</span>
+    <% end %>
+  </div>
+
+  <!-- Tarjeta Principal con contraste reforzado -->
+  <main class="bg-[#1a120b] border-2 border-amber-700/60 rounded-2xl p-6 sm:p-8 shadow-2xl">
+    <header class="border-b border-amber-700/50 pb-5 mb-6">
+      <h1 class="text-2xl font-bold tracking-tight text-white">Mi Perfil</h1>
+      <p class="text-sm text-amber-100/90 mt-1">Administra tu información personal y credenciales de acceso.</p>
+    </header>
 
     <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: "space-y-6" }) do |f| %>
       <%= render "devise/shared/error_messages", resource: resource %>
 
+      <!-- Campo Email -->
       <div>
-        <div class="mb-4">
-          <%= f.label :email, class: "block text-sm font-medium text-gray-700 mb-1" %>
-          <%= f.email_field :email, autocomplete: "email", class: "mt-1 block w-full px-4 py-3 rounded-lg border border-gray-200 shadow-sm hover:border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm transition-all duration-200" %>
-        </div>
-
-        <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
-          <div class="text-sm text-yellow-600 mb-4">
-            Esperando confirmación para: <%= resource.unconfirmed_email %>
-          </div>
-        <% end %>
-
-        <div class="mb-4">
-          <%= f.label :password, "Nueva Contraseña", class: "block text-sm font-medium text-gray-700 mb-1" %>
-          <%= f.password_field :password, autocomplete: "new-password", class: "mt-1 block w-full px-4 py-3 rounded-lg border border-gray-200 shadow-sm hover:border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm transition-all duration-200" %>
-          <p class="mt-1 text-sm text-gray-500">Dejar en blanco si no deseas cambiarla</p>
-        </div>
-
-        <div class="mb-4">
-          <%= f.label :password_confirmation, "Confirmar Nueva Contraseña", class: "block text-sm font-medium text-gray-700 mb-1" %>
-          <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "mt-1 block w-full px-4 py-3 rounded-lg border border-gray-200 shadow-sm hover:border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm transition-all duration-200" %>
-        </div>
-
-        <div class="mb-4">
-          <%= f.label :current_password, "Contraseña Actual", class: "block text-sm font-medium text-gray-700 mb-1" %>
-          <%= f.password_field :current_password, autocomplete: "current-password", class: "mt-1 block w-full px-4 py-3 rounded-lg border border-gray-200 shadow-sm hover:border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm transition-all duration-200" %>
-          <p class="mt-1 text-sm text-gray-500">Necesitamos tu contraseña actual para confirmar los cambios</p>
-        </div>
+        <%= f.label :email, "Correo Electrónico", class: "block text-sm font-bold text-white mb-2" %>
+        <%= f.email_field :email, autofocus: true, autocomplete: "email", required: true, class: "w-full px-4 py-3 rounded-xl bg-[#0d0905] border-2 border-amber-600/70 text-white placeholder-amber-200/50 text-base focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all" %>
       </div>
 
-      <div class="mt-8 flex items-center justify-between">
-        <div>
-          <%= button_to "Eliminar mi cuenta", registration_path(resource_name), 
-              data: { confirm: "¿Estás seguro? Esta acción no se puede deshacer." }, 
-              method: :delete, 
-              class: "text-sm text-red-600 hover:text-red-500" %>
+      <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+        <div role="status" class="p-4 rounded-xl bg-amber-950/80 border-2 border-amber-500 text-sm font-medium text-amber-100">
+          Esperando confirmación para: <strong class="underline"><%= resource.unconfirmed_email %></strong>
         </div>
-        <%= f.submit "Actualizar Perfil", class: "ml-3 inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" %>
+      <% end %>
+
+      <!-- Nueva Contraseña -->
+      <div>
+        <div class="flex flex-wrap items-baseline justify-between gap-1 mb-2">
+          <%= f.label :password, "Nueva Contraseña", class: "text-sm font-bold text-white" %>
+          <span class="text-xs font-medium text-amber-200">(Dejar en blanco si no deseas cambiarla)</span>
+        </div>
+        <%= f.password_field :password, autocomplete: "new-password", aria_describedby: "password-hint", class: "w-full px-4 py-3 rounded-xl bg-[#0d0905] border-2 border-amber-600/70 text-white placeholder-amber-200/50 text-base focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all" %>
+        <% if @minimum_password_length %>
+          <span id="password-hint" class="text-xs font-medium text-amber-200/90 mt-1.5 block">
+            Mínimo <%= @minimum_password_length %> caracteres.
+          </span>
+        <% end %>
+      </div>
+
+      <!-- Confirmar Nueva Contraseña -->
+      <div>
+        <%= f.label :password_confirmation, "Confirmar Nueva Contraseña", class: "block text-sm font-bold text-white mb-2" %>
+        <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "w-full px-4 py-3 rounded-xl bg-[#0d0905] border-2 border-amber-600/70 text-white placeholder-amber-200/50 text-base focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all" %>
+      </div>
+
+      <!-- Contraseña Actual -->
+      <div class="pt-5 border-t border-amber-700/50">
+        <div class="mb-2">
+          <%= f.label :current_password, "Contraseña Actual", class: "block text-sm font-bold text-white" %>
+          <span class="text-xs font-medium text-amber-200 mt-0.5 block">Necesaria para autorizar cualquier modificación en tu perfil.</span>
+        </div>
+        <%= f.password_field :current_password, autocomplete: "current-password", required: true, class: "w-full px-4 py-3 rounded-xl bg-[#0d0905] border-2 border-amber-600/70 text-white placeholder-amber-200/50 text-base focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all" %>
+      </div>
+
+      <!-- Botón de Guardar accesible -->
+      <div class="pt-2 flex justify-end">
+        <%= f.submit "Guardar Cambios", class: "w-full sm:w-auto px-7 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-extrabold text-sm tracking-wide shadow-lg hover:shadow-amber-400/20 focus:outline-none focus:ring-4 focus:ring-amber-400/50 transition-all cursor-pointer" %>
       </div>
     <% end %>
-  </div>
+
+    <!-- Zona de Peligro / Cancelar Cuenta con alto contraste de seguridad -->
+    <section aria-labelledby="danger-zone-title" class="mt-10 pt-6 border-t border-red-700/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div>
+        <h2 id="danger-zone-title" class="text-sm font-bold text-red-300 uppercase tracking-wide">Eliminar cuenta</h2>
+        <p class="text-xs font-medium text-red-200/90 mt-0.5">Esta acción borrará definitivamente tus credenciales y accesos.</p>
+      </div>
+      <%= button_to "Eliminar mi cuenta", registration_path(resource_name), data: { confirm: "¿Estás seguro de que deseas eliminar tu cuenta permanentemente?", turbo_confirm: "¿Estás seguro de que deseas eliminar tu cuenta permanentemente?" }, method: :delete, class: "px-4 py-2 rounded-lg bg-red-950/70 border border-red-500/80 text-xs font-bold text-red-200 hover:bg-red-900 hover:text-white focus:outline-none focus:ring-2 focus:ring-red-400 transition-colors cursor-pointer" %>
+    </section>
+  </main>
 </div>

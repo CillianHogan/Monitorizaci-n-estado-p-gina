@@ -5,7 +5,7 @@ class DomainMailer < ApplicationMailer
     @domain = domain
     @user = domain.user
     mail(
-      to: @user.email,
+      to: @domain.target_email,
       subject: "Domain Status Alert: #{@domain.name} is experiencing issues"
     )
   end
@@ -14,7 +14,7 @@ class DomainMailer < ApplicationMailer
     @domain = domain
     @user = domain.user
     mail(
-      to: @user.email,
+      to: @domain.target_email,
       subject: "Domain Status Alert: #{@domain.name} is down"
     )
   end
@@ -23,7 +23,7 @@ class DomainMailer < ApplicationMailer
     @domain = domain
     @user = domain.user
     mail(
-      to: @user.email,
+      to: @domain.target_email,
       subject: "Domain Status Alert: #{@domain.name} is back online"
     )
   end
@@ -32,8 +32,18 @@ class DomainMailer < ApplicationMailer
     @domain = domain
     @user = domain.user
     mail(
-      to: @user.email,
+      to: @domain.target_email,
       subject: "SSL Warning: El certificado de #{@domain.name} caduca en #{@domain.ssl_days_remaining} días"
     )
   end
+  def high_latency_notification(domain, latency_ms)
+    @domain = domain
+    @user = domain.user
+    @latency_ms = latency_ms
+    mail(
+      to: @domain.target_email,
+      subject: "Alerta de rendimiento: #{@domain.name} responde con lentitud (#{@latency_ms} ms)"
+    )
+  end
+
 end
