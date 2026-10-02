@@ -11,11 +11,13 @@ Rails.application.routes.draw do
   resources :domains do
     member do
       post :check_status
+      get :export_csv
     end
   end
   resources :api_endpoints do
     member do
       post :check_status
+      get :export_csv
     end
   end
   root 'home#index'

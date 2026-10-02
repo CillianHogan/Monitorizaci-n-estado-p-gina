@@ -192,6 +192,26 @@ class ApiEndpoint < ApplicationRecord
     events.reverse.take(limit)
   end
 
+  # Generación en memoria de reporte de disponibilidad (0 coste de BD)
+  def to_csv(limit = 500)
+    require "csv"
+    histories = status_histories.order(recorded_at: :desc).limit(limit)
+
+    CSV.generate(headers: true) do |csv|
+      csv << ["Fecha y Hora (UTC)", "Metodo", "Estado", "Codigo HTTP", "Tiempo Respuesta (ms)", "URL"]
+      histories.each do |h|
+        csv << [
+          h.recorded_at&.strftime("%Y-%m-%d %H:%M:%S") || h.created_at&.strftime("%Y-%m-%d %H:%M:%S"),
+          http_method&.upcase,
+          h.status&.upcase,
+          h.http_code || "N/A",
+          h.response_time_ms || "N/A",
+          url
+        ]
+      end
+    end
+  end
+
   private
 
   def notify_status_change

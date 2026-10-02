@@ -2,7 +2,7 @@
 
 class ApiEndpointsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_api_endpoint, only: %i[show edit update destroy check_status]
+  before_action :set_api_endpoint, only: %i[show edit update destroy check_status export_csv]
 
   def index
     @api_endpoints = current_user.api_endpoints.order(created_at: :desc)
@@ -45,6 +45,12 @@ class ApiEndpointsController < ApplicationController
   def check_status
     @api_endpoint.check_status!
     redirect_back fallback_location: api_endpoints_path, notice: "Estado de #{@api_endpoint.name} comprobado."
+  end
+
+
+  def export_csv
+    filename = "reporte-api-#{@api_endpoint.name.parameterize}-#{Time.current.strftime('%Y%m%d%H%M')}.csv"
+    send_data @api_endpoint.to_csv(500), filename: filename, type: "text/csv; charset=utf-8; header=present", disposition: "attachment"
   end
 
   private

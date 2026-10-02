@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class DomainsController < ApplicationController
-  before_action :set_domain, only: %i[show edit update destroy check_status]
+  before_action :set_domain, only: %i[show edit update destroy check_status export_csv]
 
 def index
   @domains = current_user.domains.order(:name)
@@ -62,6 +62,12 @@ end
   def check_status
     @domain.check_status!
     redirect_to @domain, notice: "Estado de '#{@domain.name}' verificado en tiempo real."
+  end
+
+
+  def export_csv
+    filename = "reporte-#{@domain.name.parameterize}-#{Time.current.strftime('%Y%m%d%H%M')}.csv"
+    send_data @domain.to_csv(500), filename: filename, type: "text/csv; charset=utf-8; header=present", disposition: "attachment"
   end
 
   private
