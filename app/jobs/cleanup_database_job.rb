@@ -28,7 +28,7 @@ class CleanupDatabaseJob < ApplicationJob
 
     # 5. Purgar jobs antiguos finalizados de SolidQueue (conservar solo últimas 6 horas)
     if defined?(SolidQueue::Job)
-      SolidQueue::Job.clear_finished_in_batches(finished_before: 6.hours.ago) rescue nil
+      SolidQueue::Job.clear_finished_in_batches(finished_before: 1.hour.ago) rescue nil
       Rails.logger.info("CleanupDatabaseJob: Purgados jobs finalizados de SolidQueue.")
     end
   end
