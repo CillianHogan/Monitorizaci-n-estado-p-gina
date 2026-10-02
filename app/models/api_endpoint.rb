@@ -1,6 +1,13 @@
 # frozen_string_literal: true
 
 class ApiEndpoint < ApplicationRecord
+
+  HIGH_LATENCY_THRESHOLD_MS = 2000
+
+  def latency_threshold
+    HIGH_LATENCY_THRESHOLD_MS
+  end
+
   before_validation :generate_public_token, on: :create
   validates :public_token, uniqueness: true, allow_nil: true
   belongs_to :user
@@ -58,6 +65,11 @@ class ApiEndpoint < ApplicationRecord
       last_response_time_ms: latency,
       last_http_code: response.code
     )
+
+    if new_status == :up && latency > latency_threshold
+      send_discord_alert(:slow)
+      send_telegram_alert(:slow)
+    end
 
     status_histories.create(
       status: new_status,
