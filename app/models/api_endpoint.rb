@@ -89,12 +89,23 @@ class ApiEndpoint < ApplicationRecord
   end
 
   # --- Disparadores de Notificaciones ---
-  def send_discord_alert(type)
+    def send_discord_alert(type)
     return unless notify_discord? && target_discord_webhook.present?
 
-    color = type == :up ? 3066993 : 15158332 # Verde o Rojo
-    title = type == :up ? "🟢 Endpoint Recuperado: #{name}" : "🔴 Endpoint Fallando: #{name}"
-    desc  = type == :up ? "El endpoint API vuelve a responder correctamente." : "El endpoint API no responde o devuelve un error."
+    case type.to_sym
+    when :up
+      color = 3066993 # Verde
+      title = "🟢 Endpoint Recuperado: #{name}"
+      desc  = "El endpoint API vuelve a responder correctamente."
+    when :slow, :high_latency
+      color = 16753920 # Ámbar
+      title = "⚠️ Latencia Alta Detectada: #{name}"
+      desc  = "El endpoint respondió correctamente pero superó el umbral (#{last_response_time_ms} ms > #{latency_threshold} ms)."
+    else
+      color = 15158332 # Rojo
+      title = "🔴 Endpoint Fallando: #{name}"
+      desc  = "El endpoint API no responde o devuelve un error."
+    end
 
     payload = {
       embeds: [
@@ -116,13 +127,23 @@ class ApiEndpoint < ApplicationRecord
     DiscordNotificationJob.perform_later(target_discord_webhook, payload)
   rescue StandardError => e
     Rails.logger.error("Error al preparar alerta Discord para endpoint #{name}: #{e.message}")
+  endpoint #{name}: #{e.message}")
   end
 
-  def send_telegram_alert(type)
+    def send_telegram_alert(type)
     return unless notify_telegram? && target_telegram_bot_token.present? && target_telegram_chat_id.present?
 
-    title = type == :up ? "🟢 *Endpoint API Recuperado: #{name}*" : "🔴 *Endpoint API Fallando: #{name}*"
-    status_desc = type == :up ? "El endpoint vuelve a responder con éxito." : "El endpoint no responde como se esperaba."
+    case type.to_sym
+    when :up
+      title = "🟢 *Endpoint API Recuperado: #{name}*"
+      status_desc = "El endpoint vuelve a responder con éxito."
+    when :slow, :high_latency
+      title = "⚠️ *Alta Latencia Detectada: #{name}*"
+      status_desc = "El endpoint respondió pero con lentitud excesiva (`#{last_response_time_ms} ms > #{latency_threshold} ms`)."
+    else
+      title = "🔴 *Endpoint API Fallando: #{name}*"
+      status_desc = "El endpoint no responde como se esperaba."
+    end
 
     msg = <<~TEXT
       #{title}
@@ -138,6 +159,7 @@ class ApiEndpoint < ApplicationRecord
     TelegramNotificationJob.perform_later(target_telegram_bot_token, target_telegram_chat_id, msg)
   rescue StandardError => e
     Rails.logger.error("Error al preparar alerta Telegram para endpoint #{name}: #{e.message}")
+  endpoint #{name}: #{e.message}")
   end
 
   private
