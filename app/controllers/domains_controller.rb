@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class DomainsController < ApplicationController
-  before_action :set_domain, only: %i[show edit update destroy]
+  before_action :set_domain, only: %i[show edit update destroy check_status]
 
 def index
   @domains = current_user.domains.order(:name)
@@ -56,6 +56,12 @@ end
   def destroy
     @domain.destroy
     redirect_to domains_url, notice: 'Domain was successfully deleted.'
+  end
+
+
+  def check_status
+    @domain.check_status!
+    redirect_to @domain, notice: "Estado de '#{@domain.name}' verificado en tiempo real."
   end
 
   private
