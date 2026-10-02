@@ -308,7 +308,30 @@ rescue StandardError => e
     Rails.logger.error("Error al registrar status history para #{name}: #{e.message}")
   end
 
+  
+  # Extrae cambios de estado recientes sin sobrecargar la BD
+  def recent_incidents(limit = 5)
+    histories = status_histories.order(recorded_at: :desc).limit(100).to_a
+    events = []
+
+    histories.each_cons(2) do |newer, older|
+      if newer.status != older.status
+        events << {
+          status: newer.status,
+          previous_status: older.status,
+          recorded_at: newer.recorded_at,
+          response_time_ms: newer.response_time_ms,
+          http_code: newer.http_code
+        }
+        break if events.size >= limit
+      end
+    end
+
+    events
+  end
+
   private
+
 
 
   def normalize_url
@@ -326,6 +349,16 @@ rescue StandardError => e
   validate :check_user_domain_limit, on: :create
 
   private
+
+  def check_user_domain_limit
+    return unless user
+    if user.domains.count >= user.domain_limit
+      errors.add(:base, "Has alcanzado el límite máximo de #{user.domain_limit} dominios para tu plan actual.")
+    end
+  end
+
+
+  validate :check_user_domain_limit, on: :create
 
   def check_user_domain_limit
     return unless user
