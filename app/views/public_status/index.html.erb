@@ -3,10 +3,10 @@
     <div class="flex items-center justify-between mb-8">
       <div>
         <h1 class="text-2xl font-extrabold text-gray-900 tracking-tight">Estado del Sistema</h1>
-        <p class="text-sm text-gray-500 mt-1">Monitorizacion en tiempo real de servicios y dominios</p>
+        <p class="text-sm text-gray-500 mt-1">Monitorización en tiempo real de servicios, dominios y APIs</p>
       </div>
       <div class="text-right">
-        <span class="text-xs text-gray-400">Ultima actualizacion</span>
+        <span class="text-xs text-gray-400">Última actualización</span>
         <p class="text-sm font-medium text-gray-700"><%= Time.current.strftime("%H:%M UTC") %></p>
       </div>
     </div>
@@ -18,7 +18,7 @@
           <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
         </span>
         <div>
-          <h3 class="text-sm font-semibold text-green-900">Todos los sistemas estan operativos</h3>
+          <h3 class="text-sm font-semibold text-green-900">Todos los sistemas están operativos</h3>
           <p class="text-xs text-green-700"><%= @operational_count %> de <%= @total_count %> servicios respondiendo correctamente</p>
         </div>
       </div>
@@ -27,49 +27,101 @@
         <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
         <div>
           <h3 class="text-sm font-semibold text-red-900">Incidencia detectada</h3>
-          <p class="text-xs text-red-700"><%= @down_domains.size %> de <%= @total_count %> servicios presentan problemas de conexion</p>
+          <p class="text-xs text-red-700"><%= @down_resources.size %> de <%= @total_count %> servicios presentan problemas de conexión</p>
         </div>
       </div>
     <% end %>
 
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-        <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Servicio</span>
-        <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Estado</span>
+    <%# Bloque Dominios Web %>
+    <% if @domains.any? %>
+      <div class="mb-8">
+        <h2 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-3">Dominios Web</h2>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div class="px-6 py-3 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            <span>Servicio</span>
+            <span>Estado</span>
+          </div>
+
+          <ul class="divide-y divide-gray-100">
+            <% @domains.each do |domain| %>
+              <li class="px-6 py-4 flex items-center justify-between hover:bg-gray-50/70 transition">
+                <div>
+                  <% if domain.public_token.present? %>
+                    <%= link_to domain.name, public_status_path(domain.public_token), class: "text-sm font-medium text-gray-900 hover:text-amber-600 transition" %>
+                  <% else %>
+                    <span class="text-sm font-medium text-gray-900"><%= domain.name %></span>
+                  <% end %>
+                  <p class="text-xs text-gray-400 font-mono"><%= domain.url %></p>
+                </div>
+
+                <div class="flex items-center gap-4">
+                  <% if domain.last_response_time_ms.present? %>
+                    <span class="text-xs text-gray-400 font-mono"><%= domain.last_response_time_ms %> ms</span>
+                  <% end %>
+                  <% if domain.status_up? %>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      Operativo
+                    </span>
+                  <% else %>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                      Degradado / Caído
+                    </span>
+                  <% end %>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        </div>
       </div>
+    <% end %>
 
-      <ul class="divide-y divide-gray-100">
-        <% @domains.each do |domain| %>
-          <li class="px-6 py-4 flex items-center justify-between hover:bg-gray-50/70 transition">
-            <div class="flex items-center gap-3">
-              <div>
-                <% if domain.public_token.present? %>
-                  <%= link_to domain.name, public_status_path(domain.public_token), class: "text-sm font-medium text-gray-900 hover:text-indigo-600" %>
-                <% else %>
-                  <span class="text-sm font-medium text-gray-900"><%= domain.name %></span>
-                <% end %>
-                <p class="text-xs text-gray-400"><%= domain.url %></p>
-              </div>
-            </div>
+    <%# Bloque Endpoints API %>
+    <% if @api_endpoints.any? %>
+      <div class="mb-8">
+        <h2 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-3">Endpoints API</h2>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div class="px-6 py-3 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            <span>Endpoint</span>
+            <span>Estado</span>
+          </div>
 
-            <div class="flex items-center gap-4">
-              <% if domain.last_response_time_ms.present? %>
-                <span class="text-xs text-gray-400"><%= domain.last_response_time_ms %> ms</span>
-              <% end %>
-              <% if domain.status_up? %>
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                  Operativo
-                </span>
-              <% else %>
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                  Degradado / Caido
-                </span>
-              <% end %>
-            </div>
-          </li>
-        <% end %>
-      </ul>
-    </div>
+          <ul class="divide-y divide-gray-100">
+            <% @api_endpoints.each do |endpoint| %>
+              <li class="px-6 py-4 flex items-center justify-between hover:bg-gray-50/70 transition">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="px-1.5 py-0.5 text-[10px] font-mono font-bold rounded bg-gray-100 text-gray-700 uppercase">
+                      <%= endpoint.http_method %>
+                    </span>
+                    <% if endpoint.public_token.present? %>
+                      <%= link_to endpoint.name, public_status_path(endpoint.public_token), class: "text-sm font-medium text-gray-900 hover:text-amber-600 transition" %>
+                    <% else %>
+                      <span class="text-sm font-medium text-gray-900"><%= endpoint.name %></span>
+                    <% end %>
+                  </div>
+                  <p class="text-xs text-gray-400 font-mono mt-0.5"><%= endpoint.url %></p>
+                </div>
+
+                <div class="flex items-center gap-4">
+                  <% if endpoint.last_response_time_ms.present? %>
+                    <span class="text-xs text-gray-400 font-mono"><%= endpoint.last_response_time_ms %> ms</span>
+                  <% end %>
+                  <% if endpoint.status_up? %>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      Operativo
+                    </span>
+                  <% else %>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                      Degradado / Caído
+                    </span>
+                  <% end %>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    <% end %>
 
     <div class="mt-8 text-center">
       <p class="text-xs text-gray-400">Powered by Domain Monitor</p>
