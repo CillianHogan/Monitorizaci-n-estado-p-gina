@@ -59,7 +59,11 @@
               <div class="flex flex-col">
                 <div class="flex items-center gap-2">
                   <span class="text-base font-extrabold tracking-tight text-white group-hover:text-amber-300 transition-colors">Domain Checker</span>
-                  <span class="text-[9px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">Pro</span>
+                  <% if user_signed_in? && current_user.respond_to?(:admin?) && current_user.admin? %>
+                    <span class="text-[9px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">Pro</span>
+                  <% elsif user_signed_in? %>
+                    <span class="text-[9px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded bg-stone-800/80 text-amber-200/60 border border-stone-700/50">Free</span>
+                  <% end %>
                 </div>
                 <span class="text-[10px] text-amber-200/60 font-medium tracking-wide">Uptime & Latency Monitor</span>
               </div>
