@@ -15,7 +15,7 @@ class ApiEndpointsController < ApplicationController
   end
 
   def new
-    @api_endpoint = current_user.api_endpoints.build(http_method: "GET", timeout_seconds: 10)
+    @api_endpoint = current_user.api_endpoints.build(http_method: :get)
   end
 
   def create
