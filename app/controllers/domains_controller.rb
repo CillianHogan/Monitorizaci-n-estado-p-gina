@@ -65,9 +65,14 @@ end
   end
 
 
-  def export_csv
-    filename = "reporte-#{@domain.name.parameterize}-#{Time.current.strftime('%Y%m%d%H%M')}.csv"
-    send_data @domain.to_csv(500), filename: filename, type: "text/csv; charset=utf-8; header=present", disposition: "attachment"
+    def export_csv
+    unless current_user.admin?
+      redirect_to domain_path(@domain), alert: "La exportación de métricas en CSV es exclusiva del Plan PRO." and return
+    end
+    send_data @domain.to_csv,
+              filename: "#{@domain.name.parameterize}-metricas-#{Date.current}.csv",
+              type: "text/csv; charset=utf-8"
+  end_data @domain.to_csv(500), filename: filename, type: "text/csv; charset=utf-8; header=present", disposition: "attachment"
   end
 
   private

@@ -296,7 +296,7 @@ rescue StandardError => e
 end
   def create_status_history
   lat = current_response_time_ms || (has_attribute?(:last_response_time_ms) ? last_response_time_ms : 0)
-  update_column(:last_response_time_ms, current_response_time_ms) if column_names.include?("last_response_time_ms") && current_response_time_ms.present? if has_attribute?(:last_response_time_ms) && current_response_time_ms.present?
+  update_column(:last_response_time_ms, current_response_time_ms) if self.class.column_names.include?("last_response_time_ms") && current_response_time_ms.present? if has_attribute?(:last_response_time_ms) && current_response_time_ms.present?
 
   status_histories.create(
     status: status,
