@@ -28,6 +28,10 @@ class User < ApplicationRecord
     role == 'user'
   end
 
+  def pro?
+    admin? || manager?
+  end
+
   def role?(requested_role)
     role == requested_role.to_s
   end
