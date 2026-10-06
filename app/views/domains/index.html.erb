@@ -32,7 +32,7 @@
   </div>
 
   <%# Banner / Tarjeta de Upgrade a PRO si agotó la cuota %>
-  <% if current_user && !current_user.can_create_domain? && !current_user.admin? && !current_user.manager? %>
+  <% if current_user && !current_user.pro? %>
     <div class="relative overflow-hidden rounded-2xl border border-amber-500/30 bg-gradient-to-r from-[#2a1e17] via-[#221712] to-[#1a120e] p-6 shadow-xl">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
         <div class="space-y-2">
