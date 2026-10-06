@@ -68,7 +68,7 @@
             <div>
               <div class="flex items-center justify-between mb-1">
                 <label class="block text-[11px] font-semibold text-amber-300/80">Seleccionar Canal Guardado:</label>
-                <%= link_to "+ Añadir canal", notification_channels_path, target: "_blank", class: "text-[10px] text-amber-400 hover:text-amber-200 underline" %>
+                <button type="button" onclick="document.getElementById('domain_notify_email_address').value=''; document.getElementById('domain_notify_email_address').focus(); var sel = document.getElementById('domain_select_email'); if(sel) sel.selectedIndex = -1;" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 hover:text-white text-xs font-semibold transition cursor-pointer shadow-sm"><span>+ Escribir otro correo</span></button>
               </div>
               <select id="domain_select_email" onchange="document.getElementById('domain_notify_email_address').value = this.value" class="w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
                 <% email_channels.each do |ch| %>
@@ -107,7 +107,7 @@
             <div>
               <div class="flex items-center justify-between mb-1">
                 <label class="block text-[11px] font-semibold text-amber-300/80">Seleccionar Webhook Guardado:</label>
-                <%= link_to "+ Añadir canal", notification_channels_path, target: "_blank", class: "text-[10px] text-amber-400 hover:text-amber-200 underline" %>
+                <button type="button" onclick="document.getElementById('domain_discord_webhook_url').value=''; document.getElementById('domain_discord_webhook_url').focus(); var sel = document.getElementById('domain_select_discord'); if(sel) sel.selectedIndex = -1;" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 hover:text-white text-xs font-semibold transition cursor-pointer shadow-sm"><span>+ Escribir otro webhook</span></button>
               </div>
               <select id="domain_select_discord" onchange="document.getElementById('domain_discord_webhook_url').value = this.value" class="w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
                 <% discord_channels.each do |ch| %>
@@ -146,7 +146,7 @@
             <div>
               <div class="flex items-center justify-between mb-1">
                 <label class="block text-[11px] font-semibold text-amber-300/80">Seleccionar Chat Guardado:</label>
-                <%= link_to "+ Añadir canal", notification_channels_path, target: "_blank", class: "text-[10px] text-amber-400 hover:text-amber-200 underline" %>
+                <button type="button" onclick="document.getElementById('domain_telegram_chat_id').value=''; document.getElementById('domain_telegram_chat_id').focus(); var sel = document.getElementById('domain_select_telegram'); if(sel) sel.selectedIndex = -1;" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 hover:text-white text-xs font-semibold transition cursor-pointer shadow-sm"><span>+ Escribir otro chat</span></button>
               </div>
               <select id="domain_select_telegram" onchange="document.getElementById('domain_telegram_chat_id').value = this.value" class="w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
                 <% telegram_channels.each do |ch| %>
