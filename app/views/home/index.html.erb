@@ -1,20 +1,20 @@
-<div class="py-12 sm:py-20 text-center space-y-16">
+<div class="py-12 sm:py-20 text-center space-y-24">
   <%# Hero Principal %>
   <div class="max-w-3xl mx-auto space-y-6">
-    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-semibold tracking-wide">
+    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-semibold tracking-wide shadow-inner">
       <span class="h-2 w-2 rounded-full bg-amber-400 animate-pulse"></span>
-      Monitorización 24/7 de Alta Precisión
+      Monitorización 24/7 de Alta Precisión en Tiempo Real
     </div>
 
     <h1 class="text-4xl sm:text-6xl font-black text-white tracking-tight leading-tight">
-      Supervisa tus dominios con <span class="bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 bg-clip-text text-transparent">máxima fiabilidad</span>
+      Supervisa tus dominios y APIs con <span class="bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 bg-clip-text text-transparent">máxima fiabilidad</span>
     </h1>
 
     <p class="text-base sm:text-lg text-stone-300 max-w-2xl mx-auto leading-relaxed">
-      Detección instantánea de caídas, control de caducidad SSL y alertas en tiempo real a Discord, Telegram y Correo electrónico.
+      Detección instantánea de caídas de servicio, alertas por picos de latencia, expiración de certificados SSL y avisos críticos inmediatos en Discord, Telegram y Correo.
     </p>
 
-    <div class="pt-4 flex items-center justify-center gap-4">
+    <div class="pt-4 flex flex-wrap items-center justify-center gap-4">
       <% if user_signed_in? %>
         <%= link_to domains_path, class: "inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm text-stone-950 bg-gradient-to-r from-amber-400 via-amber-300 to-orange-400 hover:from-amber-300 hover:to-orange-300 shadow-xl shadow-amber-500/25 hover:scale-[1.02] transition-all cursor-pointer" do %>
           <span>Ir a mis dominios</span>
@@ -22,66 +22,293 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
           </svg>
         <% end %>
+        <%= link_to api_endpoints_path, class: "inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm text-amber-200 hover:text-white bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition-all cursor-pointer" do %>
+          <span>Endpoints API</span>
+        <% end %>
       <% else %>
         <%= link_to new_user_registration_path, class: "inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm text-stone-950 bg-gradient-to-r from-amber-400 via-amber-300 to-orange-400 hover:from-amber-300 hover:to-orange-300 shadow-xl shadow-amber-500/25 hover:scale-[1.02] transition-all cursor-pointer" do %>
-          <span>Comenzar ahora</span>
+          <span>Crear Cuenta Gratis</span>
           <svg class="w-4 h-4 text-stone-950" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
           </svg>
         <% end %>
+        <%= link_to new_user_session_path, class: "inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm text-amber-200 hover:text-white bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition-all cursor-pointer" do %>
+          <span>Iniciar Sesión</span>
+        <% end %>
       <% end %>
     </div>
+    
+    <% unless user_signed_in? %>
+      <div class="text-[11px] text-amber-200/50 flex items-center justify-center gap-4 pt-1">
+        <span>✓ Sin tarjeta requerida</span>
+        <span>•</span>
+        <span>✓ Configuración en menos de 1 minuto</span>
+        <span>•</span>
+        <span>✓ Alertas multicanal inmediatas</span>
+      </div>
+    <% end %>
   </div>
 
-  <%# Tarjetas de Funcionalidades Integradas (Sin fondos blancos toscos) %>
-  <div class="pt-10">
-    <div class="text-xs uppercase font-bold tracking-widest text-stone-400 mb-8">
+  <%# Capacidades Destacadas (4 Tarjetas) %>
+  <div class="space-y-8">
+    <div class="text-xs uppercase font-bold tracking-widest text-amber-400/80">
       Capacidades de la plataforma
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-6xl mx-auto text-left">
       <%# Tarjeta 1 %>
-      <div class="bg-stone-900/60 hover:bg-stone-900/90 border border-white/[0.08] hover:border-amber-500/30 rounded-2xl p-6 backdrop-blur-md transition-all duration-200 group">
+      <div class="bg-[#19110d]/80 hover:bg-[#201610] border border-amber-500/20 hover:border-amber-400/40 rounded-2xl p-6 backdrop-blur-md transition-all duration-200 group shadow-lg">
         <div class="h-10 w-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-4 group-hover:scale-110 transition-transform">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
         </div>
         <h3 class="text-sm font-bold text-white mb-1.5">Métricas de Latencia</h3>
-        <p class="text-xs text-stone-400 leading-relaxed">Registro histórico milimétrico con gráficas Retina y filtros de rango temporal.</p>
+        <p class="text-xs text-amber-200/60 leading-relaxed">Registro histórico milimétrico con gráficas detalladas, promedios y seguimiento de caídas acumuladas.</p>
       </div>
 
       <%# Tarjeta 2 %>
-      <div class="bg-stone-900/60 hover:bg-stone-900/90 border border-white/[0.08] hover:border-amber-500/30 rounded-2xl p-6 backdrop-blur-md transition-all duration-200 group">
+      <div class="bg-[#19110d]/80 hover:bg-[#201610] border border-amber-500/20 hover:border-amber-400/40 rounded-2xl p-6 backdrop-blur-md transition-all duration-200 group shadow-lg">
         <div class="h-10 w-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-4 group-hover:scale-110 transition-transform">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
           </svg>
         </div>
         <h3 class="text-sm font-bold text-white mb-1.5">Alertas Multicanal</h3>
-        <p class="text-xs text-stone-400 leading-relaxed">Notificaciones inmediatas configurables por Discord, Telegram y Correo.</p>
+        <p class="text-xs text-amber-200/60 leading-relaxed">Notificaciones inmediatas configurables vía Webhooks de Discord, Bots de Telegram y Correos electrónicos.</p>
       </div>
 
       <%# Tarjeta 3 %>
-      <div class="bg-stone-900/60 hover:bg-stone-900/90 border border-white/[0.08] hover:border-amber-500/30 rounded-2xl p-6 backdrop-blur-md transition-all duration-200 group">
+      <div class="bg-[#19110d]/80 hover:bg-[#201610] border border-amber-500/20 hover:border-amber-400/40 rounded-2xl p-6 backdrop-blur-md transition-all duration-200 group shadow-lg">
         <div class="h-10 w-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-4 group-hover:scale-110 transition-transform">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
         </div>
         <h3 class="text-sm font-bold text-white mb-1.5">Vigilancia SSL</h3>
-        <p class="text-xs text-stone-400 leading-relaxed">Alertas automáticas preventivas antes de que caduque cualquier certificado.</p>
+        <p class="text-xs text-amber-200/60 leading-relaxed">Auditoría automática de tus certificados SSL con avisos anticipados antes de que expiren o provoquen fallos.</p>
       </div>
 
       <%# Tarjeta 4 %>
-      <div class="bg-stone-900/60 hover:bg-stone-900/90 border border-white/[0.08] hover:border-amber-500/30 rounded-2xl p-6 backdrop-blur-md transition-all duration-200 group">
+      <div class="bg-[#19110d]/80 hover:bg-[#201610] border border-amber-500/20 hover:border-amber-400/40 rounded-2xl p-6 backdrop-blur-md transition-all duration-200 group shadow-lg">
         <div class="h-10 w-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-4 group-hover:scale-110 transition-transform">
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
           </svg>
         </div>
         <h3 class="text-sm font-bold text-white mb-1.5">Doble Verificación</h3>
-        <p class="text-xs text-stone-400 leading-relaxed">Filtro Soft/Hard fail con reintento a los 15s para evitar falsos positivos.</p>
+        <p class="text-xs text-amber-200/60 leading-relaxed">Filtro inteligente Soft/Hard Fail con reintentos a los 15 segundos para erradicar falsos positivos.</p>
+      </div>
+    </div>
+  </div>
+
+  <%# Sección Detallada de Servicios %>
+  <div class="max-w-6xl mx-auto space-y-12 text-left">
+    <div class="text-center space-y-3">
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Todo lo que necesitas para tu infraestructura</h2>
+      <p class="text-sm text-amber-200/60 max-w-xl mx-auto">Protegemos la presencia digital de tus proyectos con verificación continua y diagnósticos fiables.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <%# Detalle 1: Dominios %>
+      <div class="p-6 rounded-2xl bg-[#1c1512] border border-amber-500/20 space-y-3 shadow-md">
+        <div class="text-xs font-bold text-amber-400 uppercase tracking-wider">Monitor de Páginas Web</div>
+        <h3 class="text-lg font-bold text-white">Verificación HTTP y Palabras Clave</h3>
+        <p class="text-xs text-stone-300 leading-relaxed">
+          Comprobamos no solo que tu servidor responda con un código HTTP 200, sino también que devuelva el contenido esperado mediante validación de palabras clave en el código HTML.
+        </p>
+        <ul class="text-xs text-amber-200/70 space-y-1.5 pt-2">
+          <li class="flex items-center gap-2">✓ Chequeo de códigos de respuesta HTTP</li>
+          <li class="flex items-center gap-2">✓ Validación de strings en el DOM</li>
+          <li class="flex items-center gap-2">✓ Límites configurables de latencia en ms</li>
+        </ul>
+      </div>
+
+      <%# Detalle 2: Endpoints API %>
+      <div class="p-6 rounded-2xl bg-[#1c1512] border border-amber-500/20 space-y-3 shadow-md">
+        <div class="text-xs font-bold text-amber-400 uppercase tracking-wider">Supervisión de APIs</div>
+        <h3 class="text-lg font-bold text-white">Healthchecks y Microservicios</h3>
+        <p class="text-xs text-stone-300 leading-relaxed">
+          Diseñado para desarrolladores y equipos técnicos. Monitoriza endpoints REST, rutas de autenticación y endpoints de salud con respuesta rápida ante incidencias.
+        </p>
+        <ul class="text-xs text-amber-200/70 space-y-1.5 pt-2">
+          <li class="flex items-center gap-2">✓ Supervisión de rutas /health y /status</li>
+          <li class="flex items-center gap-2">✓ Detección de fallos 4xx y 5xx al instante</li>
+          <li class="flex items-center gap-2">✓ Alertas directas a tus herramientas de trabajo</li>
+        </ul>
+      </div>
+
+      <%# Detalle 3: Canales %>
+      <div class="p-6 rounded-2xl bg-[#1c1512] border border-amber-500/20 space-y-3 shadow-md">
+        <div class="text-xs font-bold text-amber-400 uppercase tracking-wider">Alertas Flexibles</div>
+        <h3 class="text-lg font-bold text-white">Matriz de Canales Centralizada</h3>
+        <p class="text-xs text-stone-300 leading-relaxed">
+          Guarda tus canales favoritos (Discord, Telegram, Email), márcalos como predeterminados o define destinos independientes por cada dominio o servicio individual.
+        </p>
+        <ul class="text-xs text-amber-200/70 space-y-1.5 pt-2">
+          <li class="flex items-center gap-2">✓ Notificaciones personalizadas por endpoint</li>
+          <li class="flex items-center gap-2">✓ Plantillas de alerta con métricas y códigos de error</li>
+          <li class="flex items-center gap-2">✓ Gestión rápida y búsqueda de canales</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <%# Tabla Comparativa de Planes (Gratis vs PRO) %>
+  <div class="max-w-5xl mx-auto space-y-8">
+    <div class="text-center space-y-3">
+      <div class="inline-block px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold uppercase tracking-wider">
+        Planes y Precios Transparentes
+      </div>
+      <h2 class="text-3xl font-extrabold text-white tracking-tight">Elige el plan ideal para tus proyectos</h2>
+      <p class="text-sm text-amber-200/60 max-w-lg mx-auto">Comienza sin coste y escala cuando tu infraestructura lo necesite. Sin compromisos ni permanencias.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left items-stretch">
+      <%# Plan Gratis %>
+      <div class="p-8 rounded-3xl bg-[#18110e] border border-amber-500/20 flex flex-col justify-between space-y-6 shadow-xl relative">
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xl font-bold text-white">Plan Starter</h3>
+            <span class="px-3 py-1 rounded-full bg-stone-800 text-stone-300 text-xs font-semibold">Gratis para siempre</span>
+          </div>
+          <div class="flex items-baseline gap-1">
+            <span class="text-4xl font-black text-white">0 €</span>
+            <span class="text-sm text-stone-400">/ mes</span>
+          </div>
+          <p class="text-xs text-stone-400">Perfecto para proyectos personales, webs individuales y blogs en fase inicial.</p>
+
+          <div class="pt-4 border-t border-amber-500/10 space-y-3 text-xs text-stone-300">
+            <div class="flex items-center gap-2.5">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <span>Hasta <strong>3 Dominios</strong> monitorizados</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <span>Hasta <strong>2 Endpoints API</strong></span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <span>Frecuencia de comprobación: <strong>Cada 5 minutos</strong></span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <span>Alertas por <strong>Email</strong></span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <span class="text-emerald-400 font-bold">✓</span>
+              <span>Historial de métricas de 7 días</span>
+            </div>
+            <div class="flex items-center gap-2.5 text-stone-500">
+              <span>✕</span>
+              <span>Alertas en Discord y Telegram</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <% if user_signed_in? %>
+            <%= link_to "Plan actual activo", domains_path, class: "block w-full py-3 rounded-xl text-center text-xs font-bold bg-stone-800 hover:bg-stone-700 text-white transition" %>
+          <% else %>
+            <%= link_to "Comenzar Gratis", new_user_registration_path, class: "block w-full py-3 rounded-xl text-center text-xs font-bold bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 hover:text-white transition" %>
+          <% end %>
+        </div>
+      </div>
+
+      <%# Plan PRO %>
+      <div class="p-8 rounded-3xl bg-gradient-to-b from-[#241711] to-[#1a110c] border-2 border-amber-400 flex flex-col justify-between space-y-6 shadow-2xl relative shadow-amber-500/10">
+        <div class="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-400 text-stone-950 text-[11px] font-black uppercase tracking-wider shadow">
+          Recomendado
+        </div>
+
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xl font-bold text-white flex items-center gap-2">
+              <span>Plan PRO</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-black bg-amber-400 text-stone-950 uppercase">PRO</span>
+            </h3>
+          </div>
+          <div class="flex items-baseline gap-1">
+            <span class="text-4xl font-black text-amber-300">9,99 €</span>
+            <span class="text-sm text-amber-200/60">/ mes</span>
+          </div>
+          <p class="text-xs text-amber-200/70">Para aplicaciones en producción, e-commerce y empresas que no pueden permitirse caídas.</p>
+
+          <div class="pt-4 border-t border-amber-500/20 space-y-3 text-xs text-stone-200">
+            <div class="flex items-center gap-2.5">
+              <span class="text-amber-400 font-bold">✓</span>
+              <span><strong>Dominios ilimitados</strong> en monitorización</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <span class="text-amber-400 font-bold">✓</span>
+              <span><strong>Endpoints API ilimitados</strong></span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <span class="text-amber-400 font-bold">✓</span>
+              <span>Frecuencia ultra rápida: <strong>Cada 30 segundos</strong></span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <span class="text-amber-400 font-bold">✓</span>
+              <span>Alertas completas en <strong>Discord, Telegram y Email</strong></span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <span class="text-amber-400 font-bold">✓</span>
+              <span>Filtro anti-falsos positivos con doble chequeo a los 15s</span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <span class="text-amber-400 font-bold">✓</span>
+              <span>Historial analítico y gráficas de <strong>1 año</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <% if user_signed_in? %>
+            <button type="button" class="w-full py-3.5 rounded-xl font-black text-xs text-stone-950 bg-gradient-to-r from-amber-400 via-amber-300 to-orange-400 hover:from-amber-300 hover:to-orange-300 shadow-lg shadow-amber-500/25 transition cursor-pointer">
+              Actualizar a PRO (9,99 €/mes)
+            </button>
+          <% else %>
+            <%= link_to "Empezar prueba PRO", new_user_registration_path, class: "block w-full py-3.5 rounded-xl text-center font-black text-xs text-stone-950 bg-gradient-to-r from-amber-400 via-amber-300 to-orange-400 hover:from-amber-300 hover:to-orange-300 shadow-lg shadow-amber-500/25 transition" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# Preguntas Frecuentes (FAQ) %>
+  <div class="max-w-4xl mx-auto space-y-8 text-left">
+    <div class="text-center space-y-2">
+      <h2 class="text-2xl font-bold text-white tracking-tight">Preguntas Frecuentes</h2>
+      <p class="text-xs text-amber-200/60">Resolvemos tus dudas principales sobre la plataforma.</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="p-5 rounded-2xl bg-[#1a120c] border border-amber-500/20 space-y-2">
+        <h4 class="text-sm font-bold text-white">¿Cómo se evitan los falsos positivos?</h4>
+        <p class="text-xs text-amber-200/70 leading-relaxed">
+          Utilizamos una lógica de doble verificación: ante un fallo inicial (Soft fail), se programa un reintento a los 15 segundos. Si persiste, se marca como Hard fail y se dispara la alerta a tus canales.
+        </p>
+      </div>
+
+      <div class="p-5 rounded-2xl bg-[#1a120c] border border-amber-500/20 space-y-2">
+        <h4 class="text-sm font-bold text-white">¿Cómo funcionan las alertas por Discord y Telegram?</h4>
+        <p class="text-xs text-amber-200/70 leading-relaxed">
+          Solo necesitas pegar la URL de tu Webhook de Discord o el Chat ID de tu bot de Telegram. Nuestras peticiones son asíncronas y se despachan en menos de 2 segundos.
+        </p>
+      </div>
+
+      <div class="p-5 rounded-2xl bg-[#1a120c] border border-amber-500/20 space-y-2">
+        <h4 class="text-sm font-bold text-white">¿Puedo cambiar de plan cuando lo necesite?</h4>
+        <p class="text-xs text-amber-200/70 leading-relaxed">
+          Sí, puedes comenzar con el Plan Starter gratuito y migrar al Plan PRO en cualquier momento desde tu panel de control sin interrupción en tus métricas guardadas.
+        </p>
+      </div>
+
+      <div class="p-5 rounded-2xl bg-[#1a120c] border border-amber-500/20 space-y-2">
+        <h4 class="text-sm font-bold text-white">¿Con qué frecuencia se comprueban los certificados SSL?</h4>
+        <p class="text-xs text-amber-200/70 leading-relaxed">
+          Verificamos la cadena de confianza y la fecha de expiración diariamente, enviándote un aviso preventivo con margen suficiente antes de que caduque el certificado.
+        </p>
       </div>
     </div>
   </div>
