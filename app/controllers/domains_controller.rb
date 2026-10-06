@@ -85,6 +85,14 @@ end
   end
 
   def domain_params
-    params.expect(domain: %i[name url latency_alert_enabled max_latency_threshold_ms expected_keyword notify_email notify_discord discord_webhook_url notify_telegram telegram_bot_token telegram_chat_id])
+    permitted = params.expect(domain: %i[name url latency_alert_enabled max_latency_threshold_ms expected_keyword notify_email notify_discord discord_webhook_url notify_telegram telegram_bot_token telegram_chat_id])
+    unless current_user.pro?
+      permitted[:notify_discord] = false
+      permitted[:notify_telegram] = false
+      permitted[:discord_webhook_url] = nil
+      permitted[:telegram_chat_id] = nil
+      permitted[:telegram_bot_token] = nil
+    end
+    permitted
   end
 end

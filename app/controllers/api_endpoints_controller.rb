@@ -63,10 +63,24 @@ class ApiEndpointsController < ApplicationController
   end
 
   def api_endpoint_params
-    params.require(:api_endpoint).permit(
+    permitted = params.require(:api_endpoint).permit(
       :name, :url, :http_method, :expected_status, :timeout_seconds,
       :request_headers, :request_body, :response_keyword, :notify_on_failure,
+      :notify_email, :notify_email_address, :notify_discord, :discord_webhook_url,
+      :notify_telegram, :telegram_chat_id,
       notification_channel_ids: []
     )
+    unless current_user.pro?
+      permitted[:notify_discord] = false
+      permitted[:notify_telegram] = false
+      permitted[:discord_webhook_url] = nil
+      permitted[:telegram_chat_id] = nil
+      # Limpiar canales de tipo discord o telegram si intentaron colar sus ids
+      if permitted[:notification_channel_ids].present?
+        valid_ids = current_user.notification_channels.where(channel_type: "email").where(id: permitted[:notification_channel_ids]).pluck(:id)
+        permitted[:notification_channel_ids] = valid_ids
+      end
+    end
+    permitted
   end
 end
