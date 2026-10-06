@@ -94,15 +94,22 @@
       <%# Discord %>
       <% default_discord_ch = current_user&.notification_channels&.by_type(:discord)&.find_by(is_default: true) || current_user&.notification_channels&.by_type(:discord)&.first %>
       <% discord_channels = current_user&.notification_channels&.by_type(:discord)&.order(is_default: :desc) %>
-      <div class="p-3.5 rounded-xl bg-[#1c1512] border border-amber-500/20 space-y-2">
-        <label class="flex items-center gap-3 cursor-pointer">
-          <%= f.check_box :notify_discord, class: "h-4 w-4 rounded border-amber-500 text-amber-500 focus:ring-amber-400",
-                onchange: "if (this.checked && !document.getElementById('domain_discord_webhook_url').value && '#{default_discord_ch&.destination}') { document.getElementById('domain_discord_webhook_url').value = '#{default_discord_ch&.destination}'; var s = document.getElementById('domain_select_discord'); if(s) s.value = '#{default_discord_ch&.destination}'; }" %>
-          <div>
-            <span class="text-xs font-bold text-white block">Alertas por Discord</span>
-            <span class="text-[11px] text-amber-200/60 block">Envío automático a un canal mediante Webhook.</span>
-          </div>
-        </label>
+      <div class="p-3.5 rounded-xl bg-[#1c1512] border border-amber-500/20 space-y-2 <%= "opacity-60 bg-[#16100e]" unless current_user&.pro? %>">
+        <div class="flex items-center justify-between">
+          <label class="flex items-center gap-3 <%= current_user&.pro? ? "cursor-pointer" : "cursor-not-allowed" %>">
+            <%= f.check_box :notify_discord, disabled: !current_user&.pro?, class: "h-4 w-4 rounded border-amber-500 text-amber-500 focus:ring-amber-400 disabled:opacity-40",
+                  onchange: "if (this.checked && !document.getElementById('domain_discord_webhook_url').value && '#{default_discord_ch&.destination}') { document.getElementById('domain_discord_webhook_url').value = '#{default_discord_ch&.destination}'; var s = document.getElementById('domain_select_discord'); if(s) s.value = '#{default_discord_ch&.destination}'; }" %>
+            <div>
+              <span class="text-xs font-bold text-white block">Alertas por Discord</span>
+              <span class="text-[11px] text-amber-200/60 block">Envío automático a un canal mediante Webhook.</span>
+            </div>
+          </label>
+          <% unless current_user&.pro? %>
+            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              🔒 Exclusivo Plan PRO
+            </span>
+          <% end %>
+        </div>
         <div class="pl-7 space-y-2">
           <% if discord_channels&.any? %>
             <div>
@@ -134,15 +141,22 @@
       <%# Telegram %>
       <% default_telegram_ch = current_user&.notification_channels&.by_type(:telegram)&.find_by(is_default: true) || current_user&.notification_channels&.by_type(:telegram)&.first %>
       <% telegram_channels = current_user&.notification_channels&.by_type(:telegram)&.order(is_default: :desc) %>
-      <div class="p-3.5 rounded-xl bg-[#1c1512] border border-amber-500/20 space-y-2">
-        <label class="flex items-center gap-3 cursor-pointer">
-          <%= f.check_box :notify_telegram, class: "h-4 w-4 rounded border-amber-500 text-amber-500 focus:ring-amber-400",
-                onchange: "if (this.checked && !document.getElementById('domain_telegram_chat_id').value && '#{default_telegram_ch&.destination}') { document.getElementById('domain_telegram_chat_id').value = '#{default_telegram_ch&.destination}'; var s = document.getElementById('domain_select_telegram'); if(s) s.value = '#{default_telegram_ch&.destination}'; }" %>
-          <div>
-            <span class="text-xs font-bold text-white block">Alertas por Telegram</span>
-            <span class="text-[11px] text-amber-200/60 block">Notificaciones directas vía Bot de Telegram.</span>
-          </div>
-        </label>
+      <div class="p-3.5 rounded-xl bg-[#1c1512] border border-amber-500/20 space-y-2 <%= "opacity-60 bg-[#16100e]" unless current_user&.pro? %>">
+        <div class="flex items-center justify-between">
+          <label class="flex items-center gap-3 <%= current_user&.pro? ? "cursor-pointer" : "cursor-not-allowed" %>">
+            <%= f.check_box :notify_telegram, disabled: !current_user&.pro?, class: "h-4 w-4 rounded border-amber-500 text-amber-500 focus:ring-amber-400 disabled:opacity-40",
+                  onchange: "if (this.checked && !document.getElementById('domain_telegram_chat_id').value && '#{default_telegram_ch&.destination}') { document.getElementById('domain_telegram_chat_id').value = '#{default_telegram_ch&.destination}'; var s = document.getElementById('domain_select_telegram'); if(s) s.value = '#{default_telegram_ch&.destination}'; }" %>
+            <div>
+              <span class="text-xs font-bold text-white block">Alertas por Telegram</span>
+              <span class="text-[11px] text-amber-200/60 block">Notificaciones directas vía Bot de Telegram.</span>
+            </div>
+          </label>
+          <% unless current_user&.pro? %>
+            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              🔒 Exclusivo Plan PRO
+            </span>
+          <% end %>
+        </div>
         <div class="pl-7 space-y-2">
           <% if telegram_channels&.any? %>
             <div>
