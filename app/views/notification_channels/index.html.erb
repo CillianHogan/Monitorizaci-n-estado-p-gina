@@ -51,7 +51,32 @@
   </div>
 
   <div class="space-y-4">
-    <h2 class="text-xl font-bold text-white tracking-tight">Canales Configurados (<%= @channels.size %>)</h2>
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-amber-800/30">
+      <div>
+        <h2 class="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+          <span>Canales Configurados</span>
+          <span id="channels-count" class="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">(<%= @channels.size %>)</span>
+        </h2>
+        <p class="text-xs text-amber-200/60 mt-0.5">Encuentra y gestiona rápidamente tus métodos de alerta.</p>
+      </div>
+
+      <%# Barra de Búsqueda y Filtro de Tipo %>
+      <div class="flex flex-wrap sm:flex-nowrap items-center gap-2.5">
+        <div class="relative w-full sm:w-64">
+          <input type="text" id="channel-search-input" oninput="filterChannels()" placeholder="Buscar por nombre o destino..." class="w-full pl-8 pr-3 py-1.5 rounded-xl bg-[#0d0905] border border-amber-800/50 text-white placeholder-amber-200/30 text-xs focus:border-amber-400 focus:outline-none transition">
+          <svg class="w-4 h-4 text-amber-400/60 absolute left-2.5 top-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+
+        <select id="channel-type-filter" onchange="filterChannels()" class="w-full sm:w-auto px-3 py-1.5 rounded-xl bg-[#0d0905] border border-amber-800/50 text-white text-xs focus:border-amber-400 focus:outline-none cursor-pointer">
+          <option value="all">Todos los tipos</option>
+          <option value="email">Email</option>
+          <option value="discord">Discord</option>
+          <option value="telegram">Telegram</option>
+        </select>
+      </div>
+    </div>
 
     <% if @channels.empty? %>
       <div class="bg-[#1a120b] border-2 border-amber-800/30 rounded-2xl p-8 text-center text-amber-200/60 text-sm">
@@ -60,7 +85,7 @@
     <% else %>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <% @channels.each do |channel| %>
-          <div class="bg-[#1a120b] border-2 <%= channel.is_default? ? "border-amber-400" : "border-amber-900/40" %> rounded-2xl p-5 shadow-lg flex flex-col justify-between space-y-4">
+          <div class="channel-card bg-[#1a120b] border-2 <%= channel.is_default? ? "border-amber-400" : "border-amber-900/40" %> rounded-2xl p-5 shadow-lg flex flex-col justify-between space-y-4" data-name="<%= channel.name.to_s.downcase %>" data-destination="<%= channel.destination.to_s.downcase %>" data-type="<%= channel.channel_type.to_s.downcase %>">
             <div class="space-y-2">
               <div class="flex items-center justify-between gap-2">
                 <span class="px-2 py-0.5 text-xs font-bold rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase">
@@ -89,6 +114,48 @@
           </div>
         <% end %>
       </div>
+      <div id="no-channels-match" class="hidden bg-[#1a120b] border-2 border-amber-800/30 rounded-2xl p-8 text-center text-amber-200/60 text-sm">
+        No se encontraron canales que coincidan con los filtros aplicados.
+      </div>
     <% end %>
   </div>
 </div>
+
+<script>
+  function filterChannels() {
+    var search = (document.getElementById("channel-search-input")?.value || "").trim().toLowerCase();
+    var type = (document.getElementById("channel-type-filter")?.value || "all").toLowerCase();
+    var cards = document.querySelectorAll(".channel-card");
+    var visibleCount = 0;
+
+    cards.forEach(function(card) {
+      var name = card.getAttribute("data-name") || "";
+      var dest = card.getAttribute("data-destination") || "";
+      var cardType = card.getAttribute("data-type") || "";
+
+      var matchesSearch = !search || name.includes(search) || dest.includes(search);
+      var matchesType = (type === "all") || (cardType === type);
+
+      if (matchesSearch && matchesType) {
+        card.classList.remove("hidden");
+        visibleCount++;
+      } else {
+        card.classList.add("hidden");
+      }
+    });
+
+    var countBadge = document.getElementById("channels-count");
+    if (countBadge) {
+      countBadge.textContent = "(" + visibleCount + ")";
+    }
+
+    var noMatch = document.getElementById("no-channels-match");
+    if (noMatch) {
+      if (visibleCount === 0 && cards.length > 0) {
+        noMatch.classList.remove("hidden");
+      } else {
+        noMatch.classList.add("hidden");
+      }
+    }
+  }
+</script>
