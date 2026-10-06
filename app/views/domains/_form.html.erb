@@ -68,9 +68,10 @@
             <div>
               <div class="flex items-center justify-between mb-1">
                 <label class="block text-[11px] font-semibold text-amber-300/80">Seleccionar Canal Guardado:</label>
-                <button type="button" onclick="document.getElementById('domain_notify_email_address').value=''; document.getElementById('domain_notify_email_address').focus(); var sel = document.getElementById('domain_select_email'); if(sel) sel.selectedIndex = -1;" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 hover:text-white text-xs font-semibold transition cursor-pointer shadow-sm"><span>+ Escribir otro correo</span></button>
+                <button type="button" onclick="document.getElementById('domain_notify_email_address').value=''; document.getElementById('domain_notify_email_address').focus(); var sel = document.getElementById('domain_select_email'); if(sel) sel.value = 'custom';" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 hover:text-white text-xs font-semibold transition cursor-pointer shadow-sm"><span>+ Escribir otro correo</span></button>
               </div>
-              <select id="domain_select_email" onchange="document.getElementById('domain_notify_email_address').value = this.value" class="w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
+              <select id="domain_select_email" onchange="if(this.value !== 'custom') document.getElementById('domain_notify_email_address').value = this.value;" class="w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none cursor-pointer">
+                <option value="custom" disabled hidden>-- Escribiendo personalizado (selecciona aquí para restaurar) --</option>
                 <% email_channels.each do |ch| %>
                   <option value="<%= ch.destination %>" <%= "selected" if domain.notify_email_address == ch.destination || (domain.notify_email_address.blank? && ch.is_default?) %>>
                     <%= ch.name %> (<%= ch.destination %>) <%= "★ Predeterminado" if ch.is_default? %>
@@ -107,9 +108,10 @@
             <div>
               <div class="flex items-center justify-between mb-1">
                 <label class="block text-[11px] font-semibold text-amber-300/80">Seleccionar Webhook Guardado:</label>
-                <button type="button" onclick="document.getElementById('domain_discord_webhook_url').value=''; document.getElementById('domain_discord_webhook_url').focus(); var sel = document.getElementById('domain_select_discord'); if(sel) sel.selectedIndex = -1;" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 hover:text-white text-xs font-semibold transition cursor-pointer shadow-sm"><span>+ Escribir otro webhook</span></button>
+                <button type="button" onclick="document.getElementById('domain_discord_webhook_url').value=''; document.getElementById('domain_discord_webhook_url').focus(); var sel = document.getElementById('domain_select_discord'); if(sel) sel.value = 'custom';" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 hover:text-white text-xs font-semibold transition cursor-pointer shadow-sm"><span>+ Escribir otro webhook</span></button>
               </div>
-              <select id="domain_select_discord" onchange="document.getElementById('domain_discord_webhook_url').value = this.value" class="w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
+              <select id="domain_select_discord" onchange="if(this.value !== 'custom') document.getElementById('domain_discord_webhook_url').value = this.value;" class="w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none cursor-pointer">
+                <option value="custom" disabled hidden>-- Escribiendo personalizado (selecciona aquí para restaurar) --</option>
                 <% discord_channels.each do |ch| %>
                   <option value="<%= ch.destination %>" <%= "selected" if domain.discord_webhook_url == ch.destination || (domain.discord_webhook_url.blank? && ch.is_default?) %>>
                     <%= ch.name %> <%= "★ Predeterminado" if ch.is_default? %>
@@ -146,9 +148,10 @@
             <div>
               <div class="flex items-center justify-between mb-1">
                 <label class="block text-[11px] font-semibold text-amber-300/80">Seleccionar Chat Guardado:</label>
-                <button type="button" onclick="document.getElementById('domain_telegram_chat_id').value=''; document.getElementById('domain_telegram_chat_id').focus(); var sel = document.getElementById('domain_select_telegram'); if(sel) sel.selectedIndex = -1;" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 hover:text-white text-xs font-semibold transition cursor-pointer shadow-sm"><span>+ Escribir otro chat</span></button>
+                <button type="button" onclick="document.getElementById('domain_telegram_chat_id').value=''; document.getElementById('domain_telegram_chat_id').focus(); var sel = document.getElementById('domain_select_telegram'); if(sel) sel.value = 'custom';" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 hover:text-white text-xs font-semibold transition cursor-pointer shadow-sm"><span>+ Escribir otro chat</span></button>
               </div>
-              <select id="domain_select_telegram" onchange="document.getElementById('domain_telegram_chat_id').value = this.value" class="w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
+              <select id="domain_select_telegram" onchange="if(this.value !== 'custom') document.getElementById('domain_telegram_chat_id').value = this.value;" class="w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none cursor-pointer">
+                <option value="custom" disabled hidden>-- Escribiendo personalizado (selecciona aquí para restaurar) --</option>
                 <% telegram_channels.each do |ch| %>
                   <option value="<%= ch.destination %>" <%= "selected" if domain.telegram_chat_id == ch.destination || (domain.telegram_chat_id.blank? && ch.is_default?) %>>
                     <%= ch.name %> (<%= ch.destination %>) <%= "★ Predeterminado" if ch.is_default? %>
