@@ -42,87 +42,135 @@
 
   <%# Bloque 3: Notificaciones %>
   <div class="bg-[#261c18]/90 border border-amber-500/20 rounded-2xl p-6 backdrop-blur-md space-y-5 shadow-md">
-    <div class="flex items-center justify-between border-b border-amber-500/20 pb-3"><h3 class="text-sm font-bold text-white">Canales de Alerta</h3><%= link_to "Gestionar Canales →", notification_channels_path, class: "text-xs font-semibold text-amber-400 hover:text-amber-300" %></div>
+    <div class="flex items-center justify-between border-b border-amber-500/20 pb-3">
+      <div>
+        <h3 class="text-sm font-bold text-white uppercase tracking-wider">Canales de Alerta</h3>
+        <p class="text-xs text-amber-200/60 mt-0.5">Configura cómo y dónde recibir avisos automáticos ante caídas o lentitud.</p>
+      </div>
+      <%= link_to "Gestionar Canales →", notification_channels_path, class: "text-xs font-semibold text-amber-400 hover:text-amber-300" %>
+    </div>
 
     <div class="space-y-4">
       <%# Email %>
-<div class="p-3.5 rounded-xl bg-[#1c1512] border border-amber-500/20 space-y-3">
-  <label class="flex items-center gap-3 cursor-pointer">
-    <%= f.check_box :notify_email, class: "h-4 w-4 rounded border-amber-500 text-amber-500 focus:ring-amber-400" %>
-    <div>
-      <span class="text-xs font-bold text-white block">Notificación por Email</span>
-      <span class="text-[11px] text-amber-200/60 block">Recibe un correo ante caídas o latencias excesivas.</span>
-    </div>
-  </label>
-  <div class="pl-7 space-y-2">
-    <% if current_user&.notification_channels&.by_type(:email)&.any? %>
-      <div>
-        <label class="block text-[11px] font-semibold text-amber-300/80 mb-1">Seleccionar Canal Guardado:</label>
-        <select onchange="document.getElementById('domain_notify_email_address').value = this.value" class="w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
-          <option value="">Canal predeterminado del sistema</option>
-          <% current_user.notification_channels.by_type(:email).each do |ch| %>
-            <option value="<%= ch.destination %>" <%= "selected" if domain.notify_email_address == ch.destination %>>
-              <%= ch.name %> (<%= ch.destination %>) <%= "★ Predeterminado" if ch.is_default? %>
-            </option>
+      <% default_email_ch = current_user&.notification_channels&.by_type(:email)&.find_by(is_default: true) || current_user&.notification_channels&.by_type(:email)&.first %>
+      <% email_channels = current_user&.notification_channels&.by_type(:email)&.order(is_default: :desc) %>
+      <div class="p-3.5 rounded-xl bg-[#1c1512] border border-amber-500/20 space-y-3">
+        <label class="flex items-center gap-3 cursor-pointer">
+          <%= f.check_box :notify_email, class: "h-4 w-4 rounded border-amber-500 text-amber-500 focus:ring-amber-400",
+                onchange: "if (this.checked && !document.getElementById('domain_notify_email_address').value && '#{default_email_ch&.destination}') { document.getElementById('domain_notify_email_address').value = '#{default_email_ch&.destination}'; var s = document.getElementById('domain_select_email'); if(s) s.value = '#{default_email_ch&.destination}'; }" %>
+          <div>
+            <span class="text-xs font-bold text-white block">Notificación por Email</span>
+            <span class="text-[11px] text-amber-200/60 block">Recibe un correo ante caídas o latencias excesivas.</span>
+          </div>
+        </label>
+        <div class="pl-7 space-y-2">
+          <% if email_channels&.any? %>
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-[11px] font-semibold text-amber-300/80">Seleccionar Canal Guardado:</label>
+                <%= link_to "+ Añadir canal", notification_channels_path, target: "_blank", class: "text-[10px] text-amber-400 hover:text-amber-200 underline" %>
+              </div>
+              <select id="domain_select_email" onchange="document.getElementById('domain_notify_email_address').value = this.value" class="w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
+                <% email_channels.each do |ch| %>
+                  <option value="<%= ch.destination %>" <%= "selected" if domain.notify_email_address == ch.destination || (domain.notify_email_address.blank? && ch.is_default?) %>>
+                    <%= ch.name %> (<%= ch.destination %>) <%= "★ Predeterminado" if ch.is_default? %>
+                  </option>
+                <% end %>
+              </select>
+            </div>
+          <% else %>
+            <div class="flex justify-end">
+              <%= link_to "+ Añadir canal de correo", notification_channels_path, target: "_blank", class: "text-[10px] text-amber-400 hover:text-amber-200 underline" %>
+            </div>
           <% end %>
-        </select>
+          <div>
+            <label class="block text-[11px] font-semibold text-amber-300/60 mb-1">Destino específico (opcional):</label>
+            <%= f.text_field :notify_email_address, id: "domain_notify_email_address", value: (domain.notify_email_address.presence || (domain.new_record? ? default_email_ch&.destination : nil)), placeholder: "ej. usuario@ejemplo.com", class: "w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white placeholder-amber-200/30 focus:outline-none font-mono" %>
+          </div>
+        </div>
       </div>
-    <% end %>
-    <div>
-      <label class="block text-[11px] font-semibold text-amber-300/60 mb-1">Destino específico (opcional):</label>
-      <%= f.text_field :notify_email_address, id: "domain_notify_email_address", placeholder: "Dejar en blanco para usar predeterminado", class: "w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white placeholder-amber-200/30 focus:outline-none font-mono" %>
-    </div>
-  </div>
-</div>
 
       <%# Discord %>
-      <div class="p-3 rounded-xl bg-[#1c1512] border border-amber-500/20 space-y-2">
+      <% default_discord_ch = current_user&.notification_channels&.by_type(:discord)&.find_by(is_default: true) || current_user&.notification_channels&.by_type(:discord)&.first %>
+      <% discord_channels = current_user&.notification_channels&.by_type(:discord)&.order(is_default: :desc) %>
+      <div class="p-3.5 rounded-xl bg-[#1c1512] border border-amber-500/20 space-y-2">
         <label class="flex items-center gap-3 cursor-pointer">
-          <%= f.check_box :notify_discord, class: "h-4 w-4 rounded border-amber-500 text-amber-500 focus:ring-amber-400" %>
+          <%= f.check_box :notify_discord, class: "h-4 w-4 rounded border-amber-500 text-amber-500 focus:ring-amber-400",
+                onchange: "if (this.checked && !document.getElementById('domain_discord_webhook_url').value && '#{default_discord_ch&.destination}') { document.getElementById('domain_discord_webhook_url').value = '#{default_discord_ch&.destination}'; var s = document.getElementById('domain_select_discord'); if(s) s.value = '#{default_discord_ch&.destination}'; }" %>
           <div>
             <span class="text-xs font-bold text-white block">Alertas por Discord</span>
             <span class="text-[11px] text-amber-200/60 block">Envío automático a un canal mediante Webhook.</span>
           </div>
         </label>
-        <div>
-          <% if current_user&.notification_channels&.by_type(:discord)&.any? %>
-  <div>
-    <label class="block text-[11px] font-semibold text-amber-300/80 mb-1">Seleccionar Webhook Guardado:</label>
-    <select onchange="document.getElementById('domain_discord_webhook_url').value = this.value" class="w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
-      <option value="">Canal predeterminado del sistema</option>
-      <% current_user.notification_channels.by_type(:discord).each do |ch| %>
-        <option value="<%= ch.destination %>" <%= "selected" if domain.discord_webhook_url == ch.destination %>><%= ch.name %> <%= "★ Predeterminado" if ch.is_default? %></option>
-      <% end %>
-    </select>
-  </div>
-<% end %>
-        <%= f.text_field :discord_webhook_url, id: "domain_discord_webhook_url", placeholder: "https://discord.com/api/webhooks/...", class: "w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white placeholder-amber-200/30 focus:outline-none font-mono mt-1" %>
+        <div class="pl-7 space-y-2">
+          <% if discord_channels&.any? %>
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-[11px] font-semibold text-amber-300/80">Seleccionar Webhook Guardado:</label>
+                <%= link_to "+ Añadir canal", notification_channels_path, target: "_blank", class: "text-[10px] text-amber-400 hover:text-amber-200 underline" %>
+              </div>
+              <select id="domain_select_discord" onchange="document.getElementById('domain_discord_webhook_url').value = this.value" class="w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
+                <% discord_channels.each do |ch| %>
+                  <option value="<%= ch.destination %>" <%= "selected" if domain.discord_webhook_url == ch.destination || (domain.discord_webhook_url.blank? && ch.is_default?) %>>
+                    <%= ch.name %> <%= "★ Predeterminado" if ch.is_default? %>
+                  </option>
+                <% end %>
+              </select>
+            </div>
+          <% else %>
+            <div class="flex justify-end">
+              <%= link_to "+ Añadir webhook Discord", notification_channels_path, target: "_blank", class: "text-[10px] text-amber-400 hover:text-amber-200 underline" %>
+            </div>
+          <% end %>
+          <div>
+            <label class="block text-[11px] font-semibold text-amber-300/60 mb-1">Webhook URL:</label>
+            <%= f.text_field :discord_webhook_url, id: "domain_discord_webhook_url", value: (domain.discord_webhook_url.presence || (domain.new_record? ? default_discord_ch&.destination : nil)), placeholder: "https://discord.com/api/webhooks/...", class: "w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white placeholder-amber-200/30 focus:outline-none font-mono" %>
+          </div>
         </div>
       </div>
 
       <%# Telegram %>
-      <div class="p-3 rounded-xl bg-[#1c1512] border border-amber-500/20 space-y-2">
+      <% default_telegram_ch = current_user&.notification_channels&.by_type(:telegram)&.find_by(is_default: true) || current_user&.notification_channels&.by_type(:telegram)&.first %>
+      <% telegram_channels = current_user&.notification_channels&.by_type(:telegram)&.order(is_default: :desc) %>
+      <div class="p-3.5 rounded-xl bg-[#1c1512] border border-amber-500/20 space-y-2">
         <label class="flex items-center gap-3 cursor-pointer">
-          <%= f.check_box :notify_telegram, class: "h-4 w-4 rounded border-amber-500 text-amber-500 focus:ring-amber-400" %>
+          <%= f.check_box :notify_telegram, class: "h-4 w-4 rounded border-amber-500 text-amber-500 focus:ring-amber-400",
+                onchange: "if (this.checked && !document.getElementById('domain_telegram_chat_id').value && '#{default_telegram_ch&.destination}') { document.getElementById('domain_telegram_chat_id').value = '#{default_telegram_ch&.destination}'; var s = document.getElementById('domain_select_telegram'); if(s) s.value = '#{default_telegram_ch&.destination}'; }" %>
           <div>
             <span class="text-xs font-bold text-white block">Alertas por Telegram</span>
             <span class="text-[11px] text-amber-200/60 block">Notificaciones directas vía Bot de Telegram.</span>
           </div>
         </label>
-        <% if current_user&.notification_channels&.by_type(:telegram)&.any? %>
-  <div class="mb-3">
-    <label class="block text-[11px] font-semibold text-amber-300/80 mb-1">Seleccionar Chat Guardado:</label>
-    <select onchange="document.getElementById('domain_telegram_chat_id').value = this.value" class="w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
-      <option value="">Chat predeterminado del sistema</option>
-      <% current_user.notification_channels.by_type(:telegram).each do |ch| %>
-        <option value="<%= ch.destination %>" <%= "selected" if domain.telegram_chat_id == ch.destination %>><%= ch.name %> (<%= ch.destination %>) <%= "★ Predeterminado" if ch.is_default? %></option>
-      <% end %>
-    </select>
-  </div>
-<% end %>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
-          <%= f.text_field :telegram_bot_token, placeholder: "Bot Token (ej. 123456:ABC...)", class: "w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white placeholder-amber-200/30 focus:outline-none font-mono" %>
-          <%= f.text_field :telegram_chat_id, id: "domain_telegram_chat_id", placeholder: "Chat ID (ej. 987654321)", class: "w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white placeholder-amber-200/30 focus:outline-none font-mono" %>
+        <div class="pl-7 space-y-2">
+          <% if telegram_channels&.any? %>
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-[11px] font-semibold text-amber-300/80">Seleccionar Chat Guardado:</label>
+                <%= link_to "+ Añadir canal", notification_channels_path, target: "_blank", class: "text-[10px] text-amber-400 hover:text-amber-200 underline" %>
+              </div>
+              <select id="domain_select_telegram" onchange="document.getElementById('domain_telegram_chat_id').value = this.value" class="w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
+                <% telegram_channels.each do |ch| %>
+                  <option value="<%= ch.destination %>" <%= "selected" if domain.telegram_chat_id == ch.destination || (domain.telegram_chat_id.blank? && ch.is_default?) %>>
+                    <%= ch.name %> (<%= ch.destination %>) <%= "★ Predeterminado" if ch.is_default? %>
+                  </option>
+                <% end %>
+              </select>
+            </div>
+          <% else %>
+            <div class="flex justify-end">
+              <%= link_to "+ Añadir chat Telegram", notification_channels_path, target: "_blank", class: "text-[10px] text-amber-400 hover:text-amber-200 underline" %>
+            </div>
+          <% end %>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-semibold text-amber-300/60 mb-1">Bot Token (opcional):</label>
+              <%= f.text_field :telegram_bot_token, placeholder: "ej. 123456:ABC...", class: "w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white placeholder-amber-200/30 focus:outline-none font-mono" %>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-amber-300/60 mb-1">Chat ID:</label>
+              <%= f.text_field :telegram_chat_id, id: "domain_telegram_chat_id", value: (domain.telegram_chat_id.presence || (domain.new_record? ? default_telegram_ch&.destination : nil)), placeholder: "ej. 987654321", class: "w-full bg-[#140e0c] border border-amber-500/25 rounded-xl px-3 py-1.5 text-xs text-white placeholder-amber-200/30 focus:outline-none font-mono" %>
+            </div>
+          </div>
         </div>
       </div>
     </div>
