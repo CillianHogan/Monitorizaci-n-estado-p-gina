@@ -26,8 +26,13 @@
           <label class="block text-xs font-bold uppercase tracking-wider text-amber-300/80 mb-1">Tipo de Canal</label>
           <select name="notification_channel[channel_type]" class="w-full px-3 py-2 rounded-xl bg-[#0d0905] border border-amber-800/50 text-white text-sm focus:border-amber-400 focus:outline-none">
             <option value="email">Correo Electrónico</option>
-            <option value="discord">Discord (Webhook URL)</option>
-            <option value="telegram">Telegram (Chat ID)</option>
+            <% if current_user.pro? %>
+              <option value="discord">Discord (Webhook URL)</option>
+              <option value="telegram">Telegram (Chat ID)</option>
+            <% else %>
+              <option value="discord" disabled class="text-stone-500">Discord (Exclusivo Plan PRO)</option>
+              <option value="telegram" disabled class="text-stone-500">Telegram (Exclusivo Plan PRO)</option>
+            <% end %>
           </select>
         </div>
 

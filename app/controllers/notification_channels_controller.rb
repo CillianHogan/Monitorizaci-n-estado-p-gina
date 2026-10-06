@@ -11,6 +11,11 @@ class NotificationChannelsController < ApplicationController
 
   def create
     @channel = current_user.notification_channels.build(channel_params)
+    if @channel.channel_type.in?(%w[discord telegram]) && !current_user.pro?
+      redirect_to notification_channels_path, alert: "Los canales de Discord y Telegram están reservados exclusivamente para el Plan PRO."
+      return
+    end
+
     if @channel.save
       redirect_to notification_channels_path, notice: "Canal agregado con éxito."
     else

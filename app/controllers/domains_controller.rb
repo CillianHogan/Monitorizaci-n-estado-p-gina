@@ -60,6 +60,10 @@ end
 
 
   def check_status
+    unless current_user.pro?
+      redirect_to @domain, alert: "El chequeo manual instantáneo es una función exclusiva del Plan PRO." and return
+    end
+
     @domain.check_status!
     redirect_to @domain, notice: "Estado de '#{@domain.name}' verificado en tiempo real."
   end
