@@ -29,7 +29,7 @@ class User < ApplicationRecord
   end
 
   def pro?
-    admin? || manager?
+    admin? || manager? || role == "pro"
   end
 
   def role?(requested_role)
@@ -38,11 +38,11 @@ class User < ApplicationRecord
 
   # Límites de monitores según plan/rol
   def domain_limit
-    (admin? || manager?) ? 50 : 3
+    pro? ? 50 : 3
   end
 
   def api_endpoint_limit
-    (admin? || manager?) ? 50 : 3
+    pro? ? 50 : 3
   end
 
   def can_create_domain?
