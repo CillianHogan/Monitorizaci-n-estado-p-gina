@@ -32,8 +32,8 @@ class CheckoutsController < ApplicationController
       metadata: {
         user_id: current_user.id.to_s
       },
-      success_url: checkout_success_url + "?session_id={CHECKOUT_SESSION_ID}",
-      cancel_url: checkout_cancel_url
+      success_url: success_checkout_url + "?session_id={CHECKOUT_SESSION_ID}",
+      cancel_url: cancel_checkout_url
     )
 
     redirect_to session.url, allow_other_host: true, status: :see_other
