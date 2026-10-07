@@ -14,7 +14,7 @@ class CheckoutsController < ApplicationController
           currency: "eur",
           product_data: {
             name: "Plan PRO - Domain Monitor",
-            description: "Monitorizacion avanzada, hasta 50 dominios y alertas por Discord/Telegram"
+            description: "Monitorización avanzada, hasta 50 dominios y alertas por Discord/Telegram"
           },
           unit_amount: 900,
           recurring: { interval: "month" }
@@ -23,9 +23,8 @@ class CheckoutsController < ApplicationController
       }]
     end
 
-    session = Stripe::Checkout::Session.create(
+    session_params = {
       mode: "subscription",
-      payment_method_types: ["card"],
       line_items: line_items,
       customer_email: current_user.email,
       client_reference_id: current_user.id.to_s,
@@ -34,46 +33,68 @@ class CheckoutsController < ApplicationController
       },
       success_url: success_checkout_url + "?session_id={CHECKOUT_SESSION_ID}",
       cancel_url: cancel_checkout_url
-    )
+    }
+
+    # Si el usuario ya tiene un customer_id en Stripe, lo reutilizamos
+    if current_user.stripe_customer_id.present?
+      session_params.delete(:customer_email)
+      session_params[:customer] = current_user.stripe_customer_id
+    end
+
+    session = Stripe::Checkout::Session.create(session_params)
 
     redirect_to session.url, allow_other_host: true, status: :see_other
   rescue Stripe::StripeError => e
-    redirect_to root_path, alert: "Error al iniciar el proceso de pago: #{e.message}"
+    Rails.logger.error "[Stripe Checkout Error]: #{e.message}"
+    redirect_to root_path, alert: "No se pudo iniciar el proceso de pago seguro. Por favor, inténtalo de nuevo en unos instantes."
+  rescue StandardError => e
+    Rails.logger.error "[Checkout Error]: #{e.message}"
+    redirect_to root_path, alert: "Ocurrió un error inesperado al conectar con la pasarela de pago."
   end
 
   def success
-    if params[:session_id].present?
-      begin
-        session = Stripe::Checkout::Session.retrieve(params[:session_id])
-        if session.client_reference_id == current_user.id.to_s || session.metadata&.user_id == current_user.id.to_s
-          current_user.update(
-            role: :pro,
-            stripe_customer_id: session.customer,
-            stripe_subscription_id: session.subscription
-          )
-        end
-      rescue Stripe::StripeError => e
-        Rails.logger.error("Error retrieving checkout session: #{e.message}")
-      end
-    end
+    session_id = params[:session_id]
 
-    redirect_to root_path, notice: "Enhorabuena, te has suscrito con exito al Plan PRO."
+    if session_id.present?
+      stripe_session = Stripe::Checkout::Session.retrieve(session_id)
+
+      if stripe_session.customer.present?
+        current_user.update_columns(
+          stripe_customer_id: stripe_session.customer,
+          stripe_subscription_id: stripe_session.subscription,
+          role: :pro
+        )
+      else
+        current_user.update_column(:role, :pro)
+      end
+
+      redirect_to domains_path, notice: "¡Enhorabuena! Tu cuenta ha sido actualizada al Plan PRO con éxito."
+    else
+      redirect_to domains_path, notice: "Suscripción activada con éxito."
+    end
+  rescue Stripe::StripeError => e
+    Rails.logger.error "[Stripe Success Callback Error]: #{e.message}"
+    redirect_to domains_path, alert: "El pago se procesó, pero hubo un retraso sincronizando con Stripe. Tu plan se actualizará en breve."
   end
 
   def cancel
-    redirect_to root_path, alert: "El proceso de suscripcion fue cancelado."
+    redirect_to root_path, alert: "El proceso de suscripción al Plan PRO fue cancelado. No se ha realizado ningún cobro."
   end
 
   def portal
-    return redirect_to root_path, alert: "No tienes una suscripcion activa." unless current_user.stripe_customer_id.present?
+    unless current_user.stripe_customer_id.present?
+      redirect_to domains_path, alert: "No tienes una suscripción activa vinculada para gestionar en el portal."
+      return
+    end
 
     portal_session = Stripe::BillingPortal::Session.create(
       customer: current_user.stripe_customer_id,
-      return_url: root_url
+      return_url: domains_url
     )
 
     redirect_to portal_session.url, allow_other_host: true, status: :see_other
   rescue Stripe::StripeError => e
-    redirect_to root_path, alert: "Error al abrir el portal de facturacion: #{e.message}"
+    Rails.logger.error "[Stripe Portal Error]: #{e.message}"
+    redirect_to domains_path, alert: "No se pudo abrir el portal de facturación en este momento."
   end
 end
