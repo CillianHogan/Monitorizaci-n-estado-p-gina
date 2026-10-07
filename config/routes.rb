@@ -28,4 +28,12 @@ Rails.application.routes.draw do
 
   # Reveal health status on /up
   get 'up' => 'rails/health#show', as: :rails_health_check
+
+  # Pasarela de pago Stripe (Modo Test)
+  resource :checkout, only: [:create] do
+    get :success
+    get :cancel
+    get :portal
+  end
+  post "webhooks/stripe", to: "webhooks#stripe"
 end

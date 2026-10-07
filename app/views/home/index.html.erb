@@ -283,13 +283,20 @@
         <div>
           <% if user_signed_in? %>
             <% if is_pro_active %>
-              <%= link_to domains_path, class: "block w-full py-3.5 rounded-xl text-center font-black text-xs text-stone-950 bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-400 hover:scale-[1.01] shadow-lg shadow-emerald-500/20 transition cursor-pointer" do %>
-                <span>✓ Plan PRO Activo — Ir al Panel (<%= current_user.domains.count %>/50)</span>
-              <% end %>
+              <div class="space-y-2">
+                <%= link_to domains_path, class: "block w-full py-3 rounded-xl text-center font-black text-xs text-stone-950 bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-400 hover:scale-[1.01] shadow-lg shadow-emerald-500/20 transition cursor-pointer" do %>
+                  <span>✓ Plan PRO Activo — Ir al Panel (<%= current_user.domains.count %>/50)</span>
+                <% end %>
+                <% if current_user.stripe_customer_id.present? %>
+                  <%= link_to portal_checkout_path, class: "block w-full py-2 text-center text-[11px] font-medium text-stone-400 hover:text-amber-300 transition" do %>
+                    Gestionar facturación / Descargar facturas →
+                  <% end %>
+                <% end %>
+              </div>
             <% else %>
-              <button type="button" class="w-full py-3.5 rounded-xl font-black text-xs text-stone-950 bg-gradient-to-r from-amber-400 via-amber-300 to-orange-400 hover:from-amber-300 hover:to-orange-300 shadow-lg shadow-amber-500/25 transition cursor-pointer">
-                Actualizar a PRO (9,99 €/mes)
-              </button>
+              <%= button_to checkout_path, method: :post, data: { turbo: false }, class: "w-full py-3.5 rounded-xl font-black text-xs text-stone-950 bg-gradient-to-r from-amber-400 via-amber-300 to-orange-400 hover:from-amber-300 hover:to-orange-300 shadow-lg shadow-amber-500/25 transition cursor-pointer text-center" do %>
+                Actualizar a PRO (9,00 €/mes)
+              <% end %>
             <% end %>
           <% else %>
             <%= link_to "Empezar prueba PRO", new_user_registration_path, class: "block w-full py-3.5 rounded-xl text-center font-black text-xs text-stone-950 bg-gradient-to-r from-amber-400 via-amber-300 to-orange-400 hover:from-amber-300 hover:to-orange-300 shadow-lg shadow-amber-500/25 transition" %>
