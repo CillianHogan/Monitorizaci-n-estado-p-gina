@@ -1,0 +1,25 @@
+es:
+  activerecord:
+    errors:
+      messages:
+        record_invalid: 'La validación falló: %{errors}'
+        taken: "ya está en uso"
+        blank: "no puede estar en blanco"
+        too_short: "es demasiado corto (mínimo %{count} caracteres)"
+        too_long: "es demasiado largo (máximo %{count} caracteres)"
+        invalid: "no es válido"
+        confirmation: "no coincide con la confirmación"
+    models:
+      user:
+        attributes:
+          email:
+            taken: "ya está registrado en el sistema"
+  errors:
+    format: "%{attribute} %{message}"
+    messages:
+      not_saved:
+        one: "1 error impidió guardar este %{resource}:"
+        other: "%{count} errores impidieron guardar este %{resource}:"
+      taken: "ya está registrado"
+      blank: "no puede estar en blanco"
+      invalid: "no es válido"
