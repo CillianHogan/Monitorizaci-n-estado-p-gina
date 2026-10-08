@@ -1,25 +1,20 @@
 es:
-  activerecord:
-    errors:
-      messages:
-        record_invalid: "La validación falló: %{errors}"
-        taken: "ya está registrado en el sistema"
-        blank: "no puede estar en blanco"
-        too_short: "es demasiado corto (mínimo %{count} caracteres)"
-        too_long: "es demasiado largo (máximo %{count} caracteres)"
-        invalid: "no es válido"
-        confirmation: "no coincide con la confirmación"
-    models:
-      user:
-        attributes:
-          email:
-            taken: "ya está registrado en el sistema"
   errors:
     format: "%{attribute} %{message}"
     messages:
       not_saved:
         one: "1 error impidió guardar este %{resource}:"
         other: "%{count} errores impidieron guardar este %{resource}:"
-      taken: "ya está registrado"
+      taken: "ya está en uso"
       blank: "no puede estar en blanco"
-      invalid: "no es válido"
+      too_short:
+        one: "es demasiado corto (1 carácter mínimo)"
+        other: "es demasiado corto (%{count} caracteres mínimo)"
+      confirmation: "no coincide"
+  activerecord:
+    errors:
+      messages:
+        record_invalid: "La validación falló: %{errors}"
+        restrict_dependent_destroy:
+          has_one: "No se puede eliminar el registro porque existe un %{record} dependiente"
+          has_many: "No se puede eliminar el registro porque existen %{record} dependientes"
