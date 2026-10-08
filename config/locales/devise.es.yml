@@ -36,7 +36,7 @@ es:
       signed_up: "¡Bienvenido! Has creado tu cuenta con éxito."
       signed_up_but_inactive: "Te has registrado con éxito, pero tu cuenta no está activada todavía."
       signed_up_but_locked: "Te has registrado con éxito, pero tu cuenta está bloqueada."
-      signed_up_but_unconfirmed: "Se ha enviado un mensaje con un enlace de confirmación a tu correo electrónico."
+      signed_up_but_unconfirmed: "Te has registrado correctamente. Te hemos enviado un enlace de confirmación por correo electrónico. Por favor, revisa tu bandeja de entrada y verifica tu cuenta antes de iniciar sesión."
       update_needs_confirmation: "Has actualizado tu cuenta con éxito, pero necesitamos verificar tu nueva dirección de correo."
       updated: "Tu cuenta ha sido actualizada con éxito."
       updated_but_not_signed_in: "Tu cuenta se ha actualizado correctamente, pero debes iniciar sesión nuevamente."
