@@ -9,7 +9,7 @@
       <p class="text-xs text-amber-200/60">Comienza a monitorizar tus dominios y APIs hoy mismo.</p>
     </div>
 
-    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "mt-6 space-y-5" }) do |f| %>
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), data: { turbo: false }, html: { class: "mt-6 space-y-5" }) do |f| %>
       <%= render "devise/shared/error_messages", resource: resource %>
 
       <div class="space-y-1.5 text-left">
