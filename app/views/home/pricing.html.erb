@@ -1,0 +1,62 @@
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div class="text-center max-w-3xl mx-auto mb-16">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-300 border border-amber-500/20 mb-4">
+      <span>PLANES Y TARIFAS</span>
+    </div>
+    <h1 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4">Escala tu monitorización sin límites</h1>
+    <p class="text-stone-300 text-sm sm:text-base">Comienza gratis y desbloquea el máximo rendimiento con alertas prioritarias y comprobaciones en tiempo real para todos tus proyectos.</p>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
+    <!-- Plan Gratuito -->
+    <div class="flex flex-col justify-between rounded-3xl bg-[#1c1410] border border-amber-500/20 p-8 shadow-xl">
+      <div>
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-bold text-white">Plan Gratuito</h3>
+          <span class="text-xs px-2.5 py-1 rounded-full bg-stone-800 text-stone-300 border border-stone-700 font-medium">Básico</span>
+        </div>
+        <p class="text-xs text-stone-400 mb-6">Ideal para pequeños proyectos y pruebas personales.</p>
+        <div class="flex items-baseline gap-1 mb-8">
+          <span class="text-4xl font-extrabold text-white">0€</span>
+          <span class="text-stone-400 text-sm">/ mes</span>
+        </div>
+        <ul class="space-y-4 text-xs sm:text-sm text-stone-300">
+          <li class="flex items-center gap-3"><span>✔ Hasta <strong>3 monitores</strong> (Dominios y APIs)</span></li>
+          <li class="flex items-center gap-3"><span>✔ Intervalos de verificación cada 15 minutos</span></li>
+          <li class="flex items-center gap-3"><span>✔ Supervisión básica de certificados SSL</span></li>
+          <li class="flex items-center gap-3 text-stone-500"><span>✖ Sin comprobaciones manuales instantáneas</span></li>
+          <li class="flex items-center gap-3 text-stone-500"><span>✖ Sin alertas prioritarias (Telegram/Discord)</span></li>
+        </ul>
+      </div>
+      <div class="mt-8 pt-6 border-t border-amber-500/10">
+        <span class="block w-full text-center py-2.5 px-4 rounded-xl text-xs font-semibold text-stone-400 bg-stone-900 border border-stone-800">Plan Actual</span>
+      </div>
+    </div>
+    <!-- Plan PRO -->
+    <div class="relative flex flex-col justify-between rounded-3xl bg-gradient-to-b from-[#2a1d15] to-[#1c1410] border-2 border-amber-500/60 p-8 shadow-2xl shadow-amber-500/10">
+      <div class="absolute -top-3.5 right-6 px-3 py-1 rounded-full text-[11px] font-black tracking-wide bg-gradient-to-r from-amber-400 to-orange-400 text-stone-950 uppercase shadow-md">Recomendado</div>
+      <div>
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-bold text-amber-300">Plan PRO</h3>
+          <span class="text-xs px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-200 border border-amber-500/30 font-semibold">Ilimitado</span>
+        </div>
+        <p class="text-xs text-amber-100/70 mb-6">Para desarrolladores y empresas que requieren máxima disponibilidad.</p>
+        <div class="flex items-baseline gap-1 mb-8">
+          <span class="text-4xl font-extrabold text-white">9€</span>
+          <span class="text-stone-400 text-sm">/ mes</span>
+        </div>
+        <ul class="space-y-4 text-xs sm:text-sm text-amber-100/90">
+          <li class="flex items-center gap-3"><span>⚡ Hasta <strong>50 monitores</strong> (Dominios y APIs)</span></li>
+          <li class="flex items-center gap-3"><span>⚡ Verificación cada <strong>1 minuto</strong></span></li>
+          <li class="flex items-center gap-3"><span>⚡ Comprobaciones manuales instantáneas</span></li>
+          <li class="flex items-center gap-3"><span>⚡ Alertas prioritarias (Telegram, Discord, Webhooks)</span></li>
+          <li class="flex items-center gap-3"><span>⚡ Filtros avanzados anti-falsos positivos</span></li>
+        </ul>
+      </div>
+      <div class="mt-8 pt-6 border-t border-amber-500/20">
+        <%= button_to checkout_path, method: :post, data: { turbo: false }, class: "w-full py-3 px-6 rounded-xl font-black text-sm tracking-wide text-stone-950 bg-gradient-to-r from-amber-400 via-amber-300 to-orange-400 hover:from-amber-300 hover:to-orange-300 transition-all shadow-lg shadow-amber-500/25 hover:scale-[1.02] flex items-center justify-center gap-2 cursor-pointer" do %>
+          <span>Suscribirse al Plan PRO</span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

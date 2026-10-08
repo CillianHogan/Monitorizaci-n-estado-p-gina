@@ -21,6 +21,7 @@ Rails.application.routes.draw do
     end
   end
   root 'home#index'
+  get 'pricing', to: 'home#pricing', as: :pricing
 
   # Páginas de estado públicas
   get 'status', to: 'public_status#index', as: :status
