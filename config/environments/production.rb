@@ -75,7 +75,7 @@ Rails.application.configure do
   }
 
   # Enable email delivery errors
-  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.raise_delivery_errors = false
   config.action_mailer.perform_deliveries = true
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
