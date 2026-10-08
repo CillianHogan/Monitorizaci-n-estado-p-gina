@@ -2,8 +2,8 @@ es:
   activerecord:
     errors:
       messages:
-        record_invalid: 'La validación falló: %{errors}'
-        taken: "ya está en uso"
+        record_invalid: "La validación falló: %{errors}"
+        taken: "ya está registrado en el sistema"
         blank: "no puede estar en blanco"
         too_short: "es demasiado corto (mínimo %{count} caracteres)"
         too_long: "es demasiado largo (máximo %{count} caracteres)"
