@@ -1,16 +1,16 @@
 <% if resource.errors.any? %>
-  <div id="error_explanation" data-turbo-cache="false" class="rounded-xl border border-red-500/40 bg-red-950/40 p-4 mb-6">
+  <div id="error_explanation" class="rounded-xl border border-red-500/40 bg-red-950/40 p-4 mb-6">
     <div class="flex items-start gap-3">
       <svg class="w-5 h-5 text-red-400 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
       </svg>
       <div>
         <h3 class="text-sm font-bold text-red-200">
-          <%= resource.errors.count == 1 ? "1 error impidió guardar este registro:" : "#{resource.errors.count} errores impidieron guardar este registro:" %>
+          No se pudo completar el registro:
         </h3>
         <ul class="mt-2 text-xs text-red-300/90 list-disc list-inside space-y-1">
-          <% resource.errors.full_messages.each do |message| %>
-            <li><%= message %></li>
+          <% resource.errors.each do |error| %>
+            <li><%= error.attribute.to_s.humanize %> <%= error.message %></li>
           <% end %>
         </ul>
       </div>
