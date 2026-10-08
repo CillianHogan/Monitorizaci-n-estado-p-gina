@@ -87,22 +87,17 @@
           <%# Área de Usuario %>
           <div class="flex items-center gap-3">
             <% if user_signed_in? %>
-              <%# Email estático informativo %>
-              <div class="hidden sm:flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-xl cursor-default select-none">
-                <div class="h-2 w-2 rounded-full bg-emerald-400"></div>
-                <span class="text-xs font-medium text-amber-200/90"><%= current_user.email %></span>
-              </div>
-
-              <%# Menú desplegable Mi Perfil %>
+              <%# Menú desplegable Usuario (Email) %>
               <div class="relative" data-controller="dropdown">
-                <button type="button" data-action="click->dropdown#toggle" class="flex items-center gap-1.5 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-200 hover:text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer">
-                  <span>Mi Perfil</span>
-                  <svg class="w-3.5 h-3.5 text-amber-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <button type="button" data-action="click->dropdown#toggle" class="flex items-center gap-2 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-200 hover:text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer">
+                  <div class="h-2 w-2 rounded-full bg-emerald-400"></div>
+                  <span><%= current_user.email %></span>
+                  <svg class="w-3.5 h-3.5 text-amber-300 ml-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
 
-                <div data-dropdown-target="menu" class="hidden absolute right-0 mt-2 w-48 rounded-xl bg-[#231a16] border border-amber-500/30 shadow-2xl py-1.5 z-50 backdrop-blur-xl">
+                <div data-dropdown-target="menu" class="hidden absolute right-0 mt-2 w-52 rounded-xl bg-[#231a16] border border-amber-500/30 shadow-2xl py-1.5 z-50 backdrop-blur-xl">
                   <%= link_to notification_channels_path, class: "flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-amber-100 hover:text-white hover:bg-amber-500/20 transition-colors" do %>
                     <svg class="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -116,15 +111,17 @@
                     </svg>
                     <span>Mi Cuenta</span>
                   <% end %>
+
+                  <div class="border-t border-amber-500/15 my-1"></div>
+
+                  <%= button_to destroy_user_session_path, method: :delete, class: "w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-rose-300 hover:text-rose-200 hover:bg-rose-500/20 transition-colors text-left cursor-pointer" do %>
+                    <svg class="w-4 h-4 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span>Cerrar sesión</span>
+                  <% end %>
                 </div>
               </div>
-
-              <%= button_to destroy_user_session_path, method: :delete, class: "inline-flex items-center gap-1.5 text-xs font-medium text-amber-200/80 hover:text-white px-3 py-1.5 rounded-lg border border-amber-500/20 bg-amber-500/10 hover:bg-rose-500/20 hover:border-rose-500/30 hover:text-rose-300 transition-all cursor-pointer" do %>
-                <svg class="w-3.5 h-3.5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                <span>Salir</span>
-              <% end %>
             <% else %>
               <%= link_to "Iniciar Sesión", new_user_session_path, class: "text-xs font-semibold text-amber-200 hover:text-white px-3 py-1.5 transition-colors" %>
               <%= link_to "Comenzar", new_user_registration_path, class: "inline-flex items-center text-xs font-bold text-stone-950 bg-gradient-to-r from-amber-400 via-amber-300 to-orange-400 hover:from-amber-300 hover:to-orange-300 px-4 py-2 rounded-xl shadow-lg shadow-amber-500/25 transition-all" %>
