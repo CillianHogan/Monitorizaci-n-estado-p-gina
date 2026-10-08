@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Users::RegistrationsController < Devise::RegistrationsController
-  respond_to :html, :turbo_stream
-
   def create
     build_resource(sign_up_params)
 
@@ -21,10 +19,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
     else
       clean_up_passwords resource
       set_minimum_password_length
-      respond_to do |format|
-        format.html { render :new, status: :unprocessable_entity }
-        format.turbo_stream { render :new, status: :unprocessable_entity }
-      end
+      render "devise/registrations/new", status: :unprocessable_entity, formats: [:html]
     end
   end
 
