@@ -22,8 +22,8 @@ Rails.application.routes.draw do
   end
   root 'home#index'
   get 'pricing', to: 'home#pricing', as: :pricing
-
-
+  get 'status', to: 'public_status#index'
+  get 'status/:token', to: 'public_status#show', as: :public_status
 
   # Reveal health status on /up
   get 'up' => 'rails/health#show', as: :rails_health_check
