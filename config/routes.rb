@@ -23,9 +23,7 @@ Rails.application.routes.draw do
   root 'home#index'
   get 'pricing', to: 'home#pricing', as: :pricing
 
-  # Páginas de estado públicas
-  get 'status', to: 'public_status#index', as: :status
-  get 'status/:token', to: 'public_status#show', as: :public_status
+
 
   # Reveal health status on /up
   get 'up' => 'rails/health#show', as: :rails_health_check
