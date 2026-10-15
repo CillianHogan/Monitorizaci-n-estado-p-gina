@@ -27,7 +27,7 @@
 
   <body class="min-h-full flex flex-col bg-stone-950 font-sans antialiased selection:bg-amber-500 selection:text-stone-950">
     <div id="google_translate_element"></div>
-  <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
+    <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
       <div class="absolute -top-[40%] left-[20%] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-amber-600/10 via-orange-600/5 to-transparent blur-3xl"></div>
       <div class="absolute top-[60%] -right-[10%] w-[500px] h-[500px] rounded-full bg-gradient-to-tl from-amber-700/10 via-amber-900/5 to-transparent blur-3xl"></div>
     </div>
@@ -50,7 +50,7 @@
               </span>
             <% end %>
 
-           <!-- Selector de Idioma Persistente -->
+            <!-- Selector de Idioma Persistente -->
             <div class="notranslate flex items-center gap-1.5 text-xs font-bold bg-stone-900/90 border border-amber-500/20 px-2.5 py-1 rounded-lg" translate="no">
               <button type="button" data-action="click->i18n#setEnglish" data-i18n-target="btnEn" class="cursor-pointer text-amber-400 font-bold transition">English</button>
               <span class="text-stone-600">|</span>
@@ -67,15 +67,9 @@
                   <span class="notranslate" translate="no">API Endpoints</span>
                 <% end %>
 
-                <%= link_to notification_channels_path, class: "px-3.5 py-2 text-sm font-semibold rounded-lg transition-all #{current_page?(notification_channels_path) ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/60'}" do %>
-                  <span data-i18n-en="Channels" data-i18n-es="Canales">Channels</span>
-                <% end %>
-
                 <%= link_to pricing_path, class: "px-3.5 py-2 text-sm font-semibold rounded-lg transition-all #{current_page?(pricing_path) ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/60'}" do %>
                   <span data-i18n-en="Pricing" data-i18n-es="Precios">Pricing</span>
                 <% end %>
-
-                
               </div>
             <% end %>
           </div>
@@ -87,10 +81,13 @@
                   <div class="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center font-bold text-xs text-amber-400 notranslate" translate="no">
                     <%= current_user.email[0].upcase %>
                   </div>
-                <span class="text-xs font-medium pr-1 hidden sm:inline notranslate" translate="no"><%= current_user.email %></span>
+                  <span class="text-xs font-medium pr-1 hidden sm:inline notranslate" translate="no"><%= current_user.email %></span>
                 </button>
 
                 <div data-dropdown-target="menu" class="hidden absolute right-0 mt-2 w-48 bg-stone-900 border border-stone-800 rounded-xl shadow-xl py-1 z-50">
+                  <%= link_to notification_channels_path, class: "block px-4 py-2 text-xs text-stone-300 hover:bg-stone-800 hover:text-white" do %>
+                    <span data-i18n-en="Channels" data-i18n-es="Canales">Channels</span>
+                  <% end %>
                   <%= link_to edit_user_registration_path, class: "block px-4 py-2 text-xs text-stone-300 hover:bg-stone-800 hover:text-white" do %>
                     <span data-i18n-en="My Account" data-i18n-es="Mi Cuenta">My Account</span>
                   <% end %>
