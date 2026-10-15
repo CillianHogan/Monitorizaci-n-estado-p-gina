@@ -17,10 +17,17 @@
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+    <style>
+      .goog-te-banner-frame.skiptranslate, .goog-te-gadget-icon, .goog-te-menu-value span:nth-child(3), .goog-te-menu-value span:nth-child(5) { display: none !important; }
+      body { top: 0px !important; }
+      #google_translate_element { display: none !important; }
+      .skiptranslate iframe { display: none !important; }
+    </style>
   </head>
 
   <body class="min-h-full flex flex-col bg-stone-950 font-sans antialiased selection:bg-amber-500 selection:text-stone-950">
-    <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
+    <div id="google_translate_element"></div>
+  <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
       <div class="absolute -top-[40%] left-[20%] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-amber-600/10 via-orange-600/5 to-transparent blur-3xl"></div>
       <div class="absolute top-[60%] -right-[10%] w-[500px] h-[500px] rounded-full bg-gradient-to-tl from-amber-700/10 via-amber-900/5 to-transparent blur-3xl"></div>
     </div>
