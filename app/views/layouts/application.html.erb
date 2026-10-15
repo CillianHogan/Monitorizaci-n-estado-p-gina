@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="h-full bg-stone-950 text-stone-100">
   <head>
-    <title><%= content_for(:title) || "Domain Checker - Website & API Monitoring" %></title>
+    <title translate="no" class="notranslate"><%= content_for(:title) || "Domain Checker - Website & API Monitoring" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -45,7 +45,7 @@
                   </svg>
                 </div>
               </div>
-              <span class="text-xl font-black tracking-tight text-white group-hover:text-amber-400 transition-colors">
+              <span class="text-xl font-black tracking-tight text-white group-hover:text-amber-400 transition-colors notranslate" translate="no">
                 Domain<span class="text-amber-500">Checker</span>
               </span>
             <% end %>
@@ -56,7 +56,7 @@
               <span class="text-stone-600">|</span>
               <button type="button" data-action="click->i18n#setSpanish" data-i18n-target="btnEs" class="cursor-pointer text-stone-400 hover:text-white transition">Español</button>
             </div>
-            
+
             <% if user_signed_in? %>
               <div class="hidden md:flex items-center gap-1">
                 <%= link_to domains_path, class: "px-3.5 py-2 text-sm font-semibold rounded-lg transition-all #{current_page?(domains_path) ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/60'}" do %>
@@ -64,7 +64,7 @@
                 <% end %>
 
                 <%= link_to api_endpoints_path, class: "px-3.5 py-2 text-sm font-semibold rounded-lg transition-all #{current_page?(api_endpoints_path) ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/60'}" do %>
-                  <span data-i18n-en="API Endpoints" data-i18n-es="Endpoints API">API Endpoints</span>
+                  <span class="notranslate" translate="no">API Endpoints</span>
                 <% end %>
 
                 <%= link_to notification_channels_path, class: "px-3.5 py-2 text-sm font-semibold rounded-lg transition-all #{current_page?(notification_channels_path) ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/60'}" do %>
@@ -87,10 +87,10 @@
             <% if user_signed_in? %>
               <div class="relative" data-controller="dropdown">
                 <button type="button" data-action="click->dropdown#toggle" class="flex items-center gap-2 p-1.5 rounded-xl bg-stone-900 border border-stone-800 hover:border-amber-500/30 transition text-stone-300">
-                  <div class="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center font-bold text-xs text-amber-400">
+                  <div class="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center font-bold text-xs text-amber-400 notranslate" translate="no">
                     <%= current_user.email[0].upcase %>
                   </div>
-                  <span class="text-xs font-medium pr-1 hidden sm:inline"><%= current_user.email %></span>
+                <span class="text-xs font-medium pr-1 hidden sm:inline notranslate" translate="no"><%= current_user.email %></span>
                 </button>
 
                 <div data-dropdown-target="menu" class="hidden absolute right-0 mt-2 w-48 bg-stone-900 border border-stone-800 rounded-xl shadow-xl py-1 z-50">
