@@ -3,27 +3,27 @@
   <div class="max-w-3xl mx-auto space-y-6">
     <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-semibold tracking-wide shadow-inner">
       <span class="h-2 w-2 rounded-full bg-amber-400 animate-pulse"></span>
-      Monitorización 24/7 de Alta Precisión en Tiempo Real
+      <span data-i18n-en="High-Precision 24/7 Real-Time Monitoring" data-i18n-es="Monitorización 24/7 de Alta Precisión en Tiempo Real">High-Precision 24/7 Real-Time Monitoring</span>
     </div>
 
     <h1 class="text-4xl sm:text-6xl font-black text-white tracking-tight leading-tight">
-      Supervisa tus dominios y APIs con <span class="bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 bg-clip-text text-transparent">máxima fiabilidad</span>
+      <span data-i18n-en="Monitor your domains and APIs with" data-i18n-es="Supervisa tus dominios y APIs con">Monitor your domains and APIs with</span> <span class="bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 bg-clip-text text-transparent"><span data-i18n-en="maximum reliability" data-i18n-es="máxima fiabilidad">maximum reliability</span></span>
     </h1>
 
     <p class="text-base sm:text-lg text-stone-300 max-w-2xl mx-auto leading-relaxed">
-      Detección instantánea de caídas de servicio, alertas por picos de latencia, expiración de certificados SSL y avisos críticos inmediatos en Discord, Telegram y Correo.
+      <span data-i18n-en="Instant service downtime detection, latency spike alerts, SSL certificate expiration warnings, and critical notifications via Discord, Telegram, and <span data-i18n-en="Email" data-i18n-es="Email">Email</span>." data-i18n-es="Detección instantánea de caídas de servicio, alertas por picos de latencia, expiración de certificados SSL y avisos críticos inmediatos en Discord, Telegram y Correo.">Instant service downtime detection, latency spike alerts, SSL certificate expiration warnings, and critical notifications via Discord, Telegram, and <span data-i18n-en="Email" data-i18n-es="Email">Email</span>.</span>
     </p>
 
     <div class="pt-4 flex flex-wrap items-center justify-center gap-4">
       <% if user_signed_in? %>
         <%= link_to domains_path, class: "inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm text-stone-950 bg-gradient-to-r from-amber-400 via-amber-300 to-orange-400 hover:from-amber-300 hover:to-orange-300 shadow-xl shadow-amber-500/25 hover:scale-[1.02] transition-all cursor-pointer" do %>
-          <span>Ir a mis dominios</span>
+          <span><span data-i18n-en="Go to my domains" data-i18n-es="Ir a mis dominios">Go to my domains</span></span>
           <svg class="w-4 h-4 text-stone-950" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
           </svg>
         <% end %>
         <%= link_to api_endpoints_path, class: "inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm text-amber-200 hover:text-white bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition-all cursor-pointer" do %>
-          <span>Endpoints API</span>
+          <span><span data-i18n-en="API Endpoints" data-i18n-es="Endpoints API">API Endpoints</span></span>
         <% end %>
       <% else %>
         <%= link_to new_user_registration_path, class: "inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm text-stone-950 bg-gradient-to-r from-amber-400 via-amber-300 to-orange-400 hover:from-amber-300 hover:to-orange-300 shadow-xl shadow-amber-500/25 hover:scale-[1.02] transition-all cursor-pointer" do %>
@@ -52,7 +52,7 @@
   <%# Capacidades Destacadas (4 Tarjetas) %>
   <div class="space-y-8">
     <div class="text-xs uppercase font-bold tracking-widest text-amber-400/80">
-      Capacidades de la plataforma
+      <span data-i18n-en="Platform Capabilities" data-i18n-es="Capacidades de la plataforma">Platform Capabilities</span>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-6xl mx-auto text-left">
@@ -63,8 +63,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
         </div>
-        <h3 class="text-sm font-bold text-white mb-1.5">Métricas de Latencia</h3>
-        <p class="text-xs text-amber-200/60 leading-relaxed">Registro histórico milimétrico con gráficas detalladas, promedios y seguimiento de caídas acumuladas.</p>
+        <h3 class="text-sm font-bold text-white mb-1.5"><span data-i18n-en="Latency Metrics" data-i18n-es="Métricas de Latencia">Latency Metrics</span></h3>
+        <p class="text-xs text-amber-200/60 leading-relaxed"><span data-i18n-en="Milimetric historical logs with detailed graphs, averages, and cumulative downtime tracking." data-i18n-es="Registro histórico milimétrico con gráficas detalladas, promedios y seguimiento de caídas acumuladas.">Milimetric historical logs with detailed graphs, averages, and cumulative downtime tracking.</span></p>
       </div>
 
       <%# Tarjeta 2 %>
@@ -74,8 +74,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
           </svg>
         </div>
-        <h3 class="text-sm font-bold text-white mb-1.5"><span data-i18n-en="Multi-Channel Alerts" data-i18n-es="Alertas Multicanal">Multi-Channel Alerts</span></h3>
-        <p class="text-xs text-amber-200/60 leading-relaxed">Notificaciones inmediatas configurables vía Webhooks de Discord, Bots de Telegram y Correos electrónicos.</p>
+        <h3 class="text-sm font-bold text-white mb-1.5"><span data-i18n-en="<span data-i18n-en="Multi-Channel Alerts" data-i18n-es="Multi-Channel Alerts">Multi-Channel Alerts</span>" data-i18n-es="Alertas Multicanal"><span data-i18n-en="Multi-Channel Alerts" data-i18n-es="Multi-Channel Alerts">Multi-Channel Alerts</span></span></h3>
+        <p class="text-xs text-amber-200/60 leading-relaxed"><span data-i18n-en="Instant configurable notifications via Discord Webhooks, Telegram Bots, and <span data-i18n-en="Email" data-i18n-es="Email">Email</span>s." data-i18n-es="Notificaciones inmediatas configurables vía Webhooks de Discord, Bots de Telegram y Correos electrónicos.">Instant configurable notifications via Discord Webhooks, Telegram Bots, and <span data-i18n-en="Email" data-i18n-es="Email">Email</span>s.</span></p>
       </div>
 
       <%# Tarjeta 3 %>
@@ -85,8 +85,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
         </div>
-        <h3 class="text-sm font-bold text-white mb-1.5">Vigilancia SSL</h3>
-        <p class="text-xs text-amber-200/60 leading-relaxed">Auditoría automática de tus certificados SSL con avisos anticipados antes de que expiren o provoquen fallos.</p>
+        <h3 class="text-sm font-bold text-white mb-1.5"><span data-i18n-en="SSL Monitoring" data-i18n-es="Vigilancia SSL">SSL Monitoring</span></h3>
+        <p class="text-xs text-amber-200/60 leading-relaxed"><span data-i18n-en="Automated auditing of your SSL certificates with early warnings before they expire or cause downtime." data-i18n-es="Auditoría automática de tus certificados SSL con avisos anticipados antes de que expiren o provoquen fallos.">Automated auditing of your SSL certificates with early warnings before they expire or cause downtime.</span></p>
       </div>
 
       <%# Tarjeta 4 %>
@@ -96,8 +96,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
           </svg>
         </div>
-        <h3 class="text-sm font-bold text-white mb-1.5">Doble Verificación</h3>
-        <p class="text-xs text-amber-200/60 leading-relaxed">Filtro inteligente Soft/Hard Fail con reintentos a los 15 segundos para erradicar falsos positivos.</p>
+        <h3 class="text-sm font-bold text-white mb-1.5"><span data-i18n-en="Double Verification" data-i18n-es="Doble Verificación">Double Verification</span></h3>
+        <p class="text-xs text-amber-200/60 leading-relaxed"><span data-i18n-en="Intelligent Soft/Hard Fail filter with 15-second retries to eliminate false positives." data-i18n-es="Filtro inteligente Soft/Hard Fail con reintentos a los 15 segundos para erradicar falsos positivos.">Intelligent Soft/Hard Fail filter with 15-second retries to eliminate false positives.</span></p>
       </div>
     </div>
   </div>
@@ -105,50 +105,50 @@
   <%# Sección Detallada de Servicios %>
   <div class="max-w-6xl mx-auto space-y-12 text-left">
     <div class="text-center space-y-3">
-      <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Todo lo que necesitas para tu infraestructura</h2>
-      <p class="text-sm text-amber-200/60 max-w-xl mx-auto">Protegemos la presencia digital de tus proyectos con verificación continua y diagnósticos fiables.</p>
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight"><span data-i18n-en="Everything you need for your infrastructure" data-i18n-es="Todo lo que necesitas para tu infraestructura">Everything you need for your infrastructure</span></h2>
+      <p class="text-sm text-amber-200/60 max-w-xl mx-auto"><span data-i18n-en="We safeguard your digital presence with continuous verification and reliable diagnostics." data-i18n-es="Protegemos la presencia digital de tus proyectos con verificación continua y diagnósticos fiables.">We safeguard your digital presence with continuous verification and reliable diagnostics.</span></p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <%# Detalle 1: Dominios %>
       <div class="p-6 rounded-2xl bg-[#1c1512] border border-amber-500/20 space-y-3 shadow-md">
-        <div class="text-xs font-bold text-amber-400 uppercase tracking-wider">Monitor de Páginas Web</div>
-        <h3 class="text-lg font-bold text-white">Verificación HTTP y Palabras Clave</h3>
+        <div class="text-xs font-bold text-amber-400 uppercase tracking-wider"><span data-i18n-en="Website Monitor" data-i18n-es="Monitor de Páginas Web">Website Monitor</span></div>
+        <h3 class="text-lg font-bold text-white"><span data-i18n-en="HTTP & Keyword Verification" data-i18n-es="Verificación HTTP y Palabras Clave">HTTP & Keyword Verification</span></h3>
         <p class="text-xs text-stone-300 leading-relaxed">
-          Comprobamos no solo que tu servidor responda con un código HTTP 200, sino también que devuelva el contenido esperado mediante validación de palabras clave en el código HTML.
+          <span data-i18n-en="We ensure not only that your server returns an HTTP 200 status, but also that it serves the expected content through HTML keyword validation." data-i18n-es="Comprobamos no solo que tu servidor responda con un código HTTP 200, sino también que devuelva el contenido esperado mediante validación de palabras clave en el código HTML.">We ensure not only that your server returns an HTTP 200 status, but also that it serves the expected content through HTML keyword validation.</span>
         </p>
         <ul class="text-xs text-amber-200/70 space-y-1.5 pt-2">
-          <li class="flex items-center gap-2">✓ Chequeo de códigos de respuesta HTTP</li>
-          <li class="flex items-center gap-2">✓ Validación de strings en el DOM</li>
-          <li class="flex items-center gap-2">✓ Límites configurables de latencia en ms</li>
+          <li class="flex items-center gap-2">✓ <span data-i18n-en="HTTP status code checks" data-i18n-es="Chequeo de códigos de respuesta HTTP">HTTP status code checks</span></li>
+          <li class="flex items-center gap-2">✓ <span data-i18n-en="DOM string assertions" data-i18n-es="Validación de strings en el DOM">DOM string assertions</span></li>
+          <li class="flex items-center gap-2">✓ <span data-i18n-en="Configurable latency thresholds in ms" data-i18n-es="Límites configurables de latencia en ms">Configurable latency thresholds in ms</span></li>
         </ul>
       </div>
 
-      <%# Detalle 2: Endpoints API %>
+      <%# Detalle 2: <span data-i18n-en="API Endpoints" data-i18n-es="Endpoints API">API Endpoints</span> %>
       <div class="p-6 rounded-2xl bg-[#1c1512] border border-amber-500/20 space-y-3 shadow-md">
-        <div class="text-xs font-bold text-amber-400 uppercase tracking-wider">Supervisión de APIs</div>
-        <h3 class="text-lg font-bold text-white">Healthchecks y Microservicios</h3>
+        <div class="text-xs font-bold text-amber-400 uppercase tracking-wider"><span data-i18n-en="API Monitoring" data-i18n-es="Supervisión de APIs">API Monitoring</span></div>
+        <h3 class="text-lg font-bold text-white"><span data-i18n-en="Healthchecks & Microservices" data-i18n-es="Healthchecks y Microservicios">Healthchecks & Microservices</span></h3>
         <p class="text-xs text-stone-300 leading-relaxed">
-          Diseñado para desarrolladores y equipos técnicos. Monitoriza endpoints REST, rutas de autenticación y endpoints de salud con respuesta rápida ante incidencias.
+          <span data-i18n-en="Engineered for developers and technical teams. Monitor REST endpoints, authentication routes, and healthchecks with fast incident response." data-i18n-es="Diseñado para desarrolladores y equipos técnicos. Monitoriza endpoints REST, rutas de autenticación y endpoints de salud con respuesta rápida ante incidencias.">Engineered for developers and technical teams. Monitor REST endpoints, authentication routes, and healthchecks with fast incident response.</span>
         </p>
         <ul class="text-xs text-amber-200/70 space-y-1.5 pt-2">
-          <li class="flex items-center gap-2">✓ Supervisión de rutas /health y /status</li>
-          <li class="flex items-center gap-2">✓ Detección de fallos 4xx y 5xx al instante</li>
-          <li class="flex items-center gap-2">✓ Alertas directas a tus herramientas de trabajo</li>
+          <li class="flex items-center gap-2">✓ <span data-i18n-en="Monitoring of /health and /status routes" data-i18n-es="Supervisión de rutas /health y /status">Monitoring of /health and /status routes</span></li>
+          <li class="flex items-center gap-2">✓ <span data-i18n-en="Instant 4xx and 5xx failure detection" data-i18n-es="Detección de fallos 4xx y 5xx al instante">Instant 4xx and 5xx failure detection</span></li>
+          <li class="flex items-center gap-2">✓ <span data-i18n-en="Direct alerts to your team workspace tools" data-i18n-es="Alertas directas a tus herramientas de trabajo">Direct alerts to your team workspace tools</span></li>
         </ul>
       </div>
 
       <%# Detalle 3: Canales %>
       <div class="p-6 rounded-2xl bg-[#1c1512] border border-amber-500/20 space-y-3 shadow-md">
-        <div class="text-xs font-bold text-amber-400 uppercase tracking-wider">Alertas Flexibles</div>
-        <h3 class="text-lg font-bold text-white">Matriz de Canales Centralizada</h3>
+        <div class="text-xs font-bold text-amber-400 uppercase tracking-wider"><span data-i18n-en="Flexible Alerts" data-i18n-es="Alertas Flexibles">Flexible Alerts</span></div>
+        <h3 class="text-lg font-bold text-white"><span data-i18n-en="Centralized Channel Matrix" data-i18n-es="Matriz de Canales Centralizada">Centralized Channel Matrix</span></h3>
         <p class="text-xs text-stone-300 leading-relaxed">
-          Guarda tus canales favoritos (Discord, Telegram, Email), márcalos como predeterminados o define destinos independientes por cada dominio o servicio individual.
+          <span data-i18n-en="Save favorite channels (Discord, Telegram, <span data-i18n-en="Email" data-i18n-es="Email">Email</span>), set defaults, or route specific services independently." data-i18n-es="Guarda tus canales favoritos (Discord, Telegram, <span data-i18n-en="Email" data-i18n-es="Email">Email</span>), márcalos como predeterminados o define destinos independientes por cada dominio o servicio individual.">Save favorite channels (Discord, Telegram, <span data-i18n-en="Email" data-i18n-es="Email">Email</span>), set defaults, or route specific services independently.</span>
         </p>
         <ul class="text-xs text-amber-200/70 space-y-1.5 pt-2">
-          <li class="flex items-center gap-2">✓ Notificaciones personalizadas por endpoint</li>
-          <li class="flex items-center gap-2">✓ Plantillas de alerta con métricas y códigos de error</li>
-          <li class="flex items-center gap-2">✓ Gestión rápida y búsqueda de canales</li>
+          <li class="flex items-center gap-2">✓ <span data-i18n-en="Custom notifications per endpoint" data-i18n-es="Notificaciones personalizadas por endpoint">Custom notifications per endpoint</span></li>
+          <li class="flex items-center gap-2">✓ <span data-i18n-en="Alert templates with metrics and error codes" data-i18n-es="Plantillas de alerta con métricas y códigos de error">Alert templates with metrics and error codes</span></li>
+          <li class="flex items-center gap-2">✓ <span data-i18n-en="Fast channel management and search" data-i18n-es="Gestión rápida y búsqueda de canales">Fast channel management and search</span></li>
         </ul>
       </div>
     </div>
@@ -158,10 +158,10 @@
   <div class="max-w-5xl mx-auto space-y-8">
     <div class="text-center space-y-3">
       <div class="inline-block px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold uppercase tracking-wider">
-        Planes y Precios Transparentes
+        <span data-i18n-en="Transparent Plans and Pricing" data-i18n-es="Planes y Precios Transparentes">Transparent Plans and Pricing</span>
       </div>
-      <h2 class="text-3xl font-extrabold text-white tracking-tight">Elige el plan ideal para tus proyectos</h2>
-      <p class="text-sm text-amber-200/60 max-w-lg mx-auto">Comienza sin coste y escala cuando tu infraestructura lo necesite. Sin compromisos ni permanencias.</p>
+      <h2 class="text-3xl font-extrabold text-white tracking-tight"><span data-i18n-en="Choose the ideal plan for your projects" data-i18n-es="Elige el plan ideal para tus proyectos">Choose the ideal plan for your projects</span></h2>
+      <p class="text-sm text-amber-200/60 max-w-lg mx-auto"><span data-i18n-en="Start for free and scale as your infrastructure grows. No commitments, cancel anytime." data-i18n-es="Comienza sin coste y escala cuando tu infraestructura lo necesite. Sin compromisos ni permanencias.">Start for free and scale as your infrastructure grows. No commitments, cancel anytime.</span></p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left items-stretch">
@@ -170,49 +170,49 @@
       <div class="p-8 rounded-3xl bg-[#18110e] border <%= is_starter_active ? "border-amber-400/80 shadow-amber-500/10" : "border-amber-500/20" %> flex flex-col justify-between space-y-6 shadow-xl relative">
         <div class="space-y-4">
           <div class="flex items-center justify-between">
-            <h3 class="text-xl font-bold text-white">Plan Starter</h3>
+            <h3 class="text-xl font-bold text-white"><span data-i18n-en="Starter Plan" data-i18n-es="Plan Starter">Starter Plan</span></h3>
             <% if is_starter_active %>
               <span class="px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-500/40 text-[11px] font-bold">
                 Tu Plan Actual
               </span>
             <% else %>
-              <span class="px-3 py-1 rounded-full bg-stone-800 text-stone-300 text-xs font-semibold">Gratis para siempre</span>
+              <span class="px-3 py-1 rounded-full bg-stone-800 text-stone-300 text-xs font-semibold"><span data-i18n-en="Free forever" data-i18n-es="Gratis para siempre">Free forever</span></span>
             <% end %>
           </div>
           <div class="flex items-baseline gap-1">
             <span class="text-4xl font-black text-white">0 €</span>
-            <span class="text-sm text-stone-400">/ mes</span>
+            <span class="text-sm text-stone-400"><span data-i18n-en="/ month" data-i18n-es="/ mes">/ month</span></span>
           </div>
-          <p class="text-xs text-stone-400">Perfecto para proyectos personales, webs individuales y blogs en fase inicial.</p>
+          <p class="text-xs text-stone-400"><span data-i18n-en="Perfect for personal side-projects, standalone sites, and early-stage blogs." data-i18n-es="Perfecto para proyectos personales, webs individuales y blogs en fase inicial.">Perfect for personal side-projects, standalone sites, and early-stage blogs.</span></p>
 
           <div class="pt-4 border-t border-amber-500/10 space-y-3 text-xs text-stone-300">
             <div class="flex items-center gap-2.5">
               <span class="text-emerald-400 font-bold">✓</span>
-              <span>Hasta <strong>3 Dominios</strong> monitorizados</span>
+              <span><span data-i18n-en="Up to" data-i18n-es="Hasta">Up to</span> <strong>3 Dominios</strong> <span data-i18n-en="monitored" data-i18n-es="monitorizados">monitored</span></span>
             </div>
             <div class="flex items-center gap-2.5">
               <span class="text-emerald-400 font-bold">✓</span>
-              <span>Hasta <strong>3 Endpoints API</strong></span>
+              <span><span data-i18n-en="Up to" data-i18n-es="Hasta">Up to</span> <strong>3 <span data-i18n-en="API Endpoints" data-i18n-es="Endpoints API">API Endpoints</span></strong></span>
             </div>
             <div class="flex items-center gap-2.5">
               <span class="text-emerald-400 font-bold">✓</span>
-              <span>Frecuencia periódica: <strong>Cada 5 minutos</strong></span>
+              <span><span data-i18n-en="Periodic check interval:" data-i18n-es="Frecuencia periódica:">Periodic check interval:</span> <strong><span data-i18n-en="Every 5 minutes" data-i18n-es="<span data-i18n-en="Every 5 min" data-i18n-es="Cada 5 min">Every 5 min</span>utos">Every 5 minutes</span></strong></span>
             </div>
             <div class="flex items-center gap-2.5">
               <span class="text-emerald-400 font-bold">✓</span>
-              <span>Alertas automáticas por <strong>Email</strong></span>
+              <span><span data-i18n-en="Automated alerts via" data-i18n-es="Alertas automáticas por">Automated alerts via</span> <strong><span data-i18n-en="Email" data-i18n-es="Email">Email</span></strong></span>
             </div>
             <div class="flex items-center gap-2.5">
               <span class="text-emerald-400 font-bold">✓</span>
-              <span>Historial analítico de <strong>7 días</strong></span>
+              <span><span data-i18n-en="Analytics history:" data-i18n-es="Historial analítico de">Analytics history:</span> <strong><span data-i18n-en="7 days" data-i18n-es="7 días">7 days</span></strong></span>
             </div>
             <div class="flex items-center gap-2.5 text-stone-500">
               <span>✕</span>
-              <span>Chequeo manual instantáneo</span>
+              <span><span data-i18n-en="Instant manual checks" data-i18n-es="Chequeo manual instantáneo">Instant manual checks</span></span>
             </div>
             <div class="flex items-center gap-2.5 text-stone-500">
               <span>✕</span>
-              <span>Alertas en Discord y Telegram</span>
+              <span><span data-i18n-en="Discord and Telegram alerts" data-i18n-es="Alertas en Discord y Telegram">Discord and Telegram alerts</span></span>
             </div>
           </div>
         </div>
@@ -224,7 +224,7 @@
                 Plan actual activo (<%= current_user.domains.count %>/3 dominios)
               </div>
             <% else %>
-              <%= link_to "Ver mis dominios (Plan PRO activo)", domains_path, class: "block w-full py-3 rounded-xl text-center text-xs font-semibold text-stone-400 hover:text-white bg-stone-900 border border-stone-800 hover:border-amber-500/30 transition" %>
+              <%= link_to "<span data-i18n-en="View my domains (PRO Plan active)" data-i18n-es="Ver mis dominios (<span data-i18n-en="PRO Plan" data-i18n-es="Plan PRO">PRO Plan</span> activo)">View my domains (PRO Plan active)</span>", domains_path, class: "block w-full py-3 rounded-xl text-center text-xs font-semibold text-stone-400 hover:text-white bg-stone-900 border border-stone-800 hover:border-amber-500/30 transition" %>
             <% end %>
           <% else %>
             <%= link_to "Comenzar Gratis", new_user_registration_path, class: "block w-full py-3 rounded-xl text-center text-xs font-bold bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 hover:text-white transition" %>
@@ -232,50 +232,50 @@
         </div>
       </div>
 
-      <%# Plan PRO %>
+      <%# <span data-i18n-en="PRO Plan" data-i18n-es="Plan PRO">PRO Plan</span> %>
       <% is_pro_active = user_signed_in? && current_user.pro? %>
       <div class="p-8 rounded-3xl bg-gradient-to-b from-[#241711] to-[#1a110c] border-2 <%= is_pro_active ? "border-emerald-500 shadow-emerald-500/15" : "border-amber-400 shadow-amber-500/10" %> flex flex-col justify-between space-y-6 shadow-2xl relative">
         <div class="absolute -top-3.5 right-6 px-3.5 py-1 rounded-full <%= is_pro_active ? "bg-gradient-to-r from-emerald-400 to-teal-400 text-stone-950 font-black" : "bg-gradient-to-r from-amber-400 to-orange-400 text-stone-950 font-black" %> text-[11px] uppercase tracking-wider shadow">
-          <%= is_pro_active ? "✓ Tu Plan Activo" : "Recomendado" %>
+          <%= is_pro_active ? "✓ <span data-i18n-en="Your Active Plan" data-i18n-es="Tu Plan Activo">Your Active Plan</span>" : "Recomendado" %>
         </div>
 
         <div class="space-y-4">
           <div class="flex items-center justify-between">
             <h3 class="text-xl font-bold text-white flex items-center gap-2">
-              <span>Plan PRO</span>
+              <span><span data-i18n-en="PRO Plan" data-i18n-es="Plan PRO">PRO Plan</span></span>
               <span class="px-2 py-0.5 rounded text-[10px] font-black bg-amber-400 text-stone-950 uppercase">PRO</span>
             </h3>
           </div>
           <div class="flex items-baseline gap-1">
             <span class="text-4xl font-black text-amber-300">9,99 €</span>
-            <span class="text-sm text-amber-200/60">/ mes</span>
+            <span class="text-sm text-amber-200/60"><span data-i18n-en="/ month" data-i18n-es="/ mes">/ month</span></span>
           </div>
-          <p class="text-xs text-amber-200/70">Para aplicaciones en producción, e-commerce y empresas que no pueden permitirse caídas.</p>
+          <p class="text-xs text-amber-200/70"><span data-i18n-en="For production web apps, e-commerce stores, and mission-critical businesses." data-i18n-es="Para aplicaciones en producción, e-commerce y empresas que no pueden permitirse caídas.">For production web apps, e-commerce stores, and mission-critical businesses.</span></p>
 
           <div class="pt-4 border-t border-amber-500/20 space-y-3 text-xs text-stone-200">
             <div class="flex items-center gap-2.5">
               <span class="text-amber-400 font-bold">✓</span>
-              <span>Hasta <strong>50 Dominios</strong> en monitorización <%= "(#{current_user.domains.count}/50 en uso)" if is_pro_active %></span>
+              <span><span data-i18n-en="Up to" data-i18n-es="Hasta">Up to</span> <strong>50 Dominios</strong> <span data-i18n-en="under monitoring" data-i18n-es="en monitorización">under monitoring</span> <%= "(#{current_user.domains.count}/50 <span data-i18n-en="in use" data-i18n-es="en uso">in use</span>)" if is_pro_active %></span>
             </div>
             <div class="flex items-center gap-2.5">
               <span class="text-amber-400 font-bold">✓</span>
-              <span>Hasta <strong>50 Endpoints API</strong> <%= "(#{current_user.api_endpoints.count}/50 en uso)" if is_pro_active %></span>
+              <span><span data-i18n-en="Up to" data-i18n-es="Hasta">Up to</span> <strong>50 <span data-i18n-en="API Endpoints" data-i18n-es="Endpoints API">API Endpoints</span></strong> <%= "(#{current_user.api_endpoints.count}/50 <span data-i18n-en="in use" data-i18n-es="en uso">in use</span>)" if is_pro_active %></span>
             </div>
             <div class="flex items-center gap-2.5">
               <span class="text-amber-400 font-bold">✓</span>
-              <span>Comprobación periódica: <strong>Cada 5 min</strong> + Chequeo manual inmediato</span>
+              <span><span data-i18n-en="Periodic check frequency:" data-i18n-es="Comprobación periódica:">Periodic check frequency:</span> <strong><span data-i18n-en="Every 5 min" data-i18n-es="Cada 5 min">Every 5 min</span></strong> + <span data-i18n-en="Instant manual checks" data-i18n-es="Chequeo manual inmediato">Instant manual checks</span></span>
             </div>
             <div class="flex items-center gap-2.5">
               <span class="text-amber-400 font-bold">✓</span>
-              <span>Alertas completas en <strong>Discord, Telegram y Email</strong></span>
+              <span><span data-i18n-en="Full alert coverage on" data-i18n-es="Alertas completas en">Full alert coverage on</span> <strong>Discord, Telegram y <span data-i18n-en="Email" data-i18n-es="Email">Email</span></strong></span>
             </div>
             <div class="flex items-center gap-2.5">
               <span class="text-amber-400 font-bold">✓</span>
-              <span>Filtro anti-falsos positivos con doble chequeo a los 15s</span>
+              <span><span data-i18n-en="Anti-false-positive filter with 15s double check" data-i18n-es="Filtro anti-falsos positivos con doble chequeo a los 15s">Anti-false-positive filter with 15s double check</span></span>
             </div>
             <div class="flex items-center gap-2.5">
               <span class="text-amber-400 font-bold">✓</span>
-              <span>Historial analítico de <strong>7 días</strong> (hasta 500 comprobaciones)</span>
+              <span><span data-i18n-en="Analytics history:" data-i18n-es="Historial analítico de">Analytics history:</span> <strong><span data-i18n-en="7 days" data-i18n-es="7 días">7 days</span></strong> (<span data-i18n-en="up to 500 checks" data-i18n-es="hasta 500 comprobaciones">up to 500 checks</span>)</span>
             </div>
           </div>
         </div>
@@ -285,7 +285,7 @@
             <% if is_pro_active %>
               <div class="space-y-2">
                 <%= link_to domains_path, class: "block w-full py-3 rounded-xl text-center font-black text-xs text-stone-950 bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-400 hover:scale-[1.01] shadow-lg shadow-emerald-500/20 transition cursor-pointer" do %>
-                  <span>✓ Plan PRO Activo — Ir al Panel (<%= current_user.domains.count %>/50)</span>
+                  <span>✓ <span data-i18n-en="PRO Plan" data-i18n-es="Plan PRO">PRO Plan</span> Activo — Ir al Panel (<%= current_user.domains.count %>/50)</span>
                 <% end %>
                 <% if current_user.stripe_customer_id.present? %>
                   <%= link_to portal_checkout_path, class: "block w-full py-2 text-center text-[11px] font-medium text-stone-400 hover:text-amber-300 transition" do %>
@@ -306,39 +306,39 @@
     </div>
   </div>
 
-  <%# Preguntas Frecuentes (FAQ) %>
+  <%# <span data-i18n-en="Frequently Asked Questions" data-i18n-es="Preguntas Frecuentes">Frequently Asked Questions</span> (FAQ) %>
   <div class="max-w-4xl mx-auto space-y-8 text-left">
     <div class="text-center space-y-2">
-      <h2 class="text-2xl font-bold text-white tracking-tight">Preguntas Frecuentes</h2>
-      <p class="text-xs text-amber-200/60">Resolvemos tus dudas principales sobre la plataforma.</p>
+      <h2 class="text-2xl font-bold text-white tracking-tight"><span data-i18n-en="Frequently Asked Questions" data-i18n-es="Preguntas Frecuentes">Frequently Asked Questions</span></h2>
+      <p class="text-xs text-amber-200/60"><span data-i18n-en="Clear answers to the most common questions about the platform." data-i18n-es="Resolvemos tus dudas principales sobre la plataforma.">Clear answers to the most common questions about the platform.</span></p>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div class="p-5 rounded-2xl bg-[#1a120c] border border-amber-500/20 space-y-2">
-        <h4 class="text-sm font-bold text-white">¿Cómo se evitan los falsos positivos?</h4>
+        <h4 class="text-sm font-bold text-white"><span data-i18n-en="How are false positives prevented?" data-i18n-es="¿Cómo se evitan los falsos positivos?">How are false positives prevented?</span></h4>
         <p class="text-xs text-amber-200/70 leading-relaxed">
-          Utilizamos una lógica de doble verificación: ante un fallo inicial (Soft fail), se programa un reintento a los 15 segundos. Si persiste, se marca como Hard fail y se dispara la alerta a tus canales.
+          <span data-i18n-en="We run a dual verification check: on an initial failure (Soft fail), a 15-second retry is scheduled. If it persists, it escalates to Hard fail and notifies your channels." data-i18n-es="Utilizamos una lógica de doble verificación: ante un fallo inicial (Soft fail), se programa un reintento a los 15 segundos. Si persiste, se marca como Hard fail y se dispara la alerta a tus canales.">We run a dual verification check: on an initial failure (Soft fail), a 15-second retry is scheduled. If it persists, it escalates to Hard fail and notifies your channels.</span>
         </p>
       </div>
 
       <div class="p-5 rounded-2xl bg-[#1a120c] border border-amber-500/20 space-y-2">
-        <h4 class="text-sm font-bold text-white">¿Cómo funcionan las alertas por Discord y Telegram?</h4>
+        <h4 class="text-sm font-bold text-white"><span data-i18n-en="How do Discord and Telegram alerts work?" data-i18n-es="¿Cómo funcionan las alertas por Discord y Telegram?">How do Discord and Telegram alerts work?</span></h4>
         <p class="text-xs text-amber-200/70 leading-relaxed">
-          Solo necesitas pegar la URL de tu Webhook de Discord o el Chat ID de tu bot de Telegram. Nuestras peticiones son asíncronas y se despachan en menos de 2 segundos.
+          <span data-i18n-en="Simply provide your Discord Webhook URL or Telegram Bot Chat ID. Requests are handled asynchronously in under 2 seconds." data-i18n-es="Solo necesitas pegar la URL de tu Webhook de Discord o el Chat ID de tu bot de Telegram. Nuestras peticiones son asíncronas y se despachan en menos de 2 segundos.">Simply provide your Discord Webhook URL or Telegram Bot Chat ID. Requests are handled asynchronously in under 2 seconds.</span>
         </p>
       </div>
 
       <div class="p-5 rounded-2xl bg-[#1a120c] border border-amber-500/20 space-y-2">
-        <h4 class="text-sm font-bold text-white">¿Puedo cambiar de plan cuando lo necesite?</h4>
+        <h4 class="text-sm font-bold text-white"><span data-i18n-en="Can I switch plans whenever needed?" data-i18n-es="¿Puedo cambiar de plan cuando lo necesite?">Can I switch plans whenever needed?</span></h4>
         <p class="text-xs text-amber-200/70 leading-relaxed">
-          Sí, puedes comenzar con el Plan Starter gratuito y solicitar la activación del Plan PRO a nuestro equipo para ampliar cuotas a 50 dominios sin perder ninguna métrica.
+          Sí, puedes comenzar con el <span data-i18n-en="Starter Plan" data-i18n-es="Plan Starter">Starter Plan</span> gratuito y solicitar la activación del <span data-i18n-en="PRO Plan" data-i18n-es="Plan PRO">PRO Plan</span> a nuestro equipo para ampliar cuotas a 50 dominios sin perder ninguna métrica.
         </p>
       </div>
 
       <div class="p-5 rounded-2xl bg-[#1a120c] border border-amber-500/20 space-y-2">
-        <h4 class="text-sm font-bold text-white">¿Con qué frecuencia se comprueban los certificados SSL?</h4>
+        <h4 class="text-sm font-bold text-white"><span data-i18n-en="How often are SSL certificates verified?" data-i18n-es="¿Con qué frecuencia se comprueban los certificados SSL?">How often are SSL certificates verified?</span></h4>
         <p class="text-xs text-amber-200/70 leading-relaxed">
-          Verificamos la cadena de confianza y la fecha de expiración diariamente, enviándote un aviso preventivo con margen suficiente antes de que caduque el certificado.
+          <span data-i18n-en="We inspect certificate chains and expiration dates daily, sending proactive alerts well before certificate expiry." data-i18n-es="Verificamos la cadena de confianza y la fecha de expiración diariamente, enviándote un aviso preventivo con margen suficiente antes de que caduque el certificado.">We inspect certificate chains and expiration dates daily, sending proactive alerts well before certificate expiry.</span>
         </p>
       </div>
     </div>
