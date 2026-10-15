@@ -67,7 +67,7 @@
                   <span class="notranslate" translate="no">API Endpoints</span>
                 <% end %>
 
-                <%= link_to pricing_path, class: "px-3.5 py-2 text-sm font-semibold rounded-lg transition-all #{current_page?(pricing_path) ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/60'}" do %>
+                <%= link_to root_path(anchor: "pricing"), class: "px-3.5 py-2 text-sm font-semibold rounded-lg text-stone-400 hover:text-stone-200 hover:bg-stone-800/60 transition-all" do %>
                   <span data-i18n-en="Pricing" data-i18n-es="Precios">Pricing</span>
                 <% end %>
               </div>
