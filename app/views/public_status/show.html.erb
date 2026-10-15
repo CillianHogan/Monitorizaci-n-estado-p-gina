@@ -1,4 +1,6 @@
 <% service = @domain || @api_endpoint %>
+<% resp_time = service.try(:last_response_time) || service.try(:response_time) || service.try(:last_response_time_ms) || 0 %>
+
 <div class="max-w-4xl mx-auto space-y-8 py-6">
   <!-- Cabecera -->
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-stone-800">
@@ -6,12 +8,12 @@
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold">
         <span><%= @domain ? "Web Domain" : "API Endpoint" %></span>
       </div>
-      <h1 class="text-3xl font-black text-white tracking-tight"><%= service.name %></h1>
-      <p class="text-stone-400 text-sm font-mono"><%= service.url %></p>
+      <h1 class="text-3xl font-black text-white tracking-tight"><%= service.try(:name) %></h1>
+      <p class="text-stone-400 text-sm font-mono"><%= service.try(:url) %></p>
     </div>
 
     <div>
-      <% if service.status.to_s.downcase == "up" %>
+      <% if service.try(:status).to_s.downcase == "up" %>
         <span class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
           <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
           Operational
@@ -29,14 +31,14 @@
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
     <div class="p-5 rounded-2xl bg-stone-900/60 border border-stone-800 backdrop-blur-xl">
       <span class="text-xs font-medium text-stone-400 uppercase tracking-wider">Response Time</span>
-      <p class="text-2xl font-black text-white mt-1 font-mono"><%= service.last_response_time.to_i %> <span class="text-sm font-normal text-stone-500">ms</span></p>
+      <p class="text-2xl font-black text-white mt-1 font-mono"><%= resp_time.to_i %> <span class="text-sm font-normal text-stone-500">ms</span></p>
     </div>
 
     <% if @domain %>
       <div class="p-5 rounded-2xl bg-stone-900/60 border border-stone-800 backdrop-blur-xl">
         <span class="text-xs font-medium text-stone-400 uppercase tracking-wider">SSL Certificate</span>
-        <% if service.respond_to?(:ssl_days_remaining) && service.ssl_days_remaining.present? %>
-          <p class="text-2xl font-black <%= service.ssl_days_remaining > 15 ? 'text-emerald-400' : 'text-amber-400' %> mt-1 font-mono">
+        <% if service.try(:ssl_days_remaining).present? %>
+          <p class="text-2xl font-black <%= service.ssl_days_remaining.to_i > 15 ? 'text-emerald-400' : 'text-amber-400' %> mt-1 font-mono">
             <%= service.ssl_days_remaining %> <span class="text-sm font-normal text-stone-500">days</span>
           </p>
         <% else %>
@@ -46,14 +48,14 @@
     <% else %>
       <div class="p-5 rounded-2xl bg-stone-900/60 border border-stone-800 backdrop-blur-xl">
         <span class="text-xs font-medium text-stone-400 uppercase tracking-wider">HTTP Method</span>
-        <p class="text-2xl font-black text-amber-400 mt-1 font-mono"><%= service.http_method || "GET" %></p>
+        <p class="text-2xl font-black text-amber-400 mt-1 font-mono"><%= service.try(:http_method) || "GET" %></p>
       </div>
     <% end %>
 
     <div class="p-5 rounded-2xl bg-stone-900/60 border border-stone-800 backdrop-blur-xl">
       <span class="text-xs font-medium text-stone-400 uppercase tracking-wider">Last Check</span>
       <p class="text-2xl font-black text-white mt-1 font-mono">
-        <%= service.last_check_at ? service.last_check_at.strftime("%H:%M UTC") : "Just now" %>
+        <%= service.try(:last_check_at) ? service.last_check_at.strftime("%H:%M UTC") : "Just now" %>
       </p>
     </div>
   </div>
