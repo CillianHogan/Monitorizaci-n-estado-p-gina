@@ -35,6 +35,14 @@ class Domain < ApplicationRecord
     ((up_count.to_f / histories.count) * 100).round(1)
   end
 
+  def notify_status_change
+    # Lanza las notificaciones configuradas si los jobs existen
+    DiscordNotificationJob.perform_later(self) if respond_to?(:notify_discord?) && notify_discord?
+    TelegramNotificationJob.perform_later(self) if respond_to?(:notify_telegram?) && notify_telegram?
+  rescue => e
+    Rails.logger.error("Error en notify_status_change para #{url}: #{e.message}")
+  end
+
   def target_email
     return notify_email_address if respond_to?(:notify_email_address) && notify_email_address.present?
     return user.notification_channels.default_for(:email)&.destination if user.present? && user.notification_channels.default_for(:email).present?
