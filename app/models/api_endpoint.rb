@@ -1,25 +1,34 @@
 # frozen_string_literal: true
 
 class ApiEndpoint < ApplicationRecord
-
   HIGH_LATENCY_THRESHOLD_MS = 2000
-
-  def latency_threshold
-    HIGH_LATENCY_THRESHOLD_MS
-  end
 
   before_validation :generate_public_token, on: :create
   validates :public_token, uniqueness: true, allow_nil: true
   belongs_to :user
-  has_many :status_histories, class_name: 'ApiEndpointStatusHistory', dependent: :destroy
+  has_many :status_histories, class_name: "ApiEndpointStatusHistory", dependent: :destroy
 
-  validates :url, presence: true, format: { with: URI::DEFAULT_PARSER.make_regexp, message: 'must be a valid URL' }
+  validates :url, presence: true, format: { with: URI::DEFAULT_PARSER.make_regexp, message: "must be a valid URL" }
   validates :name, presence: true
+  validate :check_user_api_endpoint_limit, on: :create
 
   enum :status, { pending: 0, up: 1, down: 2, error: 3 }, prefix: true
   enum :http_method, { get: 0, post: 1, put: 2, patch: 3, remove: 4 }, default: :get
 
   after_update_commit :notify_status_change, if: -> { saved_change_to_status? }
+
+  # --- Métrica de Uptime público ---
+  def uptime_percentage(days = 7)
+    histories = status_histories.where("recorded_at >= ?", days.days.ago)
+    return 100.0 if histories.empty?
+
+    up_count = histories.where(status: "up").count
+    ((up_count.to_f / histories.count) * 100).round(1)
+  end
+
+  def latency_threshold
+    HIGH_LATENCY_THRESHOLD_MS
+  end
 
   # --- Métodos de resolución de jerarquía de canales ---
   def target_email
@@ -89,7 +98,7 @@ class ApiEndpoint < ApplicationRecord
   end
 
   # --- Disparadores de Notificaciones ---
-    def send_discord_alert(type)
+  def send_discord_alert(type)
     return unless notify_discord? && target_discord_webhook.present?
 
     case type.to_sym
@@ -127,10 +136,9 @@ class ApiEndpoint < ApplicationRecord
     DiscordNotificationJob.perform_later(target_discord_webhook, payload)
   rescue StandardError => e
     Rails.logger.error("Error al preparar alerta Discord para endpoint #{name}: #{e.message}")
-  endpoint #{name}: #{e.message}")
   end
 
-    def send_telegram_alert(type)
+  def send_telegram_alert(type)
     return unless notify_telegram? && target_telegram_bot_token.present? && target_telegram_chat_id.present?
 
     case type.to_sym
@@ -149,19 +157,17 @@ class ApiEndpoint < ApplicationRecord
       #{title}
 
       #{status_desc}
-      • *Método:* `#{http_method.to_s.upcase}`
-      • *Estado:* `#{status.to_s.upcase}`
-      • *Código HTTP:* `#{last_http_code || 'Error'}`
-      • *URL:* #{url}
-      • *Fecha:* `#{Time.current.strftime("%d/%m/%Y %H:%M:%S")}`
+      - *Método:* `#{http_method.to_s.upcase}`
+      - *Estado:* `#{status.to_s.upcase}`
+      - *Código HTTP:* `#{last_http_code || 'Error'}`
+      - *URL:* #{url}
+      - *Fecha:* `#{Time.current.strftime("%d/%m/%Y %H:%M:%S")}`
     TEXT
 
     TelegramNotificationJob.perform_later(target_telegram_bot_token, target_telegram_chat_id, msg)
   rescue StandardError => e
     Rails.logger.error("Error al preparar alerta Telegram para endpoint #{name}: #{e.message}")
-  endpoint #{name}: #{e.message}")
   end
-
 
   # Historial no persistente de transiciones e incidentes recientes (cero impacto en BD)
   def recent_incidents(limit = 5)
@@ -176,15 +182,15 @@ class ApiEndpoint < ApplicationRecord
           recorded_at: curr.recorded_at || curr.created_at,
           http_code: curr.http_code,
           response_time_ms: curr.response_time_ms,
-          message: curr.status == 'up' ? 'Recuperación del servicio' : 'Caída o fallo de verificación'
+          message: curr.status == "up" ? "Recuperación del servicio" : "Caída o fallo de verificación"
         }
-      elsif curr.status != 'up'
+      elsif curr.status != "up"
         events << {
           type: :down,
           recorded_at: curr.recorded_at || curr.created_at,
           http_code: curr.http_code,
           response_time_ms: curr.response_time_ms,
-          message: 'Error en respuesta HTTP'
+          message: "Error en respuesta HTTP"
         }
       end
     end
@@ -221,7 +227,6 @@ class ApiEndpoint < ApplicationRecord
       send_discord_alert(:down)
       send_telegram_alert(:down)
     when :up
-      # Opcional: alerta de recuperación si venía de un fallo
       send_discord_alert(:up)
       send_telegram_alert(:up)
     end
@@ -236,13 +241,10 @@ class ApiEndpoint < ApplicationRecord
 
     expected_response.all? { |key, value| response[key] == value }
   end
+
   def generate_public_token
     self.public_token ||= SecureRandom.alphanumeric(32)
   end
-
-  validate :check_user_api_endpoint_limit, on: :create
-
-  private
 
   def check_user_api_endpoint_limit
     return unless user
@@ -250,5 +252,4 @@ class ApiEndpoint < ApplicationRecord
       errors.add(:base, "Has alcanzado el límite máximo de #{user.api_endpoint_limit} endpoints API para tu plan actual.")
     end
   end
-
 end

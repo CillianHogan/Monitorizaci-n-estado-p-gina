@@ -68,7 +68,7 @@
   <% latency = @api_endpoint.last_response_time_ms || @api_endpoint.status_histories.last&.response_time_ms %>
   <% http_code = @api_endpoint.last_http_code || @api_endpoint.status_histories.last&.http_code %>
 
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+ <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
     <div class="bg-[#241a16]/80 border border-amber-500/20 rounded-2xl p-5 backdrop-blur-sm">
       <div class="text-xs font-semibold text-amber-200/70 uppercase tracking-wider">Latencia Actual</div>
       <div class="mt-2 text-2xl font-black text-white font-mono flex items-baseline gap-2">
@@ -84,6 +84,15 @@
         <span class="text-xs font-normal text-amber-200/60 font-sans">status code</span>
       </div>
     </div>
+
+    <%# Tarjeta de Uptime para el detalle del Endpoint %>
+  <div class="bg-[#241a16]/80 border border-amber-500/20 rounded-2xl p-5 backdrop-blur-sm shadow-sm">
+    <div class="text-xs font-semibold text-amber-200/70 uppercase tracking-wider">Uptime (7 días)</div>
+    <div class="mt-2 text-2xl font-black font-mono flex items-baseline gap-1 <%= @api_endpoint.uptime_percentage >= 99.0 ? 'text-emerald-400' : 'text-amber-400' %>">
+      <span><%= @api_endpoint.uptime_percentage %></span>
+      <span class="text-xs font-normal text-amber-200/60 font-sans">%</span>
+    </div>
+  </div>
 
     <div class="bg-[#241a16]/80 border border-amber-500/20 rounded-2xl p-5 backdrop-blur-sm">
       <div class="text-xs font-semibold text-amber-200/70 uppercase tracking-wider">Total de Muestras</div>

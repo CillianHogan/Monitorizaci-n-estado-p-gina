@@ -6,23 +6,6 @@ require "openssl"
 require "httparty"
 
 class Domain < ApplicationRecord
-
-def target_email
-  return notify_email_address if respond_to?(:notify_email_address) && notify_email_address.present?
-  return user.notification_channels.default_for(:email)&.destination if user.present? && user.notification_channels.default_for(:email).present?
-  user&.email
-end
-
-def target_discord_webhook
-  return discord_webhook_url if discord_webhook_url.present?
-  user&.notification_channels&.default_for(:discord)&.destination
-end
-
-def target_telegram_chat_id
-  return telegram_chat_id if telegram_chat_id.present?
-  user&.notification_channels&.default_for(:telegram)&.destination
-end
-
   belongs_to :user
   has_many :status_histories, dependent: :destroy, class_name: "DomainStatusHistory"
   has_one :latest_status_history, -> { order(recorded_at: :desc) }, class_name: "DomainStatusHistory"
@@ -35,12 +18,38 @@ end
   validates :url, presence: true, format: { with: URI::DEFAULT_PARSER.make_regexp, message: "must be a valid URL" }
   validates :name, presence: true
   validates :public_token, presence: true, uniqueness: true
+  validate :check_user_domain_limit, on: :create
 
   enum :status, { pending: 0, up: 1, down: 2, error: 3 }, prefix: true
 
   after_create :check_initial_status
   after_save :create_status_history
   after_update_commit :notify_status_change, if: -> { saved_change_to_status? }
+
+  # Calcula el porcentaje de Uptime en una ventana de días (por defecto 7)
+  def uptime_percentage(days = 7)
+    histories = status_histories.where("recorded_at >= ?", days.days.ago)
+    return 100.0 if histories.empty?
+
+    up_count = histories.where(status: "up").count
+    ((up_count.to_f / histories.count) * 100).round(1)
+  end
+
+  def target_email
+    return notify_email_address if respond_to?(:notify_email_address) && notify_email_address.present?
+    return user.notification_channels.default_for(:email)&.destination if user.present? && user.notification_channels.default_for(:email).present?
+    user&.email
+  end
+
+  def target_discord_webhook
+    return discord_webhook_url if discord_webhook_url.present?
+    user&.notification_channels&.default_for(:discord)&.destination
+  end
+
+  def target_telegram_chat_id
+    return telegram_chat_id if telegram_chat_id.present?
+    user&.notification_channels&.default_for(:telegram)&.destination
+  end
 
   def check_status!(record_down: true)
     clean_url = url.to_s.strip
@@ -72,7 +81,6 @@ end
       http_status = :down
     end
 
-    # Si ha fallado y estamos en intento transitorio, no guardamos caida en BD todavia
     return false if http_status == :down && !record_down
 
     ssl_data = check_ssl
@@ -93,13 +101,11 @@ end
     http_status == :up
   end
 
-
-def check_latency_alert!(latency_ms)
+  def check_latency_alert!(latency_ms)
     return unless latency_alert_enabled? && status_up? && latency_ms.present?
     threshold = max_latency_threshold_ms.presence || 2000
     return if latency_ms <= threshold
 
-    # Cooldown estricto de 4 horas por dominio
     return if latency_alert_sent_at.present? && latency_alert_sent_at > 4.hours.ago
 
     DomainMailer.high_latency_notification(self, latency_ms).deliver_later
@@ -123,9 +129,9 @@ def check_latency_alert!(latency_ms)
 
     if should_notify
       DomainMailer.ssl_expiration_warning_notification(self).deliver_later if notify_email?
-    send_discord_ssl_alert(ssl_days_remaining)
-    send_telegram_ssl_alert(ssl_days_remaining)
-    update_column(:ssl_alert_sent_at, Date.current)
+      send_discord_ssl_alert(ssl_days_remaining)
+      send_telegram_ssl_alert(ssl_days_remaining)
+      update_column(:ssl_alert_sent_at, Date.current)
     end
   end
 
@@ -159,7 +165,6 @@ def check_latency_alert!(latency_ms)
     { valid: false, error: e.message }
   end
 
-  
   def last_response_time_ms
     status_histories.order(recorded_at: :desc).first&.response_time_ms
   end
@@ -167,55 +172,57 @@ def check_latency_alert!(latency_ms)
   def average_response_time_ms(since = 24.hours.ago)
     status_histories.where("recorded_at >= ?", since).average(:response_time_ms)&.round
   end
-def send_discord_alert(type)
-  return unless notify_discord? && target_discord_webhook.present?
 
-  color = type == :up ? 3066993 : 15158332 # Verde o Rojo
-  title = type == :up ? "🟢 Dominio Recuperado: #{name}" : "🔴 Dominio Caído: #{name}"
-  desc  = type == :up ? "El dominio **#{url}** vuelve a responder con normalidad." : "El dominio **#{url}** no responde o devuelve un código de error."
+  def send_discord_alert(type)
+    return unless notify_discord? && target_discord_webhook.present?
 
-  payload = {
-    embeds: [
-      {
-        title: title,
-        description: desc,
-        color: color,
-        timestamp: Time.current.iso8601,
-        fields: [
-          { name: "Estado actual", value: status.to_s.upcase, inline: true },
-          { name: "URL", value: url, inline: true }
-        ]
-      }
-    ]
-  }
+    color = type == :up ? 3066993 : 15158332
+    title = type == :up ? "🟢 Dominio Recuperado: #{name}" : "🔴 Dominio Caído: #{name}"
+    desc  = type == :up ? "El dominio **#{url}** vuelve a responder con normalidad." : "El dominio **#{url}** no responde o devuelve un código de error."
 
-  DiscordNotificationJob.perform_later(target_discord_webhook, payload)
-rescue StandardError => e
-  Rails.logger.error("Error al preparar alerta de Discord para #{name}: #{e.message}")
-end
+    payload = {
+      embeds: [
+        {
+          title: title,
+          description: desc,
+          color: color,
+          timestamp: Time.current.iso8601,
+          fields: [
+            { name: "Estado actual", value: status.to_s.upcase, inline: true },
+            { name: "URL", value: url, inline: true }
+          ]
+        }
+      ]
+    }
 
-def send_discord_latency_alert(latency_ms)
-  return unless notify_discord? && target_discord_webhook.present?
+    DiscordNotificationJob.perform_later(target_discord_webhook, payload)
+  rescue StandardError => e
+    Rails.logger.error("Error al preparar alerta de Discord para #{name}: #{e.message}")
+  end
 
-  payload = {
-    embeds: [
-      {
-        title: "⚠️ Latencia Alta Detectada: #{name}",
-        description: "El dominio **#{url}** ha registrado una latencia de **#{latency_ms} ms**, superando el límite configurado.",
-        color: 15105570, # Ámbar
-        timestamp: Time.current.iso8601,
-        fields: [
-          { name: "Latencia medida", value: "#{latency_ms} ms", inline: true },
-          { name: "URL", value: url, inline: true }
-        ]
-      }
-    ]
-  }
+  def send_discord_latency_alert(latency_ms)
+    return unless notify_discord? && target_discord_webhook.present?
 
-  DiscordNotificationJob.perform_later(target_discord_webhook, payload)
-rescue StandardError => e
-  Rails.logger.error("Error al preparar alerta de latencia Discord para #{name}: #{e.message}")
-end
+    payload = {
+      embeds: [
+        {
+          title: "⚠️ Latencia Alta Detectada: #{name}",
+          description: "El dominio **#{url}** ha registrado una latencia de **#{latency_ms} ms**, superando el límite configurado.",
+          color: 15105570,
+          timestamp: Time.current.iso8601,
+          fields: [
+            { name: "Latencia medida", value: "#{latency_ms} ms", inline: true },
+            { name: "URL", value: url, inline: true }
+          ]
+        }
+      ]
+    }
+
+    DiscordNotificationJob.perform_later(target_discord_webhook, payload)
+  rescue StandardError => e
+    Rails.logger.error("Error al preparar alerta de latencia Discord para #{name}: #{e.message}")
+  end
+
   def send_telegram_alert(type)
     return unless notify_telegram? && telegram_bot_token.present? && target_telegram_chat_id.present?
 
@@ -226,9 +233,9 @@ end
       #{title}
 
       #{status_desc}
-      • *Estado actual:* `#{status.to_s.upcase}`
-      • *URL:* #{url}
-      • *Fecha:* `#{Time.current.strftime("%d/%m/%Y %H:%M:%S")}`
+      - *Estado actual:* `#{status.to_s.upcase}`
+      - *URL:* #{url}
+      - *Fecha:* `#{Time.current.strftime("%d/%m/%Y %H:%M:%S")}`
     TEXT
 
     TelegramNotificationJob.perform_later(target_telegram_bot_token, target_telegram_chat_id, msg)
@@ -243,73 +250,74 @@ end
       ⚠️ *Alerta de Latencia Alta: #{name}*
 
       El dominio ha registrado una latencia de *#{latency_ms} ms*, superando el umbral.
-      • *URL:* #{url}
-      • *Fecha:* `#{Time.current.strftime("%d/%m/%Y %H:%M:%S")}`
+      - *URL:* #{url}
+      - *Fecha:* `#{Time.current.strftime("%d/%m/%Y %H:%M:%S")}`
     TEXT
 
     TelegramNotificationJob.perform_later(target_telegram_bot_token, target_telegram_chat_id, msg)
   rescue StandardError => e
     Rails.logger.error("Error al preparar alerta de latencia Telegram para #{name}: #{e.message}")
   end
-def send_discord_ssl_alert(days)
-  return unless notify_discord? && target_discord_webhook.present?
 
-  payload = {
-    embeds: [
-      {
-        title: "🔐 Advertencia SSL: #{name}",
-        description: "El certificado SSL de **#{url}** está próximo a caducar.",
-        color: 16753920,
-        timestamp: Time.current.iso8601,
-        fields: [
-          { name: "Días restantes", value: "#{days} días", inline: true },
-          { name: "Emisor", value: ssl_issuer.to_s.presence || "Desconocido", inline: true },
-          { name: "Caduca el", value: ssl_expires_at ? ssl_expires_at.strftime("%d/%m/%Y") : "N/D", inline: false }
-        ]
-      }
-    ]
-  }
+  def send_discord_ssl_alert(days)
+    return unless notify_discord? && target_discord_webhook.present?
 
-  DiscordNotificationJob.perform_later(target_discord_webhook, payload)
-rescue StandardError => e
-  Rails.logger.error("Error al preparar alerta SSL Discord para #{name}: #{e.message}")
-end
+    payload = {
+      embeds: [
+        {
+          title: "🔐 Advertencia SSL: #{name}",
+          description: "El certificado SSL de **#{url}** está próximo a caducar.",
+          color: 16753920,
+          timestamp: Time.current.iso8601,
+          fields: [
+            { name: "Días restantes", value: "#{days} días", inline: true },
+            { name: "Emisor", value: ssl_issuer.to_s.presence || "Desconocido", inline: true },
+            { name: "Caduca el", value: ssl_expires_at ? ssl_expires_at.strftime("%d/%m/%Y") : "N/D", inline: false }
+          ]
+        }
+      ]
+    }
 
-def send_telegram_ssl_alert(days)
-  return unless notify_telegram? && telegram_bot_token.present? && target_telegram_chat_id.present?
+    DiscordNotificationJob.perform_later(target_discord_webhook, payload)
+  rescue StandardError => e
+    Rails.logger.error("Error al preparar alerta SSL Discord para #{name}: #{e.message}")
+  end
 
-  formatted_date = ssl_expires_at ? ssl_expires_at.strftime("%d/%m/%Y") : "N/D"
-  issuer_name = ssl_issuer.presence || "Desconocido"
+  def send_telegram_ssl_alert(days)
+    return unless notify_telegram? && telegram_bot_token.present? && target_telegram_chat_id.present?
 
-  msg = "🔐 *Advertencia de Certificado SSL: " + name.to_s + "*
+    formatted_date = ssl_expires_at ? ssl_expires_at.strftime("%d/%m/%Y") : "N/D"
+    issuer_name = ssl_issuer.presence || "Desconocido"
 
-"         "El certificado SSL está próximo a caducar.
-"         "• *Días restantes:* *" + days.to_s + " días*
-"         "• *Emisor:* " + issuer_name.to_s + "
-"         "• *Caduca el:* `" + formatted_date.to_s + "`
-"         "• *URL:* " + url.to_s + "
-"
+    msg = <<~TEXT
+      🔐 *Advertencia de Certificado SSL: #{name}*
 
-  TelegramNotificationJob.perform_later(target_telegram_bot_token, target_telegram_chat_id, msg)
-rescue StandardError => e
-  Rails.logger.error("Error al preparar alerta SSL Telegram para #{name}: #{e.message}")
-end
+      El certificado SSL está próximo a caducar.
+      • *Días restantes:* *#{days} días*
+      • *Emisor:* #{issuer_name}
+      • *Caduca el:* `#{formatted_date}`
+      • *URL:* #{url}
+    TEXT
+
+    TelegramNotificationJob.perform_later(target_telegram_bot_token, target_telegram_chat_id, msg)
+  rescue StandardError => e
+    Rails.logger.error("Error al preparar alerta SSL Telegram para #{name}: #{e.message}")
+  end
+
   def create_status_history
-  lat = current_response_time_ms || (has_attribute?(:last_response_time_ms) ? last_response_time_ms : 0)
-  update_column(:last_response_time_ms, current_response_time_ms) if self.class.column_names.include?("last_response_time_ms") && current_response_time_ms.present? if has_attribute?(:last_response_time_ms) && current_response_time_ms.present?
+    lat = current_response_time_ms || (has_attribute?(:last_response_time_ms) ? last_response_time_ms : 0)
+    update_column(:last_response_time_ms, current_response_time_ms) if has_attribute?(:last_response_time_ms) && current_response_time_ms.present?
 
-  status_histories.create(
-    status: status,
-    response_time_ms: lat || 0,
-    http_code: current_http_code || 200,
-    recorded_at: Time.current
-  )
-rescue StandardError => e
+    status_histories.create(
+      status: status,
+      response_time_ms: lat || 0,
+      http_code: current_http_code || 200,
+      recorded_at: Time.current
+    )
+  rescue StandardError => e
     Rails.logger.error("Error al registrar status history para #{name}: #{e.message}")
   end
 
-  
-  # Extrae cambios de estado recientes sin sobrecargar la BD
   def recent_incidents(limit = 5)
     histories = status_histories.order(recorded_at: :desc).limit(100).to_a
     events = []
@@ -330,7 +338,6 @@ rescue StandardError => e
     events
   end
 
-  # Generación en memoria de reporte de disponibilidad (0 coste de BD)
   def to_csv(limit = 500)
     require "csv"
     histories = status_histories.order(recorded_at: :desc).limit(limit)
@@ -355,12 +362,9 @@ rescue StandardError => e
     if defined?(CheckSingleDomainJob)
       CheckSingleDomainJob.perform_later(id)
     else
-      # Chequeo directo de respaldo seguro
       check_status! rescue nil
     end
   end
-
-
 
   def normalize_url
     return if url.blank?
@@ -374,25 +378,10 @@ rescue StandardError => e
     self.public_token ||= SecureRandom.alphanumeric(32)
   end
 
-  validate :check_user_domain_limit, on: :create
-
-  private
-
   def check_user_domain_limit
     return unless user
     if user.domains.count >= user.domain_limit
       errors.add(:base, "Has alcanzado el límite máximo de #{user.domain_limit} dominios para tu plan actual.")
     end
   end
-
-
-  validate :check_user_domain_limit, on: :create
-
-  def check_user_domain_limit
-    return unless user
-    if user.domains.count >= user.domain_limit
-      errors.add(:base, "Has alcanzado el límite máximo de #{user.domain_limit} dominios para tu plan actual.")
-    end
-  end
-
 end

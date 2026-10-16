@@ -135,32 +135,39 @@
               </div>
             </div>
 
-            <%# Métricas %>
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-6 py-2 lg:py-0 border-y lg:border-y-0 border-amber-500/15 text-xs">
-              <div>
-                <span class="text-[11px] font-medium text-amber-200/60 block">Respuesta</span>
-                <span class="text-sm font-bold font-mono <%= (latency.to_i > 800) ? 'text-amber-400' : 'text-amber-100' %>">
-                  <%= latency.present? ? "#{latency} ms" : "—" %>
+            <%# Bloque de Métricas estilizado para API Endpoints %>
+            <div class="flex items-center gap-2.5 sm:gap-3 flex-wrap">
+              <%# Uptime %>
+              <div class="flex flex-col justify-center px-3 py-2 rounded-xl bg-black/25 border border-amber-500/15 backdrop-blur-sm min-w-[95px]">
+                <span class="text-[10px] font-semibold text-amber-200/50 uppercase tracking-wider">Uptime 7d</span>
+                <span class="text-sm font-black font-mono tracking-tight <%= endpoint.uptime_percentage >= 99.0 ? 'text-emerald-400' : 'text-amber-400' %>">
+                  <%= endpoint.uptime_percentage %><span class="text-xs font-normal text-amber-200/40 font-sans ml-0.5">%</span>
                 </span>
               </div>
 
-              <div>
-                <span class="text-[11px] font-medium text-amber-200/60 block">Código HTTP</span>
-                <% if endpoint.last_http_code.present? %>
-                  <span class="text-xs font-semibold font-mono <%= endpoint.last_http_code.to_i < 400 ? 'text-emerald-300' : 'text-rose-400' %>">
-                    HTTP <%= endpoint.last_http_code %>
-                  </span>
-                <% else %>
-                  <span class="text-xs text-amber-200/40 font-mono">—</span>
-                <% end %>
+              <%# Latencia %>
+              <div class="flex flex-col justify-center px-3 py-2 rounded-xl bg-black/25 border border-amber-500/15 backdrop-blur-sm min-w-[95px]">
+                <span class="text-[10px] font-semibold text-amber-200/50 uppercase tracking-wider">Respuesta</span>
+                <span class="text-sm font-black font-mono tracking-tight <%= (endpoint.last_response_time_ms.to_i > endpoint.latency_threshold) ? 'text-amber-400' : 'text-stone-100' %>">
+                  <%= endpoint.last_response_time_ms.present? ? "#{endpoint.last_response_time_ms} ms" : "—" %>
+                </span>
               </div>
 
-              <div class="col-span-2 sm:col-span-1">
-                <span class="text-[11px] font-medium text-amber-200/60 block">Canales</span>
-                <div class="flex items-center gap-1.5 mt-0.5">
-                  <span class="px-1.5 py-0.5 rounded text-[10px] font-mono <%= (endpoint.respond_to?(:notify_email?) && endpoint.notify_email?) ? 'bg-amber-500/30 text-amber-200 border border-amber-500/30' : 'bg-black/20 text-amber-200/30' %>">Mail</span>
-                  <span class="px-1.5 py-0.5 rounded text-[10px] font-mono <%= (endpoint.respond_to?(:notify_discord?) && endpoint.notify_discord?) ? 'bg-indigo-500/30 text-indigo-200 border border-indigo-500/30' : 'bg-black/20 text-amber-200/30' %>">Discord</span>
-                  <span class="px-1.5 py-0.5 rounded text-[10px] font-mono <%= (endpoint.respond_to?(:notify_telegram?) && endpoint.notify_telegram?) ? 'bg-sky-500/30 text-sky-200 border border-sky-500/30' : 'bg-black/20 text-amber-200/30' %>">TG</span>
+              <%# Código HTTP %>
+              <div class="flex flex-col justify-center px-3 py-2 rounded-xl bg-black/25 border border-amber-500/15 backdrop-blur-sm min-w-[90px]">
+                <span class="text-[10px] font-semibold text-amber-200/50 uppercase tracking-wider">HTTP Code</span>
+                <span class="text-sm font-black font-mono tracking-tight <%= endpoint.last_http_code.to_i.between?(200, 299) ? 'text-emerald-400' : 'text-rose-400' %>">
+                  <%= endpoint.last_http_code.presence || "—" %>
+                </span>
+              </div>
+
+              <%# Canales %>
+              <div class="flex flex-col justify-center px-3 py-2 rounded-xl bg-black/25 border border-amber-500/15 backdrop-blur-sm">
+                <span class="text-[10px] font-semibold text-amber-200/50 uppercase tracking-wider mb-1">Alertas</span>
+                <div class="flex items-center gap-1.5">
+                  <span class="px-1.5 py-0.5 rounded-md text-[10px] font-mono font-medium <%= (endpoint.respond_to?(:notify_email?) && endpoint.notify_email?) ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-stone-900/60 text-stone-600 border border-stone-800' %>">Mail</span>
+                  <span class="px-1.5 py-0.5 rounded-md text-[10px] font-mono font-medium <%= (endpoint.respond_to?(:notify_discord?) && endpoint.notify_discord?) ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-stone-900/60 text-stone-600 border border-stone-800' %>">Discord</span>
+                  <span class="px-1.5 py-0.5 rounded-md text-[10px] font-mono font-medium <%= (endpoint.respond_to?(:notify_telegram?) && endpoint.notify_telegram?) ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30' : 'bg-stone-900/60 text-stone-600 border border-stone-800' %>">TG</span>
                 </div>
               </div>
             </div>

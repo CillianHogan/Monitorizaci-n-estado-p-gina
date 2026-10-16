@@ -125,32 +125,43 @@
               </div>
             </div>
 
-            <%# Métricas %>
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-6 py-2 lg:py-0 border-y lg:border-y-0 border-amber-500/15 text-xs">
-              <div>
-                <span class="text-[11px] font-medium text-amber-200/60 block">Respuesta</span>
-                <span class="text-sm font-bold font-mono <%= (latency.to_i > 800) ? 'text-amber-400' : 'text-amber-100' %>">
+            <%# Bloque de Métricas estilizado %>
+            <div class="flex items-center gap-2.5 sm:gap-3 flex-wrap">
+              <%# Uptime %>
+              <div class="flex flex-col justify-center px-3 py-2 rounded-xl bg-black/25 border border-amber-500/15 backdrop-blur-sm min-w-[95px]">
+                <span class="text-[10px] font-semibold text-amber-200/50 uppercase tracking-wider">Uptime 7d</span>
+                <span class="text-sm font-black font-mono tracking-tight <%= domain.uptime_percentage >= 99.0 ? 'text-emerald-400' : 'text-amber-400' %>">
+                  <%= domain.uptime_percentage %><span class="text-xs font-normal text-amber-200/40 font-sans ml-0.5">%</span>
+                </span>
+              </div>
+
+              <%# Latencia %>
+              <div class="flex flex-col justify-center px-3 py-2 rounded-xl bg-black/25 border border-amber-500/15 backdrop-blur-sm min-w-[95px]">
+                <span class="text-[10px] font-semibold text-amber-200/50 uppercase tracking-wider">Respuesta</span>
+                <span class="text-sm font-black font-mono tracking-tight <%= (latency.to_i > 800) ? 'text-amber-400' : 'text-stone-100' %>">
                   <%= latency.present? ? "#{latency} ms" : "—" %>
                 </span>
               </div>
 
-              <div>
-                <span class="text-[11px] font-medium text-amber-200/60 block">Certificado SSL</span>
+              <%# Certificado SSL %>
+              <div class="flex flex-col justify-center px-3 py-2 rounded-xl bg-black/25 border border-amber-500/15 backdrop-blur-sm min-w-[105px]">
+                <span class="text-[10px] font-semibold text-amber-200/50 uppercase tracking-wider">Cert. SSL</span>
                 <% if days_ssl.present? %>
-                  <span class="text-xs font-semibold font-mono <%= days_ssl <= 15 ? 'text-amber-400' : 'text-emerald-300' %>">
-                    <%= days_ssl %> días
+                  <span class="text-sm font-black font-mono tracking-tight <%= days_ssl <= 15 ? 'text-amber-400' : 'text-emerald-400' %>">
+                    <%= days_ssl %> <span class="text-[11px] font-medium font-sans text-amber-200/60">días</span>
                   </span>
                 <% else %>
-                  <span class="text-xs text-amber-200/40">No detectado</span>
+                  <span class="text-xs font-medium text-stone-500">Sin SSL</span>
                 <% end %>
               </div>
 
-              <div class="col-span-2 sm:col-span-1">
-                <span class="text-[11px] font-medium text-amber-200/60 block">Canales</span>
-                <div class="flex items-center gap-1.5 mt-0.5">
-                  <span class="px-1.5 py-0.5 rounded text-[10px] font-mono <%= (domain.respond_to?(:notify_email?) && domain.notify_email?) ? 'bg-amber-500/30 text-amber-200 border border-amber-500/30' : 'bg-black/20 text-amber-200/30' %>">Mail</span>
-                  <span class="px-1.5 py-0.5 rounded text-[10px] font-mono <%= (domain.respond_to?(:notify_discord?) && domain.notify_discord?) ? 'bg-indigo-500/30 text-indigo-200 border border-indigo-500/30' : 'bg-black/20 text-amber-200/30' %>">Discord</span>
-                  <span class="px-1.5 py-0.5 rounded text-[10px] font-mono <%= (domain.respond_to?(:notify_telegram?) && domain.notify_telegram?) ? 'bg-sky-500/30 text-sky-200 border border-sky-500/30' : 'bg-black/20 text-amber-200/30' %>">TG</span>
+              <%# Canales %>
+              <div class="flex flex-col justify-center px-3 py-2 rounded-xl bg-black/25 border border-amber-500/15 backdrop-blur-sm">
+                <span class="text-[10px] font-semibold text-amber-200/50 uppercase tracking-wider mb-1">Alertas</span>
+                <div class="flex items-center gap-1.5">
+                  <span class="px-1.5 py-0.5 rounded-md text-[10px] font-mono font-medium <%= (domain.respond_to?(:notify_email?) && domain.notify_email?) ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-stone-900/60 text-stone-600 border border-stone-800' %>">Mail</span>
+                  <span class="px-1.5 py-0.5 rounded-md text-[10px] font-mono font-medium <%= (domain.respond_to?(:notify_discord?) && domain.notify_discord?) ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-stone-900/60 text-stone-600 border border-stone-800' %>">Discord</span>
+                  <span class="px-1.5 py-0.5 rounded-md text-[10px] font-mono font-medium <%= (domain.respond_to?(:notify_telegram?) && domain.notify_telegram?) ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30' : 'bg-stone-900/60 text-stone-600 border border-stone-800' %>">TG</span>
                 </div>
               </div>
             </div>
